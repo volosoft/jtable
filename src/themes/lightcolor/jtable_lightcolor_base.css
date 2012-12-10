@@ -1,0 +1,654 @@
+﻿/******************************************************************************
+ * Name        : jtable jQuery plug-in 'light color theme base''
+ * Author      : Halil İbrahim KALKAN
+ * Description : This is the base file for light color themes, no color defines.
+ *               Color files imports this and adds colors.
+ *****************************************************************************/
+
+/* MAIN ELEMENTS *************************************************************/
+
+/* Main container of all elements those are created by jtable plugin */
+div.jtable-main-container
+{
+    font-family: 'Verdana';
+    font-size: 11px;
+    color: #222;
+    position: relative;
+}
+
+/* A div that contains title of the table (if any title supplied in options) */
+.jtable-title
+{
+    text-align: left;
+    position: relative;
+    height: 34px;
+    line-height: 34px;
+    -webkit-border-radius: 3px 3px 0 0;
+    -moz-border-radius: 3px 3px 0 0;
+    border-radius: 3px 3px 0 0;
+    box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.5);
+    padding-left: 10px;
+    border: 1px solid;
+}
+
+/* A div that is in jtable-title and contains the title text */
+div.jtable-title div.jtable-title-text
+{
+    font-weight: bold;
+}
+
+/* Main table tag */
+table.jtable
+{
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    border: 1px solid #C8C8C8;
+}
+
+/* BOTTOM PANEL */
+
+/* A panel below the table that contains some commands */
+div.jtable-bottom-panel
+{
+    padding: 1px;
+    background: #fff;
+    border: 1px solid #C8C8C8;
+    border-top: none;
+    border-radius: 0px 0px 3px 3px;
+    min-height: 26px;
+    line-height: 16px;
+    font-size: 0.9em;
+}
+
+/* Left area in the bottom panel */
+div.jtable-bottom-panel div.jtable-left-area
+{
+    display: inline-block;
+    float: left;
+}
+
+/* Right area in the bottom panel */
+div.jtable-bottom-panel div.jtable-right-area
+{
+    display: inline-block;
+    float: right;
+    padding: 2px;
+}
+
+/* HEADER ********************************************************************/
+
+table.jtable thead
+{
+    background: url('bg-thead.png') repeat-x scroll top left #dddddd;
+    border-top: 1px solid #fff;
+    border-bottom: 1px solid #C8C8C8;
+}
+
+/* All header cells in the table */
+table.jtable thead th
+{
+    vertical-align: middle;
+    text-align: left;
+    padding: 4px 3px 4px 6px;
+    border-left: 1px solid #fff;
+    border-right: 1px solid #C8C8C8;
+}
+
+/* Disable left border for first columns */
+table.jtable thead th:first-child
+{
+    border-left: none;
+}
+
+table.jtable thead th:last-child
+{
+    border-right: none;
+}
+
+/* All header cells except command column header cell */
+table.jtable th.jtable-column-header
+{
+    /* no additional style */
+}
+
+/* Column header container in header cells */
+table.jtable th.jtable-column-header div.jtable-column-header-container
+{
+    height: 20px;
+    position: relative;
+}
+
+/* Header text in column header cell */
+table.jtable th.jtable-column-header span.jtable-column-header-text
+{
+    display: inline-block;
+    margin-top: 3px;
+}
+
+/* Command column header cell */
+table.jtable th.jtable-command-column-header
+{
+    text-align: center;
+}
+
+/* Selecting/deselecting all header cell */
+table.jtable th.jtable-column-header-selecting
+{
+    text-align: center;
+    width: 1%;
+}
+
+/* Checkbox in the selecting/deselecting all header cell */
+table.jtable th.jtable-column-header-selecting input
+{
+    margin-left: 1px;
+    cursor: pointer;
+}
+
+/* SORTING *******************************************************************/
+
+/* A sortable column header */
+table.jtable th.jtable-column-header-sortable
+{
+    cursor: pointer;
+}
+
+/* Sorting icon in the sortable table column header */
+table.jtable th.jtable-column-header-sortable div.jtable-column-header-container
+{
+    background: url('column-sortable.png') no-repeat right;
+}
+
+/* Ascending sorted icon in the table column header */
+table.jtable th.jtable-column-header-sorted-asc div.jtable-column-header-container
+{
+    background: url('column-asc.png') no-repeat right;
+}
+
+/* Descending sorted icon in the table column header */
+table.jtable th.jtable-column-header-sorted-desc div.jtable-column-header-container
+{
+    background: url('column-desc.png') no-repeat right;
+}
+
+/* PAGING ********************************************************************/
+
+/* A container for page list */
+.jtable-page-list
+{
+    display: inline-block;
+    margin: 2px;
+}
+
+/* Page numbers */
+.jtable-page-number, /* dots between numbers (...) */ .jtable-page-number-space, /* First page link */ .jtable-page-number-first, /* Last page link */ .jtable-page-number-last, /* Previous page link */ .jtable-page-number-previous, /* Next page link */ .jtable-page-number-next, /* Active page link */ .jtable-page-number-active
+{
+    display: inline-block;
+    background-color: #ebebeb;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ffffff #b5b5b5 #b5b5b5 #ffffff;
+    margin: 0;
+    padding: 2px 5px;
+    cursor: pointer;
+    text-shadow: 0 1px 0 white;
+}
+
+/* Page numbers */
+.jtable-page-number, /* First page link */ .jtable-page-number-first, /* Last page link */ .jtable-page-number-last, /* Previous page link */ .jtable-page-number-previous, /* Next page link */ .jtable-page-number-next
+{
+    cursor: pointer;
+}
+
+/* ... between page numbers */
+.jtable-page-number-space, /* Active/current page link */ .jtable-page-number-active
+{
+    cursor: default;
+}
+
+/* Page numbers */
+.jtable-page-number:hover, /* First page link */ .jtable-page-number-first:hover, /* Last page link */ .jtable-page-number-last:hover, /* Previous page link */ .jtable-page-number-previous:hover, /* Next page link */ .jtable-page-number-next:hover
+{
+    background-color: #ddd;
+}
+
+/* Active/current page link */
+.jtable-page-number-active
+{
+    color: #FCFCFC;
+    text-shadow: 0 1px 0 #666;
+}
+
+/* Paging informations */
+.jtable-page-info
+{
+    display: inline-block;
+    margin-left: 5px;
+    padding: 2px;
+}
+
+/* RESIZING COLUMNS **********************************************************/
+
+/* A hidden div to resize colums */
+table.jtable div.jtable-column-resize-handler
+{
+    width: 8px;
+    height: 24px;
+    position: absolute;
+    right: -8px;
+    top: -2px;
+    z-index: 2;
+    cursor: col-resize;
+}
+
+/* A guide bar to show while resizing a column */
+.jtable-column-resize-bar
+{
+    width: 1px;
+    background-color: #000;
+    opacity: 0.5;
+    filter: alpha(opacity=50);
+}
+
+/* COLUMN SELECTION ***********************************************************/
+
+/* This overlay is shown on page while column selection is open */
+div.jtable-contextmenu-overlay
+{
+    left: 0px;
+    top: 0px;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+}
+
+/* Container of column selection list */
+div.jtable-column-selection-container
+{
+    border: 1px solid #C8C8C8;
+    position: fixed;
+    background: #fff;
+    color: #000;
+    display: none;
+    padding: 5px;
+    z-index: 101;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    -webkit-box-shadow: 2px 2px 4px rgba(50, 51, 50, 0.75);
+    -moz-box-shadow: 2px 2px 4px rgba(50, 51, 50, 0.75);
+    box-shadow: 2px 2px 4px rgba(50, 51, 50, 0.75);
+}
+
+/* Column selection list */
+ul.jtable-column-select-list
+{
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+/* An item in column selection list */
+ul.jtable-column-select-list li
+{
+    margin: 0px;
+    padding: 2px 0px;
+}
+
+/* Label of an item in column selection list */
+ul.jtable-column-select-list li label
+{
+    /* No additional style */
+}
+
+/* A checkbox in column selection list */
+ul.jtable-column-select-list li input[type="checkbox"]
+{
+    /* No additional style */
+}
+
+/* A checkbox's text (column name) in column selection list */
+ul.jtable-column-select-list li label span
+{
+    position: relative;
+    top: -2px;
+    margin-left: 4px;
+}
+
+/* ROWS **********************************************************************/
+
+/* All rows in the table */
+table.jtable tbody > tr
+{
+    padding: 2px;
+    background: #f8f8f8;
+    height: 30px;
+}
+
+/* Even rows */
+table.jtable tr.jtable-row-even
+{
+    background: #f0f0f0;
+}
+
+/* All rows in the table */
+table.jtable tbody tr:hover
+{
+    background: #e8eaef;
+}
+
+/* Command column in even rows */
+table.jtable tr.jtable-row-even td.jtable-command-column
+{
+    /* No additional style */
+}
+
+/* Style for 'no data available' row */
+table.jtable tr.jtable-no-data-row
+{
+    text-align: center;
+}
+
+/* Style for a selected row */
+table.jtable tr.jtable-row-selected
+{
+    color: #FCFCFC;
+    text-shadow: 0 1px 0 #333;
+}
+
+/* CHILD ROWS/TABLES ********************************************************/
+
+/* Style for a child row */
+table.jtable tr.jtable-child-row > td
+{
+    background-color: #ababab;
+    padding: 1px 0px;
+}
+
+table.jtable tr.jtable-child-row .jtable-title, table.jtable tr.jtable-child-row .jtable-bottom-panel
+{
+    border: none;
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
+    border-radius: 0px;
+}
+
+table.jtable tr.jtable-child-row .jtable
+{
+    border: none;
+    border-bottom: 1px solid #C8C8C8;
+}
+
+/* ROW ANIMATIONS ***********************************************************/
+
+/* A 'new created row' style for animation */
+table.jtable tr.jtable-row-created
+{
+    /* No style yet */
+}
+
+/* An 'updated row style' for animation */
+table.jtable tr.jtable-row-updated
+{
+    /* No style yet */
+}
+
+/* A 'deleting row style' for animation */
+table.jtable tr.jtable-row-deleting
+{
+    /* No style yet */
+}
+
+/* CELLS *********************************************************************/
+
+/* All table cells in the table */
+table.jtable tbody td
+{
+    padding: 5px;
+    border-left: 1px dotted #bebebe;
+}
+
+/* Command column in all rows */
+table.jtable tr td.jtable-command-column
+{
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Disable left border for first columns */
+table.jtable tbody td:first-child
+{
+    border-left: none;
+}
+
+/* Select/deselect column for a row */
+table.jtable tbody td.jtable-selecting-column
+{
+    text-align: center;
+}
+
+/* Select/deselect checkbox for a row */
+table.jtable tbody td.jtable-selecting-column input
+{
+    cursor: pointer;
+}
+
+/* COMMAND BUTTONS ***********************************************************/
+
+/* 'add new record' link container */
+span.jtable-add-record
+{
+    display: inline-block;
+    margin: 3px;
+}
+
+/* 'add new record' link */
+span.jtable-add-record a
+{
+    font-weight: bold;
+    text-decoration: none;
+}
+
+/* 'add new record' link hover state */
+span.jtable-add-record a:hover
+{
+    text-decoration: underline;
+}
+
+/* All command buttons (delete/edit) */
+.jtable-command-button
+{
+    cursor: pointer;
+    border: none;
+    display: inline;
+    margin: 0px;
+    padding: 0px;
+}
+
+/* span tag (that contains the command text) in all command buttons (delete/edit) */
+.jtable-command-button span
+{
+    display: none;
+}
+
+/* Edit command button */
+.jtable-edit-command-button
+{
+    background: url('edit.png') no-repeat;
+    width: 16px;
+    height: 16px;
+}
+
+/* Delete command button */
+.jtable-delete-command-button
+{
+    background: url('delete.png') no-repeat;
+    width: 16px;
+    height: 16px;
+}
+
+/* Table Close command button */
+.jtable-close-button
+{
+    background: url('close.png') no-repeat;
+    width: 22px;
+    height: 22px;
+    position: absolute;
+    right: 6px;
+    top: 6px;
+    opacity: 0.8;
+    filter: alpha(opacity=80);
+}
+
+.jtable-close-button:hover
+{
+    opacity: 1.0;
+    filter: alpha(opacity=100);
+}
+
+/* FORMS *********************************************************************/
+
+/* A form to edit/create records */
+form.jtable-dialog-form
+{
+    font-family: 'Verdana';
+    font-size: 10px;
+}
+
+/* A form to create records */
+form.jtable-create-form
+{
+    /* No additional style */
+}
+
+/* A form to edit records */
+form.jtable-edit-form
+{
+    /* No additional style */
+}
+
+/* FORM INPUT ELEMENTS *******************************************************/
+
+/* A div that contains a label (title) and input field */
+div.jtable-input-field-container
+{
+    margin: 0px;
+    padding: 2px 0px 3px 0px;
+    border-bottom: 1px solid #ddd;
+}
+
+div.jtable-input-field-container:last-child
+{
+    border: none;
+}
+
+/* A div that contains title of input in create/edit forms */
+div.jtable-input-label
+{
+    padding: 2px;
+    font-weight: bold;
+}
+
+/* A div that contains an input element in create/edit forms */
+div.jtable-input
+{
+    padding: 2px;
+}
+
+/* A div that contains a date input element in create/edit forms */
+div.jtable-date-input
+{
+    /* No additional style */
+}
+
+/* A div that contains a text input element in create/edit forms */
+div.jtable-text-input
+{
+    /* No additional style */
+}
+
+/* A container for radio button and checkbox textes */
+span.jtable-option-text-clickable
+{
+    position: relative;
+    top: -2px;
+}
+
+/* A div that contains a textarea input element in create/edit forms */
+div.jtable-textarea-input textarea
+{
+    width: 300px;
+    min-height: 60px;
+}
+
+/* A div that contains a password input element in create/edit forms */
+div.jtable-password-input
+{
+    /* No additional style */
+}
+
+/* A div that contains a drop down list (combobox) element in create/edit forms */
+div.jtable-dropdown-input
+{
+    /* No additional style */
+}
+
+/* A div that contains a radio button list in create/edit forms */
+div.jtable-radiobuttonlist-input
+{
+    /* No additional style */
+}
+
+/* A div that contains a single radio button element */
+div.jtable-radio-input input, /* A div that contains a checkbox element */ div.jtable-checkbox-input input, /* A span that contains text that can be clicked to set radio button's or checkbox's state */ span.jtable-option-text-clickable
+{
+    cursor: pointer;
+}
+
+/* BUSY MESSAGE AND PANEL ****************************************************/
+
+/* A panel to block table UI while is busy */
+div.jtable-busy-panel-background
+{
+    z-index: 998;
+    position: absolute;
+    opacity: 0.1;
+    filter: alpha(opacity=10);
+    background-color: #000;
+}
+
+/* A div that contains a message while table UI is busy */
+div.jtable-busy-message
+{
+    cursor: wait;
+    z-index: 999;
+    position: absolute;
+    margin: 5px;
+    font-size: 1.25em;
+    border: 1px solid;
+    color: #fff;
+    text-shadow: 0 1px 0 #333;
+    padding: 3px 5px 5px 27px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    -webkit-box-shadow: 2px 2px 4px rgba(50, 51, 50, 0.75);
+    -moz-box-shadow: 2px 2px 4px rgba(50, 51, 50, 0.75);
+    box-shadow: 2px 2px 4px rgba(50, 51, 50, 0.75);
+}
+
+/* MISC **********************************************************************/
+
+/* Style of the text that is shown in a delete confirmation dialog */
+.jtable-delete-confirm-message
+{
+    /* No additional style */
+}
+
+/* Style of a row that is ready to remove from table (Deleted from server, waiting for deletion from table) */
+.jtable-row-ready-to-remove
+{
+    /* No additional style */
+}

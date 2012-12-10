@@ -1,0 +1,185 @@
+﻿/******************************************************************************
+ * Name        : jtable jQuery plug-in 'standard red' theme
+ * Author      : Halil İbrahim KALKAN
+ * Description : This file defines 'red' colors for jtable standart theme.
+ *****************************************************************************/
+
+/* IMPORTS *******************************************************************/
+
+@import '../jtable_standard_base.css';
+
+/* MAIN ELEMENTS *************************************************************/
+
+/* Main container of all elements those are created by jtable plugin */
+div.jtable-main-container
+{
+    color: #000000;
+}
+
+/* A div that contains title of the table (if any title supplied in options) */
+div.jtable-title
+{
+    color: #FFFFFF;
+    background:url('title-bg.png') left;
+    border-color: #e1c6c6;
+}
+
+/* Main table tag */
+table.jtable
+{
+    background-color: #e1c6c6;
+}
+
+/* A panel below the table that contains some commands */
+div.jtable-bottom-panel
+{
+    background-color: #e8e0e0;
+    border-color:#e1c6c6;
+}
+
+/* HEADER ********************************************************************/
+
+/* All header cells in the table */
+table.jtable th
+{
+    background:url('header-bg.gif') left;
+    color:#e7cfcf; 
+}
+
+/* PAGING ********************************************************************/
+
+/* Page numbers */
+.jtable-page-number,
+/* First page link */
+.jtable-page-number-first,
+/* Last page link */
+.jtable-page-number-last,
+/* Previous page link */
+.jtable-page-number-previous,
+/* Next page link */
+.jtable-page-number-next
+{
+    background-color: #e7cfcf;
+    border: 1px solid #d6a3a3;
+}
+
+/* Page numbers */
+.jtable-page-number:hover,
+/* First page link */
+.jtable-page-number-first:hover,
+/* Last page link */
+.jtable-page-number-last:hover,
+/* Previous page link */
+.jtable-page-number-previous:hover,
+/* Next page link */
+.jtable-page-number-next:hover
+{
+    background-color: #e99e9e;
+}
+
+/* Active/current page link */
+.jtable-page-number-active
+{
+    background-color: #b04848;
+    border: 1px solid #d6a3a3;
+    color: #fff;
+    font-weight: bold;
+}
+
+/* ROWS **********************************************************************/
+
+/* All rows in the table */
+table.jtable tr
+{
+    background-color: #FFFFFF;
+}
+
+/* Even rows */
+table.jtable tr.jtable-row-even
+{
+    color: #550000;
+    background-color: #F6ECEC;
+}
+
+/* Rows when mouse over */
+table.jtable tr:hover
+{
+    background-color: #edcece;
+}
+
+/* Selected row */
+table.jtable tr.jtable-row-selected
+{
+    color: #ffffff;
+    background-color: #da3e3e;
+}
+
+/* Style for a child row */
+table.jtable tr.jtable-child-row
+{
+    background-color: #ffb1b1;
+}
+
+/* ROW ANIMATIONS ***********************************************************/
+
+/* A 'new created row' style for animation */
+table.jtable tr.jtable-row-created
+{
+    background-color: #00FF89;
+}
+
+/* An 'updated row style' for animation */
+table.jtable tr.jtable-row-updated
+{
+    background-color: #00FFFF;
+}
+
+/* A 'deleting row style' for animation */
+table.jtable tr.jtable-row-deleting
+{
+    background-color: #FF0000;
+}
+
+/* COMMAND BUTTONS ***********************************************************/
+
+/* 'add new record' link */
+span.jtable-add-record a
+{
+    color: #ff1e20;
+}
+
+/* FORMS *********************************************************************/
+
+/* A form to edit/create records */
+form.jtable-dialog-form
+{
+    font-family: 'Verdana';
+    font-size: 10px;
+}
+
+/* FORM INPUT ELEMENTS *******************************************************/
+
+/* A div that contains a label (title) and input field */
+div.jtable-input-field-container
+{
+    background-color: #F6ECEC;
+    border-color: #e1c6c6;
+}
+
+/* BUSY MESSAGE AND PANEL ****************************************************/
+
+/* A panel to block table UI while is busy */
+div.jtable-busy-panel-background
+{
+    background-color: #000000;
+}
+
+/* A div that contains a message while table UI is busy */
+div.jtable-busy-message
+{
+    color: #000000;
+    border-color: #000000;
+    background: url('loading.gif') no-repeat;
+    background-position: 5px;
+    background-color: #ff8a8a;
+}

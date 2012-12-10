@@ -1,0 +1,176 @@
+﻿/******************************************************************************
+ * Name        : jtable jQuery plug-in 'standard blue' theme
+ * Author      : Halil İbrahim KALKAN
+ * Description : This file defines 'blue' colors for jtable standard theme.
+ *****************************************************************************/
+
+/* IMPORTS *******************************************************************/
+
+@import '../jtable_standard_base.css';
+
+/* MAIN ELEMENTS *************************************************************/
+
+/* Main container of all elements those are created by jtable plugin */
+div.jtable-main-container
+{
+    color: #000000;
+}
+
+/* A div that contains title of the table (if any title supplied in options) */
+div.jtable-title
+{
+    background:url('title-bg.png') left;
+    color: #FFFFFF;
+    border-color: #C6D5E1;
+}
+
+/* Main table tag */
+table.jtable
+{
+    background-color: #C6D5E1;
+}
+
+/* A panel below the table that contains some commands */
+div.jtable-bottom-panel
+{
+    background-color: #E0E8E7;
+    border-color: #C6D5E1;
+}
+
+/* HEADER ********************************************************************/
+
+/* All header cells in the table */
+table.jtable th
+{
+    background:url('header-bg.gif')  left;
+    color:#CFDCE7; 
+}
+
+/* PAGING ********************************************************************/
+
+/* Page numbers */
+.jtable-page-number,
+/* First page link */
+.jtable-page-number-first,
+/* Last page link */
+.jtable-page-number-last,
+/* Previous page link */
+.jtable-page-number-previous,
+/* Next page link */
+.jtable-page-number-next
+{
+    background-color: #CFDCE7;
+    border: 1px solid #a3bfd6;
+}
+
+/* Page numbers */
+.jtable-page-number:hover,
+/* First page link */
+.jtable-page-number-first:hover,
+/* Last page link */
+.jtable-page-number-last:hover,
+/* Previous page link */
+.jtable-page-number-previous:hover,
+/* Next page link */
+.jtable-page-number-next:hover
+{
+    background-color: #9ec7e9;
+}
+
+/* Active/current page link */
+.jtable-page-number-active
+{
+    background-color: #4881b0;
+    border: 1px solid #a3bfd6;
+    color: #fff;
+    font-weight: bold;
+}
+
+/* ROWS **********************************************************************/
+
+/* All rows in the table */
+table.jtable tr
+{
+    background-color: #FFFFFF;
+}
+
+/* Even rows */
+table.jtable tr.jtable-row-even
+{
+    color: #000055;
+    background-color: #ECF2F6;
+}
+
+/* Rows when mouse over */
+table.jtable tr:hover
+{
+    background-color: #d3e2ec;
+}
+
+/* Selected row */
+table.jtable tr.jtable-row-selected
+{
+    color: #ffffff;
+    background-color: #3e9cda;
+}
+
+/* Style for a child row */
+table.jtable tr.jtable-child-row
+{
+    background-color: #b1f2ff;
+}
+
+/* ROW ANIMATIONS ***********************************************************/
+
+/* A 'new created row' style for animation */
+table.jtable tr.jtable-row-created
+{
+    background-color: #00FF89;
+}
+
+/* An 'updated row style' for animation */
+table.jtable tr.jtable-row-updated
+{
+    background-color: #00FFFF;
+}
+
+/* A 'deleting row style' for animation */
+table.jtable tr.jtable-row-deleting
+{
+    background-color: #FF0000;
+}
+
+/* COMMAND BUTTONS ***********************************************************/
+
+/* 'add new record' link */
+span.jtable-add-record a
+{
+    color: #1E90FF;
+}
+
+/* FORM INPUT ELEMENTS *******************************************************/
+
+/* A div that contains a label (title) and input field */
+div.jtable-input-field-container
+{
+    background-color: #ECF2F6;
+    border-color: #C6D5E1;
+}
+
+/* BUSY MESSAGE AND PANEL ****************************************************/
+
+/* A panel to block table UI while is busy */
+div.jtable-busy-panel-background
+{
+    background-color: #000000;
+}
+
+/* A div that contains a message while table UI is busy */
+div.jtable-busy-message
+{
+    color: #000000;
+    border-color: #000000;
+    background: url('loading.gif') no-repeat;
+    background-position: 5px;
+    background-color: #8AFFFF;
+}

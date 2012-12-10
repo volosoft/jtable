@@ -1,0 +1,199 @@
+﻿/******************************************************************************
+ * Name        : jtable jQuery plug-in 'standard purple' theme
+ * Author      : Halil İbrahim KALKAN
+ * Description : This file defines 'purple' colors for jtable standard theme.
+ *****************************************************************************/
+
+/* IMPORTS *******************************************************************/
+
+@import '../jtable_standard_base.css';
+
+/* MAIN ELEMENTS *************************************************************/
+
+/* Main container of all elements those are created by jtable plugin */
+div.jtable-main-container
+{
+    color: #F6ECF0;
+    font-size: 11px;
+}
+
+/* A div that contains title of the table (if any title supplied in options) */
+div.jtable-title
+{
+    color: #FFFFFF;
+    background: #51152A;
+    border-color: #38160C;
+}
+
+/* Main table tag */
+table.jtable
+{
+    background: #641B35;
+    border-collapse: collapse;
+    border: 1px solid #38160C;
+}
+
+/* A panel below the table that contains some commands */
+div.jtable-bottom-panel
+{
+    background-color: #853653;
+    border-color: #38160C;
+}
+
+/* LINKS *********************************************************************/
+
+div.jtable-main-container a
+{
+    color: #F6ECF0;
+}
+
+/* HEADER ********************************************************************/
+
+/* All header cells in the table */
+table.jtable th
+{
+    background: #38160C;
+    border: 1px solid #A85070;
+    padding-left: 6px;
+}
+
+table.jtable th.jtable-column-header-selecting input 
+{
+    margin-left: 0px;
+}
+
+/* PAGING ********************************************************************/
+
+/* Page numbers */
+.jtable-page-number,
+/* First page link */
+.jtable-page-number-first,
+/* Last page link */
+.jtable-page-number-last,
+/* Previous page link */
+.jtable-page-number-previous,
+/* Next page link */
+.jtable-page-number-next
+{
+    background-color: #8d415d;
+    border: 1px solid #ae6982;
+}
+
+/* Page numbers */
+.jtable-page-number:hover,
+/* First page link */
+.jtable-page-number-first:hover,
+/* Last page link */
+.jtable-page-number-last:hover,
+/* Previous page link */
+.jtable-page-number-previous:hover,
+/* Next page link */
+.jtable-page-number-next:hover
+{
+    background-color: #571930;
+}
+
+/* Active/current page link */
+.jtable-page-number-active
+{
+    background-color: #b04865;
+    border: 1px solid #c1849a;
+    color: #fff;
+    font-weight: bold;
+}
+
+/* ROWS **********************************************************************/
+
+/* All rows in the table */
+table.jtable tr
+{
+    background: #7B2342;
+}
+
+/* Even rows */
+table.jtable tr.jtable-row-even
+{
+    background: #641b35;
+}
+
+/* Mouse over rows */
+table.jtable tr:hover
+{
+    background: #51152A;
+}
+
+/* Selected row */
+table.jtable tr.jtable-row-selected
+{
+    color: #ffffff;
+    background-color: #000000;
+}
+
+/* Style for a child row */
+table.jtable tr.jtable-child-row
+{
+    padding: 0px;
+    background-color: #ab284d;
+}
+
+/* CELLS ********************************************************************/
+
+table.jtable td
+{
+    padding: 6px;
+    border: 1px dashed #B85A7C;
+}
+
+/* Style for a child row cell */
+table.jtable tr.jtable-child-row td
+{
+    padding: 3px;
+}
+
+/* ROW ANIMATIONS ***********************************************************/
+
+/* A 'new created row' style for animation */
+table.jtable tr.jtable-row-created
+{
+    background-color: #c000ff;
+}
+
+/* An 'updated row style' for animation */
+table.jtable tr.jtable-row-updated
+{
+    background-color: #ff00eb;
+}
+
+/* A 'deleting row style' for animation */
+table.jtable tr.jtable-row-deleting
+{
+    background-color: #FF0000;
+}
+
+/* FORM INPUT ELEMENTS *******************************************************/
+
+/* A div that contains a label (title) and input field */
+div.jtable-input-field-container
+{
+    color: #F6ECF0;
+    background-color: #641b35;
+    border-color: #000000;
+}
+
+/* BUSY MESSAGE AND PANEL ****************************************************/
+
+/* A panel to block table UI while is busy */
+div.jtable-busy-panel-background
+{
+    background-color: #000000;
+}
+
+/* A div that contains a message while table UI is busy */
+div.jtable-busy-message
+{
+    color: #000000;
+    border-color: #000000;
+    background: url('loading.gif') no-repeat;
+    background-position: 5px;
+    background-color: #ff00eb;
+}

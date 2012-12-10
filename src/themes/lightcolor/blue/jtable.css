@@ -1,0 +1,89 @@
+﻿/******************************************************************************
+ * Name        : jtable jQuery plug-in 'Light color - Orange' theme
+ * Author      : Halil İbrahim KALKAN
+ * Description : This file defines 'orange' colors for jtable light color theme.
+ *****************************************************************************/
+
+/* IMPORTS *******************************************************************/
+
+@import '../jtable_lightcolor_base.css';
+
+/* MAIN ELEMENTS *************************************************************/
+
+/* A div that contains title of the table (if any title supplied in options) */
+div.jtable-title
+{
+	background: rgb(120,177,237); /* Old browsers */
+	background: -moz-linear-gradient(top,  rgba(120,177,237,1) 0%, rgba(65,123,181,1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(120,177,237,1)), color-stop(100%,rgba(65,123,181,1))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  rgba(120,177,237,1) 0%,rgba(65,123,181,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  rgba(120,177,237,1) 0%,rgba(65,123,181,1) 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  rgba(120,177,237,1) 0%,rgba(65,123,181,1) 100%); /* IE10+ */
+	background: linear-gradient(top,  rgba(120,177,237,1) 0%,rgba(65,123,181,1) 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#78b1ed', endColorstr='#417bb5',GradientType=0 ); /* IE6-9 */
+    border-color: #2B5177;
+}
+
+div.jtable-title-text 
+{
+    color: #fff;
+    text-shadow: 0 1px 0 #666;
+    filter: progid:DXImageTransform.Microsoft.Shadow(direction=135,strength=2,color=666666);
+}
+
+/* PAGING ********************************************************************/
+
+/* Active/current page link */
+.jtable-page-number-active
+{
+    background-color: #2D5580;
+    border-color: #123458;
+}
+
+/* ROWS **********************************************************************/
+
+/* Selected row */
+table.jtable tr.jtable-row-selected,
+table.jtable tr.jtable-row-selected:hover
+{
+    background-color: #5f9cdc;
+}
+
+/* ROW ANIMATIONS ***********************************************************/
+
+/* A 'new created row' style for animation */
+table.jtable tr.jtable-row-created
+{
+    background-color: #5f9cdc;
+}
+
+/* An 'updated row style' for animation */
+table.jtable tr.jtable-row-updated
+{
+    background-color: #5f9cdc;
+}
+
+/* A 'deleting row style' for animation */
+table.jtable tr.jtable-row-deleting
+{
+    background-color: #5f9cdc;
+}
+
+/* COMMAND BUTTONS ***********************************************************/
+
+/* 'add new record' link */
+span.jtable-add-record a
+{
+    color: #2B5177;
+}
+
+/* BUSY MESSAGE AND PANEL ****************************************************/
+
+/* A div that contains a message while table UI is busy */
+div.jtable-busy-message
+{
+    border-color: #2B5177;
+    background: url('loading.gif') no-repeat;
+    background-color: #78B1ED;
+    background-position: 5px;
+}
