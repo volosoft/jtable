@@ -1,4 +1,4 @@
-﻿/******************************************************************************
+﻿﻿/******************************************************************************
  * Name        : jtable jQuery plug-in 'light color theme base''
  * Author      : Halil İbrahim KALKAN
  * Description : This is the base file for light color themes, no color defines.
@@ -11,7 +11,7 @@
 div.jtable-main-container
 {
     font-family: 'Verdana';
-    font-size: 11px;
+    font-size: 1em;
     color: #222;
     position: relative;
 }
@@ -85,6 +85,12 @@ table.jtable thead
     border-bottom: 1px solid #C8C8C8;
 }
 
+table.jtable tfoot{
+    background: url('bg-tfoot.png') repeat-x scroll top left #dddddd;
+    border-top: 1px solid #C8C8C8;
+    border-bottom: 1px solid #fff;
+}
+
 /* All header cells in the table */
 table.jtable thead th
 {
@@ -95,13 +101,22 @@ table.jtable thead th
     border-right: 1px solid #C8C8C8;
 }
 
+table.jtable tfoot th
+{
+    vertical-align: middle;
+    text-align: center;
+    padding: 4px 3px 4px 6px;
+    border-left: 1px solid #fff;
+    border-right: 1px solid #C8C8C8;
+}
+
 /* Disable left border for first columns */
-table.jtable thead th:first-child
+table.jtable thead th:first-child, table.jtable tfoot th:first-child
 {
     border-left: none;
 }
 
-table.jtable thead th:last-child
+table.jtable thead th:last-child, table.jtable tfoot th:last-child
 {
     border-right: none;
 }
@@ -121,6 +136,13 @@ table.jtable th.jtable-column-header div.jtable-column-header-container
 
 /* Header text in column header cell */
 table.jtable th.jtable-column-header span.jtable-column-header-text
+{
+    display: inline-block;
+    margin-top: 3px;
+}
+
+/* Command column header cell */
+table.jtable th.jtable-column-footer span.jtable-column-footer-text
 {
     display: inline-block;
     margin-top: 3px;
@@ -295,6 +317,7 @@ ul.jtable-column-select-list li
 {
     margin: 0px;
     padding: 2px 0px;
+	text-align: left;
 }
 
 /* Label of an item in column selection list */
@@ -514,7 +537,7 @@ span.jtable-add-record a:hover
 form.jtable-dialog-form
 {
     font-family: 'Verdana';
-    font-size: 10px;
+    font-size: 1em;
 }
 
 /* A form to create records */
