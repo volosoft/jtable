@@ -147,11 +147,11 @@
             var columnIndexInTable = this._firstDataColumnOffset + columnIndex + 1;
             if (field.visibility != 'hidden' && visibility == 'hidden') {
                 this._$table
-                    .find('>thead >th:nth-child(' + columnIndexInTable + '),>tbody >td:nth-child(' + columnIndexInTable + ')')
+                    .find('>thead >tr >th:nth-child(' + columnIndexInTable + '),>tbody >tr >td:nth-child(' + columnIndexInTable + ')')
                     .hide();
             } else if (field.visibility == 'hidden' && visibility != 'hidden') {
                 this._$table
-                    .find('>thead >th:nth-child(' + columnIndexInTable + '),>tbody >td:nth-child(' + columnIndexInTable + ')')
+                    .find('>thead >tr >th:nth-child(' + columnIndexInTable + '),>tbody >tr >td:nth-child(' + columnIndexInTable + ')')
                     .show()
                     .css('display', 'table-cell');
             }
@@ -411,7 +411,7 @@
         _saveColumnSettings: function () {
             var self = this;
             var fieldSettings = '';
-            this._$table.find('>thead >th.jtable-column-header').each(function () {
+            this._$table.find('>thead >tr >th.jtable-column-header').each(function () {
                 var $cell = $(this);
                 var fieldName = $cell.data('fieldName');
                 var columnWidth = $cell.data('width-in-percent');
@@ -443,7 +443,7 @@
                 }; ;
             });
 
-            var headerCells = this._$table.find('>thead >th.jtable-column-header');
+            var headerCells = this._$table.find('>thead >tr >th.jtable-column-header');
             headerCells.each(function () {
                 var $cell = $(this);
                 var fieldName = $cell.data('fieldName');
