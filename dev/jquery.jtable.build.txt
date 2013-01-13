@@ -1,0 +1,13 @@
+﻿create ..\jquery.jtable.js
+add jquery.jtable.header.txt
+add jquery.jtable.core.js
+add jquery.jtable.utils.js
+add jquery.jtable.forms.js
+add jquery.jtable.creation.js
+add jquery.jtable.editing.js
+add jquery.jtable.deletion.js
+add jquery.jtable.selecting.js
+add jquery.jtable.paging.js
+add jquery.jtable.sorting.js
+add jquery.jtable.dynamiccolumns.js
+add jquery.jtable.masterchild.js
