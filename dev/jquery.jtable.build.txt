@@ -11,3 +11,6 @@ add jquery.jtable.paging.js
 add jquery.jtable.sorting.js
 add jquery.jtable.dynamiccolumns.js
 add jquery.jtable.masterchild.js
+add jquery.jtable.masterchild.ex.js
+add jquery.jtable.sorting.ex.js
+add jquery.jtable.footer.js
