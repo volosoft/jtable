@@ -164,6 +164,12 @@
                         options.error(data);
                         return;
                     }
+                    
+                    if(!data.Record) {
+                        self._logError('Server must return the created Record object.');
+                        options.error(data);
+                        return;
+                    }
 
                     self._onRecordAdded(data);
                     
@@ -199,8 +205,8 @@
                 var fieldName = self._fieldList[i];
                 var field = self.options.fields[fieldName];
 
-                //Do not create input for fields that is key and not specially marked as editable
-                if (field.key == true && field.edit != true) {
+                //Do not create input for fields that is key and not specially marked as creatable
+                if (field.key == true && field.create != true) {
                     continue;
                 }
 
@@ -243,9 +249,15 @@
                 $addRecordForm.attr('action'),
                 $addRecordForm.serialize(),
                 function (data) {
-                    //Check for errors
+                    
                     if (data.Result != 'OK') {
                         self._showError(data.Message);
+                        self._setEnabledOfDialogButton($saveButton, true, self.options.messages.save);
+                        return;
+                    }
+                    
+                    if (!data.Record) {
+                        self._logError('Server must return the created Record object.');
                         self._setEnabledOfDialogButton($saveButton, true, self.options.messages.save);
                         return;
                     }

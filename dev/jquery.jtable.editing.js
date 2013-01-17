@@ -148,6 +148,8 @@
                     }
 
                     $.extend($updatingRow.data('record'), options.record);
+                    self._updateRecordValuesFromServerResponse($updatingRow.data('record'), data);
+
                     self._updateRowTexts($updatingRow);
                     self._onRecordUpdated($updatingRow, data);
                     if (options.animationsEnabled) {

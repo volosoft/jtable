@@ -425,7 +425,7 @@
         _createCellForRecordField: function (record, fieldName) {
             return $('<td></td>')
                 .addClass(this.options.fields[fieldName].listClass)
-                .append((this._getDisplayTextForRecordField(record, fieldName) || ''));
+                .append((this._getDisplayTextForRecordField(record, fieldName)));
         },
 
         /* Adds a list of records to the table.
