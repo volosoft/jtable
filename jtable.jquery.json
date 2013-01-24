@@ -15,12 +15,13 @@
     "version": "2.0.1",
     "author": {
         "name": "Halil ibrahim Kalkan",
+		"email": "halil@jtable.org",
         "url": "http://www.halilibrahimkalkan.com"
     },
     "maintainers": [
         {
             "name": "Halil ibrahim Kalkan",
-            "email": "developer@jtable.org",
+            "email": "halil@jtable.org",
             "url": "http://www.halilibrahimkalkan.com"
         }
     ],
