@@ -1,6 +1,6 @@
 {
     "name": "jTable",
-    "title": "jQuery jTable",
+    "title": "jTable",
     "description": "A JQuery plugin to create AJAX based CRUD tables",
     "keywords": [
         "ajax",
