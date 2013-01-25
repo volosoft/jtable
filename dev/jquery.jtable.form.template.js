@@ -112,6 +112,8 @@
                     .attr('readonly', field.readonly );
                 }
             });
+
+            data.dialog.dialog("option", "position", { my: "center", at: "center" } );
         }
     });
 })(jQuery);
