@@ -229,8 +229,15 @@
                 $fieldContainer.append(self._createInputLabelForRecordField(fieldName));
 
                 //Create input element
-                $fieldContainer.append(self._createInputForRecordField(fieldName));
+                $fieldContainer.append(
+                    self._createInputForRecordField({
+                        fieldName: fieldName,
+                        formType: 'create',
+                        form: $addRecordForm
+                    }));
             }
+
+            self._makeCascadeDropDowns($addRecordForm, undefined, 'create');
 
             //Open the form
             self._$addRecordDiv.append($addRecordForm).dialog('open');

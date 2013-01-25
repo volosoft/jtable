@@ -1,7 +1,7 @@
 {
     "name": "jTable",
     "title": "jTable",
-    "description": "A JQuery plugin to create AJAX based CRUD tables",
+    "description": "A JQuery plugin to create AJAX based CRUD tables (grids). It supports paging, sorting, selecting, master/child tables, show/hide/resize columns, localization, themes and more.",
     "keywords": [
         "ajax",
         "table",
@@ -11,7 +11,7 @@
 		"paging",
 		"sorting"
     ],
-    "version": "2.0.1",
+    "version": "2.1.0",
     "author": {
         "name": "Halil ibrahim Kalkan",
 		"email": "halil@jtable.org",

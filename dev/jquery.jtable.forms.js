@@ -33,7 +33,12 @@
 
         /* Creates an input element according to field type.
         *************************************************************************/
-        _createInputForRecordField: function (fieldName, value, record) {
+        _createInputForRecordField: function (funcParams) {
+            var fieldName = funcParams.fieldName,
+                value = funcParams.value,
+                record = funcParams.record,
+                formType = funcParams.formType,
+                form = funcParams.form;
 
             //Get the field
             var field = this.options.fields[fieldName];
@@ -45,15 +50,22 @@
 
             //Use custom function if supplied
             if (field.input) {
-                var $input = $(field.input({ value: value, record: record }));
+                var $input = $(field.input({
+                    value: value,
+                    record: record,
+                    formType: formType,
+                    form: form
+                }));
 
                 //Add id attribute if does not exists
-                //TODO: Check if id is needed?
                 if (!$input.attr('id')) {
                     $input.attr('id', 'Edit-' + fieldName);
                 }
 
-                return $input;
+                //Wrap input element with div
+                return $('<div />')
+                    .addClass('jtable-input jtable-custom-input')
+                    .append($input);
             }
 
             //Create input according to field type
@@ -67,15 +79,15 @@
                 return this._createCheckboxForField(field, fieldName, value);
             } else if (field.options) {
                 if (field.type == 'radiobutton') {
-                    return this._createRadioButtonListForField(field, fieldName, value);
+                    return this._createRadioButtonListForField(field, fieldName, value, record, formType);
                 } else {
-                    return this._createDropDownListForField(field, fieldName, value);
+                    return this._createDropDownListForField(field, fieldName, value, record, formType, form);
                 }
             } else {
                 return this._createTextInputForField(field, fieldName, value);
             }
         },
-        
+
         //Creates a hidden input element with given name and value.
         _createInputForHidden: function (fieldName, value) {
             if (value == undefined || value == null) {
@@ -166,7 +178,7 @@
             if (field.setOnTextClick != false) {
                 $textSpan
                     .addClass('jtable-option-text-clickable')
-                    .click(function() {
+                    .click(function () {
                         if ($checkBox.is(':checked')) {
                             $checkBox.attr('checked', false);
                         } else {
@@ -182,7 +194,8 @@
 
         /* Creates a drop down list (combobox) input element for a field.
         *************************************************************************/
-        _createDropDownListForField: function (field, fieldName, value) {
+        _createDropDownListForField: function (field, fieldName, value, record, source, form) {
+
             //Create a container div
             var $containerDiv = $('<div />')
                 .addClass('jtable-input jtable-dropdown-input');
@@ -191,41 +204,76 @@
             var $select = $('<select class="' + field.inputClass + '" id="Edit-' + fieldName + '" name="' + fieldName + '"></select>')
                 .appendTo($containerDiv);
 
+            if (field.dependsOn) {
+                $select.attr('data-depends-on', field.dependsOn);
+            }
+
             //add options
-            var options = this._getOptionsWithCaching(fieldName);
-            $.each(options, function (propName, propValue) {
-                $select.append('<option value="' + propName + '"' + (propName == value ? ' selected="selected"' : '') + '>' + propValue + '</option>');
+            var options = this._getOptionsForField(fieldName, {
+                record: record,
+                source: source,
+                form: form,
+                dependedValues: this._createDependedValuesUsingForm(form, field.dependsOn)
             });
+
+            this._fillDropDownListWithOptions($select, options, value);
 
             return $containerDiv;
         },
+        
+        /* Fills a dropdown list with given options.
+        *************************************************************************/
+        _fillDropDownListWithOptions: function ($select, options, value) {
+            $select.empty();
+            for (var i = 0; i < options.length; i++) {
+                $select.append('<option value="' + options[i].Value + '"' + (options[i].Value == value ? ' selected="selected"' : '') + '>' + options[i].DisplayText + '</option>');
+            }
+        },
+
+        _createDependedValuesUsingForm: function ($form, dependsOn) {
+
+            if (!dependsOn) {
+                return {};
+            }
+
+            var $dependsOn = $form.find('select[name=' + dependsOn + ']');
+            if ($dependsOn.length <= 0) {
+                return {};
+            }
+
+            var dependedValues = {};
+            dependedValues[dependsOn] = $dependsOn.val();
+
+            return dependedValues;
+        },
+
         /* Creates a radio button list for a field.
         *************************************************************************/
-        _createRadioButtonListForField: function (field, fieldName, value) {
-            //Create a container div
+        _createRadioButtonListForField: function (field, fieldName, value, record, source) {
             var $containerDiv = $('<div />')
                 .addClass('jtable-input jtable-radiobuttonlist-input');
 
-            //create radio buttons
-            var options = this._getOptionsWithCaching(fieldName);
-            var radioButtonIndex = 0;
-            $.each(options, function (propName, propValue) {
+            var options = this._getOptionsForField(fieldName, {
+                record: record,
+                source: source
+            });
 
+            $.each(options, function(i, option) {
                 var $radioButtonDiv = $('<div class=""></div>')
                     .addClass('jtable-radio-input')
                     .appendTo($containerDiv);
 
-                var $radioButton = $('<input type="radio" id="Edit-' + fieldName + (radioButtonIndex++) + '" class="' + field.inputClass + '" name="' + fieldName + '" value="' + propName + '"' + ((propName == (value + '')) ? ' checked="true"' : '') + ' />')
+                var $radioButton = $('<input type="radio" id="Edit-' + fieldName + '-' + i + '" class="' + field.inputClass + '" name="' + fieldName + '" value="' + option.Value + '"' + ((option.Value == (value + '')) ? ' checked="true"' : '') + ' />')
                     .appendTo($radioButtonDiv);
 
                 var $textSpan = $('<span></span>')
-                    .html(propValue)
+                    .html(option.DisplayText)
                     .appendTo($radioButtonDiv);
 
                 if (field.setOnTextClick != false) {
                     $textSpan
                         .addClass('jtable-option-text-clickable')
-                        .click(function() {
+                        .click(function () {
                             if (!$radioButton.is(':checked')) {
                                 $radioButton.attr('checked', true);
                             }
@@ -283,34 +331,89 @@
             return stateArray;
         },
 
-        /* Gets options from cache if exists, else downloads and caches.
-        * TODO: Allow options to be a function and send record to the function.
+        /* Searches a form for dependend dropdowns and makes them cascaded.
+        */
+        _makeCascadeDropDowns: function ($form, record, source) {
+            var self = this;
+
+            $form.find('select[data-depends-on]')
+                .each(function () {
+                    var $thisDropdown = $(this);
+                    var fieldName = $thisDropdown.attr('name');
+                    if (!fieldName) {
+                        return;
+                    }
+
+                    var dependsOnField = $thisDropdown.attr('data-depends-on');
+                    var $dependsOn = $form.find('select[name=' + dependsOnField + ']');
+                    $dependsOn.change(function () {
+
+                        //Refresh options
+
+                        var funcParams = {
+                            record: record,
+                            source: source,
+                            form: $form,
+                            dependedValues: {}
+                        };
+                        funcParams.dependedValues[dependsOnField] = $dependsOn.val();
+
+                        var options = self._getOptionsForField(fieldName, funcParams);
+                        self._fillDropDownListWithOptions($thisDropdown, options, undefined);
+
+                        //Thigger change event to refresh multi cascade dropdowns.
+                        
+                        $thisDropdown.change();
+                    });
+                });
+        },
+
+        /* Updates values of a record from given form
         *************************************************************************/
-        _getOptionsWithCaching: function (fieldName) {
-            var cacheKey = 'options_' + fieldName;
-            if (!this._cache[cacheKey]) {
-                var optionsSource = this.options.fields[fieldName].options;
-                //Build options according to it's source type
-                if (typeof optionsSource == 'string') {
-                    //It is an Url to rownload options
-                    this._cache[cacheKey] = this._downloadOptions(fieldName, optionsSource);
-                } else if (jQuery.isArray(optionsSource)) {
-                    //It is an array of options
-                    this._cache[cacheKey] = this._buildOptionsFromArray(optionsSource);
+        _updateRecordValuesFromForm: function (record, $form) {
+            for (var i = 0; i < this._fieldList.length; i++) {
+                var fieldName = this._fieldList[i];
+                var field = this.options.fields[fieldName];
+
+                //Do not update non-editable fields
+                if (field.edit == false) {
+                    continue;
+                }
+
+                //Get field name and the input element of this field in the form
+                var $inputElement = $form.find('[name="' + fieldName + '"]');
+                if ($inputElement.length <= 0) {
+                    continue;
+                }
+
+                //Update field in record according to it's type
+                if (field.type == 'date') {
+                    var displayFormat = field.displayFormat || this.options.defaultDateFormat;
+                    try {
+                        var date = $.datepicker.parseDate(displayFormat, $inputElement.val());
+                        record[fieldName] = '/Date(' + date.getTime() + ')/';
+                    } catch (e) {
+                        //TODO: Handle incorrect/different date formats
+                        record[fieldName] = '/Date(' + (new Date()).getTime() + ')/';
+                    }
+                } else if (field.options && field.type == 'radiobutton') {
+                    var $checkedElement = $inputElement.filter(':checked');
+                    if ($checkedElement.length) {
+                        record[fieldName] = $checkedElement.val();
+                    } else {
+                        record[fieldName] = undefined;
+                    }
                 } else {
-                    //It is an object that it's properties are options, so use directly this object
-                    this._cache[cacheKey] = optionsSource;
+                    record[fieldName] = $inputElement.val();
                 }
             }
-
-            return this._cache[cacheKey];
         },
 
         /* Download options for a field from server.
         *************************************************************************/
         _downloadOptions: function (fieldName, url) {
             var self = this;
-            var options = {};
+            var options = [];
 
             self._ajax({
                 url: url,
@@ -321,28 +424,13 @@
                         return;
                     }
 
-                    //Get options from incoming data
-                    for (var i = 0; i < data.Options.length; i++) {
-                        options[data.Options[i].Value] = data.Options[i].DisplayText;
-                    }
+                    options = data.Options;
                 },
                 error: function () {
                     var errMessage = self._formatString(self.options.messages.cannotLoadOptionsFor, fieldName);
                     self._showError(errMessage);
                 }
             });
-
-            return options;
-        },
-
-        /* Creates an options object (that it's property is value, value is displaytext)
-        *  from a simple array.
-        *************************************************************************/
-        _buildOptionsFromArray: function (optionsArray) {
-            var options = {};
-            for (var i = 0; i < optionsArray.length; i++) {
-                options[optionsArray[i]] = optionsArray[i];
-            }
 
             return options;
         },
