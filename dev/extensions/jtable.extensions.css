@@ -1,0 +1,81 @@
+/* Styles for buttons created on main-container title div */
+/**************************************************************************/
+div.jtable-main-container div.jtable-title .jtable-command-button {
+  cursor: pointer;
+  border: none;
+  display: inline;
+}
+div.jtable-main-container div.jtable-title .jtable-command-button span {
+  display: none;
+}
+/**/
+div.jtable-main-container div.jtable-title {
+    height: 34px;
+}
+div.jtable-main-container div.jtable-title div.jtable-title-text {
+  float: left; /* In order to stack multiple command-buttons on the right of title div */
+}
+/* FOOTER EXTENSION styles */
+/**************************************************************************/
+div.jtable-main-container table.jtable tfoot {
+  background: url('../../lightcolor/bg-tfoot.png') repeat-x scroll top left #dddddd;
+  border-top: 1px solid #C8C8C8;
+  border-bottom: 1px solid #C8C8C8;
+}
+div.jtable-main-container table.jtable tfoot th {
+  padding: 4px 3px 4px 6px;
+  border-left: 1px solid #fff;
+  border-right: 1px solid #C8C8C8;
+}
+div.jtable-main-container table.jtable tfoot th:first-child {
+  border-left: none;
+}
+div.jtable-main-container table.jtable tfoot thth:last-child {
+  border-right: none;
+}
+/* RELOAD EXTENSION styles */
+/**************************************************************************/
+div.jtable-main-container div.jtable-title .jtable-reload-button {
+  margin-top: 6px;
+  margin-right: 6px;
+  float: right; /* In order to stack multiple command-buttons on the right */
+  opacity: 0.8;
+  filter: alpha(opacity=50);
+  background: url('../../lightcolor/reload.png') no-repeat;
+  width: 22px;
+  height: 22px;
+}
+div.jtable-main-container div.jtable-title .jtable-reload-button:hover {
+  opacity: 1;
+  filter: alpha(opacity=50);
+}
+/* FILTER EXTENSION styles */
+/**************************************************************************/
+div.jtable-main-container div.jtable-filter {
+    border: 1px solid;
+}
+div.jtable-main-container div.jtable-title .jtable-filter-button {
+  margin-top: 6px;
+  margin-right: 6px;
+  float: right; /* In order to stack multiple command-buttons on the right */
+  opacity: 0.8;
+  filter: alpha(opacity=50);
+  background: url('../../lightcolor/filter.png') no-repeat;
+  width: 22px;
+  height: 22px;
+}
+div.jtable-main-container div.jtable-title .jtable-filter-button:hover {
+  opacity: 1;
+  filter: alpha(opacity=50);
+}
+/* Additional application-specific styles */
+/**************************************************************************/
+div.jtable-main-container table.jtable tbody > tr.jtable-row-error:hover
+{
+    background: #ffa9a9;
+}
+div.jtable-main-container table.jtable tbody > tr.jtable-row-error
+{
+    color:#F00;
+    background: #ffbba9;
+}

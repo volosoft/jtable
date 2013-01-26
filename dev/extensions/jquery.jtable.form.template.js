@@ -76,11 +76,16 @@
             formType: 'edit',
             options: options,
             record: record*/
-            if( data.options.title ){
-                data.dialog.dialog('option', 'title', data.options.title );
-            }
             
+            // Apply user defined dialog options
+            if( data.options.options ){
+                data.dialog.dialog('option', data.options.options );
+            }
+           
             if( data.options.template ){
+                //Adds template to form
+                data.form.append( data.options.template );
+
                 //Move created fields to template
                 $.each( data.form.find('div.jtable-input-field-container'), function( index, fieldContainer ){
                     var $fieldContainer = $(fieldContainer);
@@ -93,27 +98,44 @@
                         .empty()
                         .append( $fieldContainer );
                     }
-                });                
-                
-                //Adds template to form
-                data.form.append( data.options.template );
+                });
             }
             
-            // Applies additional options for created fields
-            $.each( data.form.find('div.jtable-input-field-container'), function( index, fieldContainer ){
-                var $fieldContainer = $(fieldContainer);
-                var $fieldInput = $fieldContainer.find('div.jtable-input').children();
-                var fieldName = $fieldInput.attr('name');
-                var field = self.options.fields[fieldName];
-                
-                // Readonly option
-                if( field.readonly && field.readonly==true ){
-                    $fieldInput
-                    .attr('readonly', field.readonly );
-                }
-            });
-
-            data.dialog.dialog("option", "position", { my: "center", at: "center" } );
+            // Dialog children options
+            if( data.options.children ){
+                $.each( data.options.children, function( childID, childOptions ){
+                    var $childDiv = data.form.find('div#' + childID );
+                    if( $childDiv.length != 0 ){
+                        switch( childOptions.type ){
+                            case 'button':
+                                $childDiv
+                                .button({
+                                    disabled: childOptions.disabled || false
+                                })
+                                .click( function(e){
+                                    if( childOptions.click ){
+                                        childOptions.click({
+                                            form: data.form, 
+                                            record: data.record
+                                        });
+                                    }
+                                });
+                                break;
+                            
+                            case 'jtable':
+                                $childDiv
+                                .jtable( childOptions.options( data.record ) )
+                                .jtable('load');
+                                break;
+                        }
+                    }                        
+                });
+            }
+            
+            data.dialog.dialog("option", "position", {
+                my: "center", 
+                at: "center"
+            } );
         }
     });
 })(jQuery);

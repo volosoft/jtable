@@ -1,6 +1,6 @@
 ﻿/************************************************************************
- * SIMPLE MASTER/CHILD tables extension for jTable                      *
- *************************************************************************/
+* SIMPLE MASTER/CHILD tables extension for jTable                      *
+*************************************************************************/
 (function ($) {
 
     //Reference to base object members
@@ -14,35 +14,34 @@
     $.extend(true, $.hik.jtable.prototype, {
 
         /************************************************************************
-         * DEFAULT OPTIONS / EVENTS                                              *
-         *************************************************************************/
+     * DEFAULT OPTIONS / EVENTS                                              *
+     *************************************************************************/
         options: {
             parentRecord: null
         },
 
         /************************************************************************
-         * OVERRIDED METHODS                                                     *
-         *************************************************************************/
+     * OVERRIDED METHODS                                                     *
+     *************************************************************************/
 
         /* Gets text for a field of a record according to it's type.
-         *************************************************************************/
+     *************************************************************************/
         _getDisplayTextForRecordField: function (record, fieldName) {
             var field = this.options.fields[fieldName];
-            var fieldValue = record[fieldName];
 
             if (field.childTable){
                 return this._createChildTable(record, field, field.childTable(record));
             }
-            
+
             return base._getDisplayTextForRecordField.apply(this, arguments);
         },
 
         /************************************************************************
-         * PRIVATE METHODS                                                       *
-         *************************************************************************/
+     * PRIVATE METHODS                                                       *
+     *************************************************************************/
 
         /* Creates a child row for a row, hides and returns it.
-         *************************************************************************/
+     *************************************************************************/
         _createChildTable: function (record, field, options) {
             var self = this;
             var parentRecord = record;
@@ -66,6 +65,19 @@
                     options,
                     function (data) {
                         data.childTable.jtable('load');
+                        if( options.spotlight ){
+                            data.childTable.bind('mouseover', function(){
+                                $(this).spotlight({
+                                    opacity: .5,				//spotlight opacity
+                                    speed: 400,					//animateion speed
+                                    color: '#333',				//spotlight colour
+                                    animate: true,				//enable animation (if false 'speed' and 'easing' are irrelevant)
+                                    exitEvent: 'mouseover',                     //set which event triggers spotlight to hide (must be a valid jQuery 'live' event type)
+                                    onShow: function(){},                       //callback function after spotlight is shown
+                                    onHide: function(){}                        //callback function after spotlight is hidden
+                                }) ;
+                            });
+                        }
                     })
             });
             return $img;

@@ -17,11 +17,23 @@
     $.extend(true, $.hik.jtable.prototype, {
 
         /************************************************************************
-        * OVERRIDED METHODS                                                     *
-        *************************************************************************/
+     * DEFAULT OPTIONS / EVENTS                                              *
+     *************************************************************************/
+        options: {
+        },
+
+        /************************************************************************
+     * PRIVATE FIELDS                                                        *
+     *************************************************************************/
+
+        _aSorting: [], //Last sorting of the table
+
+        /************************************************************************
+     * OVERRIDED METHODS                                                     *
+     *************************************************************************/
        
         /* Gets text for a field of a record according to it's type.
-        *************************************************************************/
+     *************************************************************************/
         _getDisplayTextForRecordField: function (record, fieldName) {
             var field = this.options.fields[fieldName];
             var fieldValue = record[fieldName];
@@ -42,7 +54,7 @@
         },
 
         /* Creates a drop down list (combobox) input element for a field.
-        *************************************************************************/
+     *************************************************************************/
         _createDropDownListForField: function (field, fieldName, value) {
             //Create a container div
             var $containerDiv = $('<div />')
@@ -62,7 +74,7 @@
         },
         
         /* Creates a radio button list for a field.
-        *************************************************************************/
+     *************************************************************************/
         _createRadioButtonListForField: function (field, fieldName, value) {
             //Create a container div
             var $containerDiv = $('<div />')
@@ -99,7 +111,7 @@
         },
 
         /* Gets options from cache if exists, else downloads and caches.
-        *************************************************************************/
+     *************************************************************************/
         _getOptionsWithCaching: function (fieldName) {
             var field = this.options.fields[fieldName];
             var cacheKey = 'options_' + fieldName;
@@ -117,7 +129,7 @@
         },
         
         /* Download options for a field from server.
-        *************************************************************************/
+     *************************************************************************/
         _downloadOptions: function (fieldName, url) {
             var self = this;
             var options = [];
@@ -149,8 +161,8 @@
         },
 
         /* Creates an options object (that it's property is value, value is displaytext)
-        *  from a simple array.
-        *************************************************************************/
+     *  from a simple array.
+     *************************************************************************/
         _buildOptionsFromArray: function (optionsArray) {
             var options = [];
             
@@ -186,11 +198,11 @@
         },
 
         /************************************************************************
-        * PRIVATE METHODS                                                       *
-        *************************************************************************/
+     * PRIVATE METHODS                                                       *
+     *************************************************************************/
 		
         /* Gets options
-        *************************************************************************/
+     *************************************************************************/
         _getOptions: function (fieldName, field) {
             var optionsSource = field.options;
             //Build options according to it's source type
@@ -207,7 +219,7 @@
         },
         
         /* Creates an options object.
-         *************************************************************************/
+     *************************************************************************/
         _buildOptionsFromObject: function (optionsObject) {
             var options = [];
             

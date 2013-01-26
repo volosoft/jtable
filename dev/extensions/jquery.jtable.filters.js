@@ -27,7 +27,7 @@
      * PRIVATE FIELDS                                                        *
      *************************************************************************/
 
-        _$tfilter: null, //Reference to the filter area in top panel
+        _$filterForm: null, //Reference to the filter area in top panel
 
         /************************************************************************
      * CONSTRUCTOR AND INITIALIZING METHODS                                  *
@@ -57,23 +57,27 @@
             .click(function (e) {
                 e.preventDefault();
                 e.stopPropagation();
-                self._$tfilter.slideToggle('fast');
+                self._$filterForm.slideToggle('fast');
             });
-            this._addFieldsToTableFilter(this._$tfilter);
+            this._addFieldsToTableFilter(this._$filterForm);
         },
 
         /* Adds tr element to given tfoot element
      *************************************************************************/
-        _addFieldsToTableFilter: function ($tfilter) {
+        _addFieldsToTableFilter: function ($filterForm) {
             var self = this;
             $.each( self.options.fields, function( fieldName, fieldOptions ){
                 if( fieldOptions.filter ){
-                    var $fieldContainer = $('<div class="jtable-input-field-container"></div>').appendTo($tfilter);
+                    var $fieldContainer = $('<div class="jtable-input-field-container"></div>').appendTo($filterForm);
 
                     //Create a label for input
                     $fieldContainer.append(self._createInputLabelForRecordField(fieldName));
                     //Create input element with it's current value
-                    $fieldContainer.append(self._createInputForRecordField(fieldName));
+                    $fieldContainer.append(self._createInputForRecordField({
+                        fieldName: fieldName,
+                        formType: 'filter',
+                        form: $filterForm
+                    }));
                 }
             });
         }
