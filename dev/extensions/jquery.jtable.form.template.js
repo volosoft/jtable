@@ -105,7 +105,11 @@
             if( data.options.children ){
                 $.each( data.options.children, function( childID, childOptions ){
                     var $childDiv = data.form.find('div#' + childID );
+<<<<<<< HEAD:dev/extensions/jquery.jtable.form.template.js
                     if( $childDiv.length != 0 ){
+=======
+                    if( $childDiv.lenth != 0 ){
+>>>>>>> 61ea7726ee353ee578154a7ad70b1269c3061c76:dev/extensions/jquery.jtable.form.template.js
                         switch( childOptions.type ){
                             case 'button':
                                 $childDiv
@@ -132,6 +136,40 @@
                 });
             }
             
+<<<<<<< HEAD:dev/extensions/jquery.jtable.form.template.js
+=======
+            // Applies formatting to template buttons
+            /*if( data.options.buttons ){
+                $.each( data.options.buttons, function( buttonID, options ){
+                    var $templateButton = data.options.template.find('button#' + buttonID );
+
+                    if( $templateButton.length != 0 ){
+                        $templateButton
+                        .button()
+                        .click( function(e){
+                            if( options.click ){
+                                options.click();
+                            }
+                        });
+                    }
+                });
+            }*/
+            
+            // Applies additional options for created fields
+            /*$.each( data.form.find('div.jtable-input-field-container'), function( index, fieldContainer ){
+                var $fieldContainer = $(fieldContainer);
+                var $fieldInput = $fieldContainer.find('div.jtable-input').children();
+                var fieldName = $fieldInput.attr('name');
+                var field = self.options.fields[fieldName];
+                
+                // Readonly option
+                if( field.readonly && field.readonly==true ){
+                    $fieldInput
+                    .attr('readonly', field.readonly );
+                }
+            });*/
+            
+>>>>>>> 61ea7726ee353ee578154a7ad70b1269c3061c76:dev/extensions/jquery.jtable.form.template.js
             data.dialog.dialog("option", "position", {
                 my: "center", 
                 at: "center"
