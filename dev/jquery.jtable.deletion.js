@@ -29,8 +29,8 @@
                 deleteConfirmation: 'This record will be deleted. Are you sure?',
                 deleteText: 'Delete',
                 deleting: 'Deleting',
-                canNotDeletedRecords: 'Can not deleted {0} of {1} records!',
-                deleteProggress: 'Deleted {0} of {1} records, processing...'
+                canNotDeletedRecords: 'Can not delete {0} of {1} records!',
+                deleteProggress: 'Deleting {0} of {1} records, processing...'
             }
         },
 

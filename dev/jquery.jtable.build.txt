@@ -1,4 +1,4 @@
-﻿create ..\jquery.jtable.js
+﻿create jquery.jtable.js
 add jquery.jtable.header.txt
 add jquery.jtable.core.js
 add jquery.jtable.utils.js

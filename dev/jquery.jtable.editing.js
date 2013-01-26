@@ -76,7 +76,7 @@
                             click: function () {
                                 var $saveButton = self._$editDiv.find('#EditDialogSaveButton');
                                 var $editForm = self._$editDiv.find('form');
-                                if (self._trigger("formSubmitting", null, { form: $editForm, formType: 'edit' }) != false) {
+                                if (self._trigger("formSubmitting", null, { form: $editForm, formType: 'edit', row: self._$editingRow }) != false) {
                                     self._setEnabledOfDialogButton($saveButton, false, self.options.messages.saving);
                                     self._saveEditForm($editForm, $saveButton);
                                 }
@@ -85,7 +85,7 @@
                 close: function () {
                     var $editForm = self._$editDiv.find('form:first');
                     var $saveButton = $('#EditDialogSaveButton');
-                    self._trigger("formClosed", null, { form: $editForm, formType: 'edit' });
+                    self._trigger("formClosed", null, { form: $editForm, formType: 'edit', row: self._$editingRow });
                     self._setEnabledOfDialogButton($saveButton, true, self.options.messages.save);
                     $editForm.remove();
                 }
@@ -148,6 +148,8 @@
                     }
 
                     $.extend($updatingRow.data('record'), options.record);
+                    self._updateRecordValuesFromServerResponse($updatingRow.data('record'), data);
+
                     self._updateRowTexts($updatingRow);
                     self._onRecordUpdated($updatingRow, data);
                     if (options.animationsEnabled) {
@@ -248,13 +250,22 @@
 
                 //Create input element with it's current value
                 var currentValue = self._getValueForRecordField(record, fieldName);
-                $fieldContainer.append(self._createInputForRecordField(fieldName, currentValue, record));
+                $fieldContainer.append(
+                    self._createInputForRecordField({
+                        fieldName: fieldName,
+                        value: currentValue,
+                        record: record,
+                        formType: 'edit',
+                        form: $editForm
+                    }));
             }
+
+            self._makeCascadeDropDowns($editForm, record, 'edit');
 
             //Open dialog
             self._$editingRow = $tableRow;
             self._$editDiv.append($editForm).dialog('open');
-            self._trigger("formCreated", null, { form: $editForm, formType: 'edit', record: record });
+            self._trigger("formCreated", null, { form: $editForm, formType: 'edit', record: record, row: $tableRow });
         },
 
         /* Saves editing form to the server and updates the record on the table.
@@ -273,11 +284,11 @@
                     }
 
                     var record = self._$editingRow.data('record');
-                    
-                    self._updateRecordValuesFromEditForm(record, $editForm);
+
+                    self._updateRecordValuesFromForm(record, $editForm);
                     self._updateRecordValuesFromServerResponse(record, data);
                     self._updateRowTexts(self._$editingRow);
-                    
+
                     self._$editingRow.attr('data-record-key', self._getKeyValueOfRecord(record));
 
                     self._onRecordUpdated(self._$editingRow, data);
@@ -294,45 +305,6 @@
                 });
         },
 
-        /* Updates values of a record from given edit form
-        *************************************************************************/
-        _updateRecordValuesFromEditForm: function (record, $form) {
-            for (var i = 0; i < this._fieldList.length; i++) {
-                var fieldName = this._fieldList[i];
-                var field = this.options.fields[fieldName];
-
-                //Do not update non-editable fields
-                if (field.edit == false) {
-                    continue;
-                }
-
-                //Get field name and the input element of this field in the form
-                var $inputElement = $form.find('[name="' + fieldName + '"]');
-
-                //Update field in record according to it's type
-                if (field.type == 'date') {
-                    var displayFormat = field.displayFormat || this.options.defaultDateFormat;
-                    try {
-                        var date = $.datepicker.parseDate(displayFormat, $inputElement.val());
-                        record[fieldName] = '/Date(' + date.getTime() + ')/';
-                    } catch (e) {
-                        //TODO: Handle incorrect/different date formats
-                        record[fieldName] = '/Date(' + (new Date()).getTime() + ')/';
-                    }
-                } else if (field.options && field.type == 'radiobutton') {
-                    var $checkedElement = $inputElement.filter('[checked="true"]');
-                    if ($checkedElement.length) {
-                        record[fieldName] = $checkedElement.val();
-                    } else {
-                        record[fieldName] = undefined;
-                    }
-                } else {
-                    record[fieldName] = $inputElement.val();
-                }
-            }
-        },
-
-        
         /* This method ensures updating of current record with server response,
         * if server sends a Record object as response to updateAction.
         *************************************************************************/
@@ -365,7 +337,7 @@
                 var displayItem = this._getDisplayTextForRecordField(record, this._columnList[i]);
                 $columns.eq(this._firstDataColumnOffset + i).html(displayItem || '');
             }
-            
+
             this._onRowUpdated($tableRow);
         },
 

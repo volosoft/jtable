@@ -425,7 +425,7 @@
         _createCellForRecordField: function (record, fieldName) {
             return $('<td></td>')
                 .addClass(this.options.fields[fieldName].listClass)
-                .append((this._getDisplayTextForRecordField(record, fieldName) || ''));
+                .append((this._getDisplayTextForRecordField(record, fieldName)));
         },
 
         /* Adds a list of records to the table.
@@ -617,11 +617,36 @@
                 return this._getDisplayTextForDateRecordField(field, fieldValue);
             } else if (field.type == 'checkbox') {
                 return this._getCheckBoxTextForFieldByValue(fieldName, fieldValue);
-            } else if (field.options) {
-                return this._getOptionsWithCaching(fieldName)[fieldValue];
-            } else {
+            } else if (field.options) { //combobox or radio button list since there are options.
+                var options = this._getOptionsForField(fieldName, {
+                    record: record,
+                    source: 'list',
+                    dependedValues: this._createDependedValuesUsingRecord(record, field.dependsOn)
+                });
+                return this._findOptionByValue(options, fieldValue).DisplayText;
+            } else { //other types
                 return fieldValue;
             }
+        },
+        
+        _createDependedValuesUsingRecord: function (record, dependsOn) {
+            if (!dependsOn) {
+                return {};
+            }
+
+            var dependedValues = {};
+            dependedValues[dependsOn] = record[dependsOn];
+            return dependedValues;
+        },
+
+        _findOptionByValue: function (options, value) {
+            for (var i = 0; i < options.length; i++) {
+                if (options[i].Value == value) {
+                    return options[i];
+                }
+            }
+
+            return {}; //no option found
         },
 
         /* Gets text for a date field.
@@ -634,6 +659,122 @@
             var displayFormat = field.displayFormat || this.options.defaultDateFormat;
             var date = this._parseDate(fieldValue);
             return $.datepicker.formatDate(displayFormat, date);
+        },
+
+        /* Gets options for a field according to user preferences.
+        *************************************************************************/
+        _getOptionsForField: function (fieldName, funcParams) {
+            var field = this.options.fields[fieldName];
+            var optionsSource = field.options;
+
+            if ($.isFunction(optionsSource)) {
+
+                //prepare parameter to the function
+                funcParams = $.extend(true, {
+                    _cacheCleared: false,
+                    dependedValues: {},
+                    clearCache: function () {
+                        this._cacheCleared = true;
+                    }
+                }, funcParams);
+
+                //call function and get actual options source
+                optionsSource = optionsSource(funcParams);
+            }
+
+            var options;
+
+            //Build options according to it's source type
+            if (typeof optionsSource == 'string') { //It is an Url to download options
+                var cacheKey = 'options_' + fieldName + '_' + optionsSource;
+                if (funcParams._cacheCleared || (!this._cache[cacheKey])) {
+                    this._cache[cacheKey] = this._downloadOptions(fieldName, optionsSource);
+                    this._sortFieldOptions(this._cache[cacheKey], field.optionsSorting);
+                }
+
+                options = this._cache[cacheKey];
+            } else if (jQuery.isArray(optionsSource)) { //It is an array of options
+                options = this._buildOptionsFromArray(optionsSource);
+                this._sortFieldOptions(options, field.optionsSorting);
+            } else { //It is an object that it's properties are options
+                options = this._buildOptionsArrayFromObject(optionsSource);
+                this._sortFieldOptions(options, field.optionsSorting);
+            }
+
+            return options;
+        },
+
+        _sortFieldOptions: function (options, sorting) {
+            
+            if ((!options) || (!options.length) || (!sorting)) {
+                return;
+            }
+            
+            //Determine using value of text
+            var dataSelector;
+            if (sorting.indexOf('value') == 0) {
+                dataSelector = function(option) {
+                    return option.Value;
+                };
+            } else { //assume as text
+                dataSelector = function (option) {
+                    return option.DisplayText;
+                };
+            }
+
+            var compareFunc;
+            if ($.type(dataSelector(options[0])) == 'string') {
+                compareFunc = function (option1, option2) {
+                    return dataSelector(option1).localeCompare(dataSelector(option2));
+                };
+            } else { //asuume as numeric
+                compareFunc = function (option1, option2) {
+                    return dataSelector(option1) - dataSelector(option2);
+                };
+            }
+
+            if (sorting.indexOf('desc') > 0) {
+                options.sort(function (a, b) {
+                    return compareFunc(b, a);
+                });
+            } else { //assume as asc
+                options.sort(function (a, b) {
+                    return compareFunc(a, b);
+                });
+            }
+        },
+
+        _buildOptionsArrayFromObject: function (options) {
+            var list = [];
+
+            $.each(options, function (propName, propValue) {
+                list.push({
+                    Value: propName,
+                    DisplayText: propValue
+                });
+            });
+
+            return list;
+        },
+
+        /* Creates an options object (that it's property is value, value is displaytext)
+        *  from a simple array.
+        *************************************************************************/
+        _buildOptionsFromArray: function (optionsArray) {
+            var list = [];
+
+            for (var i = 0; i < optionsArray.length; i++) {
+                if ($.isPlainObject) {
+                    list.push(optionsArray[i]);
+                } else { //assumed as primitive type (int, string...)
+                    list.push({
+                        Value: optionsArray[i],
+                        DisplayText: optionsArray[i]
+                    });
+                }
+            }
+
+            return list;
         },
 
         /* Parses given date string to a javascript Date object.
