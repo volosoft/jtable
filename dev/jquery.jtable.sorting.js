@@ -5,7 +5,6 @@
 
     //Reference to base object members
     var base = {
-        _create: $.hik.jtable.prototype._create,
         _normalizeFieldOptions: $.hik.jtable.prototype._normalizeFieldOptions,
         _createHeaderCellForField: $.hik.jtable.prototype._createHeaderCellForField,
         _createRecordLoadUrl: $.hik.jtable.prototype._createRecordLoadUrl

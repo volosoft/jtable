@@ -109,8 +109,21 @@
         /* Normalizes some options for a field (sets default values).
         *************************************************************************/
         _normalizeFieldOptions: function (fieldName, props) {
-            props.listClass = props.listClass || '';
-            props.inputClass = props.inputClass || '';
+            if (props.listClass == undefined) {
+                props.listClass = '';
+            }
+            if (props.inputClass == undefined) {
+                props.inputClass = '';
+            }
+
+            //Convert dependsOn to array if it's a comma seperated lists
+            if (props.dependsOn && $.type(props.dependsOn) === 'string') {
+                var dependsOnArray = props.dependsOn.split(',');
+                props.dependsOn = [];
+                for (var i = 0; i < dependsOnArray.length; i++) {
+                    props.dependsOn.push($.trim(dependsOnArray[i]));
+                }
+            }
         },
 
         /* Intializes some private variables.
@@ -522,11 +535,14 @@
             }
 
             //remove from DOM
-            $rows.remove();
+            $rows.addClass('jtable-row-removed').remove();
 
             //remove from _$tableRows array
             $rows.each(function () {
-                self._$tableRows.splice(self._findRowIndex($(this)), 1);
+                var index = self._findRowIndex($(this));
+                if (index >= 0) {
+                    self._$tableRows.splice(index, 1);
+                }
             });
 
             self._onRowsRemoved($rows, reason);
@@ -571,6 +587,10 @@
         /* Adds "no data available" row to the table.
         *************************************************************************/
         _addNoDataRow: function () {
+            if (this._$tableBody.find('>tr.jtable-no-data-row').length > 0) {
+                return;
+            }
+
             var $tr = $('<tr></tr>')
                 .addClass('jtable-no-data-row')
                 .appendTo(this._$tableBody);
@@ -620,6 +640,7 @@
             } else if (field.options) { //combobox or radio button list since there are options.
                 var options = this._getOptionsForField(fieldName, {
                     record: record,
+                    value: fieldValue,
                     source: 'list',
                     dependedValues: this._createDependedValuesUsingRecord(record, field.dependsOn)
                 });
@@ -628,17 +649,24 @@
                 return fieldValue;
             }
         },
-        
+
+        /* Creates and returns an object that's properties are depended values of a record.
+        *************************************************************************/
         _createDependedValuesUsingRecord: function (record, dependsOn) {
             if (!dependsOn) {
                 return {};
             }
 
             var dependedValues = {};
-            dependedValues[dependsOn] = record[dependsOn];
+            for (var i = 0; i < dependsOn.length; i++) {
+                dependedValues[dependsOn[i]] = record[dependsOn[i]];
+            }
+            
             return dependedValues;
         },
 
+        /* Finds an option object by given value.
+        *************************************************************************/
         _findOptionByValue: function (options, value) {
             for (var i = 0; i < options.length; i++) {
                 if (options[i].Value == value) {
@@ -668,7 +696,6 @@
             var optionsSource = field.options;
 
             if ($.isFunction(optionsSource)) {
-
                 //prepare parameter to the function
                 funcParams = $.extend(true, {
                     _cacheCleared: false,
@@ -686,10 +713,22 @@
 
             //Build options according to it's source type
             if (typeof optionsSource == 'string') { //It is an Url to download options
-                var cacheKey = 'options_' + fieldName + '_' + optionsSource;
+                var cacheKey = 'options_' + fieldName + '_' + optionsSource; //create a unique cache key
                 if (funcParams._cacheCleared || (!this._cache[cacheKey])) {
-                    this._cache[cacheKey] = this._downloadOptions(fieldName, optionsSource);
+                    //if user calls clearCache() or options are not found in the cache, download options
+                    this._cache[cacheKey] = this._buildOptionsFromArray(this._downloadOptions(fieldName, optionsSource));
                     this._sortFieldOptions(this._cache[cacheKey], field.optionsSorting);
+                } else {
+                    //found on cache..
+                    //if this method (_getOptionsForField) is called to get option for a specific value (on funcParams.source == 'list')
+                    //and this value is not in cached options, we need to re-download options to get the unfound (probably new) option.
+                    if (funcParams.value != undefined) {
+                        var optionForValue = this._findOptionByValue(this._cache[cacheKey], funcParams.value);
+                        if(optionForValue.DisplayText == undefined) { //this value is not in cached options...
+                            this._cache[cacheKey] = this._buildOptionsFromArray(this._downloadOptions(fieldName, optionsSource));
+                            this._sortFieldOptions(this._cache[cacheKey], field.optionsSorting);
+                        }
+                    }
                 }
 
                 options = this._cache[cacheKey];
@@ -704,16 +743,45 @@
             return options;
         },
 
+        /* Download options for a field from server.
+        *************************************************************************/
+        _downloadOptions: function (fieldName, url) {
+            var self = this;
+            var options = [];
+
+            self._ajax({
+                url: url,
+                async: false,
+                success: function (data) {
+                    if (data.Result != 'OK') {
+                        self._showError(data.Message);
+                        return;
+                    }
+
+                    options = data.Options;
+                },
+                error: function () {
+                    var errMessage = self._formatString(self.options.messages.cannotLoadOptionsFor, fieldName);
+                    self._showError(errMessage);
+                }
+            });
+
+            return options;
+        },
+
+        /* Sorts given options according to sorting parameter.
+        *  sorting can be: 'value', 'value-desc', 'text' or 'text-desc'.
+        *************************************************************************/
         _sortFieldOptions: function (options, sorting) {
-            
+
             if ((!options) || (!options.length) || (!sorting)) {
                 return;
             }
-            
+
             //Determine using value of text
             var dataSelector;
             if (sorting.indexOf('value') == 0) {
-                dataSelector = function(option) {
+                dataSelector = function (option) {
                     return option.Value;
                 };
             } else { //assume as text
@@ -744,6 +812,8 @@
             }
         },
 
+        /* Creates an array of options from given object.
+        *************************************************************************/
         _buildOptionsArrayFromObject: function (options) {
             var list = [];
 
@@ -757,14 +827,13 @@
             return list;
         },
 
-        /* Creates an options object (that it's property is value, value is displaytext)
-        *  from a simple array.
+        /* Creates array of options from giving options array.
         *************************************************************************/
         _buildOptionsFromArray: function (optionsArray) {
             var list = [];
 
             for (var i = 0; i < optionsArray.length; i++) {
-                if ($.isPlainObject) {
+                if ($.isPlainObject(optionsArray[i])) {
                     list.push(optionsArray[i]);
                 } else { //assumed as primitive type (int, string...)
                     list.push({

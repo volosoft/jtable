@@ -74,6 +74,13 @@
                             id: 'EditDialogSaveButton',
                             text: self.options.messages.save,
                             click: function () {
+                                
+                                //row maybe removed by another source, if so, do nothing
+                                if (self._$editingRow.hasClass('jtable-row-removed')) {
+                                    self._$editDiv.dialog('close');
+                                    return;
+                                }
+
                                 var $saveButton = self._$editDiv.find('#EditDialogSaveButton');
                                 var $editForm = self._$editDiv.find('form');
                                 if (self._trigger("formSubmitting", null, { form: $editForm, formType: 'edit', row: self._$editingRow }) != false) {
