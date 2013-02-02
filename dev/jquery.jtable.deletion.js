@@ -77,6 +77,13 @@
                             id: 'DeleteDialogButton',
                             text: self.options.messages.deleteText,
                             click: function () {
+                                
+                                //row maybe removed by another source, if so, do nothing
+                                if (self._$deletingRow.hasClass('jtable-row-removed')) {
+                                    self._$deleteRecordDiv.dialog('close');
+                                    return;
+                                }
+
                                 var $deleteButton = $('#DeleteDialogButton');
                                 self._setEnabledOfDialogButton($deleteButton, false, self.options.messages.deleting);
                                 self._deleteRecordFromServer(

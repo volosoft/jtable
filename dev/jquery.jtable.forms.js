@@ -204,10 +204,6 @@
             var $select = $('<select class="' + field.inputClass + '" id="Edit-' + fieldName + '" name="' + fieldName + '"></select>')
                 .appendTo($containerDiv);
 
-            if (field.dependsOn) {
-                $select.attr('data-depends-on', field.dependsOn);
-            }
-
             //add options
             var options = this._getOptionsForField(fieldName, {
                 record: record,
@@ -230,19 +226,26 @@
             }
         },
 
+        /* Creates depended values object from given form.
+        *************************************************************************/
         _createDependedValuesUsingForm: function ($form, dependsOn) {
-
             if (!dependsOn) {
                 return {};
             }
 
-            var $dependsOn = $form.find('select[name=' + dependsOn + ']');
-            if ($dependsOn.length <= 0) {
-                return {};
+            var dependedValues = {};
+
+            for (var i = 0; i < dependsOn.length; i++) {
+                var dependedField = dependsOn[i];
+
+                var $dependsOn = $form.find('select[name=' + dependedField + ']');
+                if ($dependsOn.length <= 0) {
+                    continue;
+                }
+
+                dependedValues[dependedField] = $dependsOn.val();
             }
 
-            var dependedValues = {};
-            dependedValues[dependsOn] = $dependsOn.val();
 
             return dependedValues;
         },
@@ -336,34 +339,46 @@
         _makeCascadeDropDowns: function ($form, record, source) {
             var self = this;
 
-            $form.find('select[data-depends-on]')
+            $form.find('select') //for each combobox
                 .each(function () {
                     var $thisDropdown = $(this);
+
+                    //get field name
                     var fieldName = $thisDropdown.attr('name');
                     if (!fieldName) {
                         return;
                     }
 
-                    var dependsOnField = $thisDropdown.attr('data-depends-on');
-                    var $dependsOn = $form.find('select[name=' + dependsOnField + ']');
-                    $dependsOn.change(function () {
+                    var field = self.options.fields[fieldName];
+                    
+                    //check if this combobox depends on others
+                    if (!field.dependsOn) {
+                        return;
+                    }
 
-                        //Refresh options
+                    //for each dependency
+                    $.each(field.dependsOn, function (index, dependsOnField) {
+                        //find the depended combobox
+                        var $dependsOnDropdown = $form.find('select[name=' + dependsOnField + ']');
+                        //when depended combobox changes
+                        $dependsOnDropdown.change(function () {
 
-                        var funcParams = {
-                            record: record,
-                            source: source,
-                            form: $form,
-                            dependedValues: {}
-                        };
-                        funcParams.dependedValues[dependsOnField] = $dependsOn.val();
+                            //Refresh options
+                            var funcParams = {
+                                record: record,
+                                source: source,
+                                form: $form,
+                                dependedValues: {}
+                            };
+                            funcParams.dependedValues = self._createDependedValuesUsingForm($form, field.dependsOn);
+                            var options = self._getOptionsForField(fieldName, funcParams);
 
-                        var options = self._getOptionsForField(fieldName, funcParams);
-                        self._fillDropDownListWithOptions($thisDropdown, options, undefined);
+                            //Fill combobox with new options
+                            self._fillDropDownListWithOptions($thisDropdown, options, undefined);
 
-                        //Thigger change event to refresh multi cascade dropdowns.
-                        
-                        $thisDropdown.change();
+                            //Thigger change event to refresh multi cascade dropdowns.
+                            $thisDropdown.change();
+                        });
                     });
                 });
         },
@@ -388,13 +403,20 @@
 
                 //Update field in record according to it's type
                 if (field.type == 'date') {
-                    var displayFormat = field.displayFormat || this.options.defaultDateFormat;
-                    try {
-                        var date = $.datepicker.parseDate(displayFormat, $inputElement.val());
-                        record[fieldName] = '/Date(' + date.getTime() + ')/';
-                    } catch (e) {
-                        //TODO: Handle incorrect/different date formats
-                        record[fieldName] = '/Date(' + (new Date()).getTime() + ')/';
+                    var dateVal = $inputElement.val();
+                    if (dateVal) {
+                        var displayFormat = field.displayFormat || this.options.defaultDateFormat;
+                        try {
+                            var date = $.datepicker.parseDate(displayFormat, dateVal);
+                            record[fieldName] = '/Date(' + date.getTime() + ')/';
+                        } catch (e) {
+                            //TODO: Handle incorrect/different date formats
+                            this._logWarn('Date format is incorrect for field ' + fieldName + ': ' + dateVal);
+                            record[fieldName] = undefined;
+                        }
+                    } else {
+                        this._logDebug('Date is empty for ' + fieldName);
+                        record[fieldName] = undefined; //TODO: undefined, null or empty string?
                     }
                 } else if (field.options && field.type == 'radiobutton') {
                     var $checkedElement = $inputElement.filter(':checked');
@@ -407,32 +429,6 @@
                     record[fieldName] = $inputElement.val();
                 }
             }
-        },
-
-        /* Download options for a field from server.
-        *************************************************************************/
-        _downloadOptions: function (fieldName, url) {
-            var self = this;
-            var options = [];
-
-            self._ajax({
-                url: url,
-                async: false,
-                success: function (data) {
-                    if (data.Result != 'OK') {
-                        self._showError(data.Message);
-                        return;
-                    }
-
-                    options = data.Options;
-                },
-                error: function () {
-                    var errMessage = self._formatString(self.options.messages.cannotLoadOptionsFor, fieldName);
-                    self._showError(errMessage);
-                }
-            });
-
-            return options;
         },
 
         /* Sets enabled/disabled state of a dialog button.
