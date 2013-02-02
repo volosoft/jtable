@@ -105,30 +105,56 @@
             if( data.options.children ){
                 $.each( data.options.children, function( childID, childOptions ){
                     var $childDiv = data.form.find('div#' + childID );
-                    if( $childDiv.lenth != 0 ){
+                    var params = { form: data.form, record: data.record };
+                    var options = typeof(childOptions.options)=='function'?childOptions.options( params ):childOptions.options || {}
+                        
+                    // if not present in form already, appends element to form
+                    if( $childDiv.length == 0 ){
+                        if( childOptions.type == 'button' ){
+                            var dialogButtons = data.dialog.dialog('option', 'buttons');
+                            var index;
+                            for( index=0; index<dialogButtons.length; index++ ){
+                                if( dialogButtons[index].id == childID ) break;
+                            }
+                            if( index==dialogButtons.length ){
+                                dialogButtons.splice(0,0,{
+                                    id: childID,
+                                    text: options.label || childID,
+                                    click: function(e){
+                                        e.preventDefault();
+                                        if( childOptions.click ){
+                                            childOptions.click(params);
+                                        }
+                                    }
+                                });
+                                data.dialog.dialog('option', 'buttons', dialogButtons);
+                            }
+                        }
+                        else{
+                            $childDiv = $('<div id="' + childID + '"/>');
+                            data.form.append($childDiv);
+                        }
+                    }
+                    
+                    if( $childDiv.length != 0 ){
                         switch( childOptions.type ){
                             case 'button':
                                 $childDiv
-                                .button({
-                                    disabled: childOptions.disabled || false
-                                })
+                                .button( options )
                                 .click( function(e){
                                     if( childOptions.click ){
-                                        childOptions.click({
-                                            form: data.form, 
-                                            record: data.record
-                                        });
+                                        childOptions.click(params);
                                     }
                                 });
                                 break;
-                            
+
                             case 'jtable':
                                 $childDiv
-                                .jtable( childOptions.options( data.record ) )
+                                .jtable( options )
                                 .jtable('load');
                                 break;
                         }
-                    }                        
+                    }
                 });
             }
             
