@@ -30,7 +30,7 @@
             var field = this.options.fields[fieldName];
 
             if (field.childTable){
-                return this._createChildTable(record, field, field.childTable(record));
+                return this._createChildTable(record, field, typeof(field.childTable)=='function'?field.childTable(record):field.childTable);
             }
 
             return base._getDisplayTextForRecordField.apply(this, arguments);
@@ -65,19 +65,6 @@
                     options,
                     function (data) {
                         data.childTable.jtable('load');
-                        if( options.spotlight ){
-                            data.childTable.bind('mouseover', function(){
-                                $(this).spotlight({
-                                    opacity: .5,				//spotlight opacity
-                                    speed: 400,					//animateion speed
-                                    color: '#333',				//spotlight colour
-                                    animate: true,				//enable animation (if false 'speed' and 'easing' are irrelevant)
-                                    exitEvent: 'mouseover',                     //set which event triggers spotlight to hide (must be a valid jQuery 'live' event type)
-                                    onShow: function(){},                       //callback function after spotlight is shown
-                                    onHide: function(){}                        //callback function after spotlight is hidden
-                                }) ;
-                            });
-                        }
                     })
             });
             return $img;
