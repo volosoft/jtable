@@ -158,6 +158,33 @@
                     .opacity(1);
                 }
             }
+
+			// Toolbar -------------------------------------------------------------
+
+			div.jtable-toolbar
+			{
+				.dock(bottom-right);
+
+				span.jtable-toolbar-item
+				{
+					background-color: @table-title-background + #0A0A0A;
+					color: white;
+
+					&.jtable-toolbar-item-add-record
+					{
+						span.jtable-toolbar-item-icon
+						{
+							background-image: url('metro/add.png');
+						}
+					}
+
+					&.jtable-toolbar-item-hover
+					{
+						background-color: @main-theme-color - #111;
+						padding-bottom: 6px;
+					}
+				}
+			}
         }
 
 		// Table ---------------------------------------------------------------
@@ -305,7 +332,7 @@
                     {
                         > td
                         {
-                            padding: 0px;
+                            padding: 2px;
                             background-color: #fff;
                         }
                     }
@@ -313,7 +340,7 @@
             }
         }
 
-		// Footer --------------------------------------------------------------
+		// Bottom panel --------------------------------------------------------------
 
         > div.jtable-bottom-panel
         {
@@ -357,28 +384,36 @@
                         background-color: @table-bottom-panel-background + #333;
                     }
 
-                .jtable-page-number-active
-                {
+                .jtable-page-number-disabled
+                {					
+					.opacity(0.75);
                     color: #ccc;
                     cursor: default;
-                }
 
-                .jtable-page-info
-                {
-					margin-left: 5px;
-					padding: 2px;
+					&:hover
+					{
+						background-color: @table-bottom-panel-background + #111;
+					}
                 }
             }
 
-            span.jtable-add-record
+			span.jtable-page-info
             {
-                margin: 4px;
-
-                a
-                {
-                    color: #fff;
-                }
+				display: inline-block;
+				padding: 4px;				
             }
+
+			span.jtable-page-size-change
+            {
+				display:inline-block;
+                padding:2px 0px 2px 0px;
+            }
+
+			span.jtable-goto-page
+			{
+				display:inline-block;
+                padding:2px 0px 2px 0px;
+			}
         }
     }
 

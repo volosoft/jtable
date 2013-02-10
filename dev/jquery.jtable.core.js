@@ -19,9 +19,17 @@
             dialogHideEffect: 'fade',
             showCloseButton: false,
             loadingAnimationDelay: 500,
+
             ajaxSettings: {
                 type: 'POST',
                 dataType: 'json'
+            },
+
+            toolbar: {
+                hoverAnimation: true,
+                hoverAnimationDuration: 60,
+                hoverAnimationEasing: undefined,
+                items: []
             },
 
             //Events
@@ -55,11 +63,12 @@
 
         _$mainContainer: null, //Reference to the main container of all elements that are created by this plug-in (jQuery object)
 
+        _$titleDiv: null, //Reference to the title div (jQuery object)
+        _$toolbarDiv: null, //Reference to the toolbar div (jQuery object)
+
         _$table: null, //Reference to the main <table> (jQuery object)
         _$tableBody: null, //Reference to <body> in the table (jQuery object)
         _$tableRows: null, //Array of all <tr> in the table (except "no data" row) (jQuery object array)
-
-        _$bottomPanel: null, //Reference to the panel at the bottom of the table (jQuery object)
 
         _$busyDiv: null, //Reference to the div that is used to block UI while busy (jQuery object)
         _$busyMessageDiv: null, //Reference to the div that is used to show some message when UI is blocked (jQuery object)
@@ -90,8 +99,8 @@
             //Creating DOM elements
             this._createMainContainer();
             this._createTableTitle();
+            this._createToolBar();
             this._createTable();
-            this._createBottomPanel();
             this._createBusyPanel();
             this._createErrorDialogDiv();
             this._addNoDataRow();
@@ -200,6 +209,8 @@
                         self._onCloseRequested();
                     });
             }
+
+            self._$titleDiv = $titleDiv;
         },
 
         /* Creates the table.
@@ -278,17 +289,6 @@
             this._$tableBody = $('<tbody></tbody>').appendTo(this._$table);
         },
 
-        /* Creates bottom panel and adds to the page.
-        *************************************************************************/
-        _createBottomPanel: function () {
-            this._$bottomPanel = $('<div />')
-                .addClass('jtable-bottom-panel')
-                .appendTo(this._$mainContainer);
-
-            $('<div />').addClass('jtable-left-area').appendTo(this._$bottomPanel);
-            $('<div />').addClass('jtable-right-area').appendTo(this._$bottomPanel);
-        },
-
         /* Creates a div to block UI while jTable is busy.
         *************************************************************************/
         _createBusyPanel: function () {
@@ -357,6 +357,12 @@
         /************************************************************************
         * PRIVATE METHODS                                                       *
         *************************************************************************/
+
+        /* Used to change options dynamically after initialization.
+        *************************************************************************/
+        _setOption: function (key, value) {
+
+        },
 
         /* LOADING RECORDS  *****************************************************/
 
@@ -661,7 +667,7 @@
             for (var i = 0; i < dependsOn.length; i++) {
                 dependedValues[dependsOn[i]] = record[dependsOn[i]];
             }
-            
+
             return dependedValues;
         },
 
@@ -724,7 +730,7 @@
                     //and this value is not in cached options, we need to re-download options to get the unfound (probably new) option.
                     if (funcParams.value != undefined) {
                         var optionForValue = this._findOptionByValue(this._cache[cacheKey], funcParams.value);
-                        if(optionForValue.DisplayText == undefined) { //this value is not in cached options...
+                        if (optionForValue.DisplayText == undefined) { //this value is not in cached options...
                             this._cache[cacheKey] = this._buildOptionsFromArray(this._downloadOptions(fieldName, optionsSource));
                             this._sortFieldOptions(this._cache[cacheKey], field.optionsSorting);
                         }
@@ -876,6 +882,89 @@
                 this._logWarn('Given date is not properly formatted: ' + dateString);
                 return 'format error!';
             }
+        },
+
+        /* TOOL BAR *************************************************************/
+
+        /* Creates the toolbar.
+        *************************************************************************/
+        _createToolBar: function () {
+            this._$toolbarDiv = $('<div />')
+            .addClass('jtable-toolbar')
+            .appendTo(this._$titleDiv);
+
+            for (var i = 0; i < this.options.toolbar.items.length; i++) {
+                this._addToolBarItem(this.options.toolbar.items[i]);
+            }
+        },
+
+        /* Adds a new item to the toolbar.
+        *************************************************************************/
+        _addToolBarItem: function (item) {
+
+            //Check if item is valid
+            if ((item == undefined) || (item.text == undefined && item.icon == undefined)) {
+                this._logWarn('Can not add tool bar item since it is not valid!');
+                this._logWarn(item);
+                return null;
+            }
+
+            var $toolBarItem = $('<span></span>')
+                .addClass('jtable-toolbar-item')
+                .appendTo(this._$toolbarDiv);
+
+            //cssClass property
+            if (item.cssClass) {
+                $toolBarItem
+                    .addClass(item.cssClass);
+            }
+
+            //tooltip property
+            if (item.tooltip) {
+                $toolBarItem
+                    .attr('title', item.tooltip);
+            }
+
+            //icon property
+            if (item.icon) {
+                var $icon = $('<span class="jtable-toolbar-item-icon"></span>').appendTo($toolBarItem);
+                if (item.icon === true) {
+                    //do nothing
+                } else if ($.type(item.icon === 'string')) {
+                    $icon.css('background', 'url("' + item.icon + '")');
+                }
+            }
+
+            //text property
+            if (item.text) {
+                $('<span class=""></span>')
+                    .html(item.text)
+                    .addClass('jtable-toolbar-item-text').appendTo($toolBarItem);
+            }
+
+            //click event
+            if (item.click) {
+                $toolBarItem.click(function () {
+                    item.click();
+                });
+            }
+
+            //set hover animation parameters
+            var hoverAnimationDuration = undefined;
+            var hoverAnimationEasing = undefined;
+            if (this.options.toolbar.hoverAnimation) {
+                hoverAnimationDuration = this.options.toolbar.hoverAnimationDuration;
+                hoverAnimationEasing = this.options.toolbar.hoverAnimationEasing;
+            }
+            
+            //change class on hover
+            $toolBarItem.hover(function () {
+                $toolBarItem.addClass('jtable-toolbar-item-hover', hoverAnimationDuration, hoverAnimationEasing);
+            }, function () {
+                $toolBarItem.removeClass('jtable-toolbar-item-hover', hoverAnimationDuration, hoverAnimationEasing);
+            });
+
+            return $toolBarItem;
         },
 
         /* ERROR DIALOG *********************************************************/
