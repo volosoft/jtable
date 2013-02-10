@@ -90,17 +90,22 @@
 
         //Creates a hidden input element with given name and value.
         _createInputForHidden: function (fieldName, value) {
-            if (value == undefined || value == null) {
+            if (value == undefined) {
                 value = "";
             }
 
-            return $('<input type="hidden" value="' + value + '" name="' + fieldName + '" id="Edit-' + fieldName + '"></input>');
+            return $('<input type="hidden" name="' + fieldName + '" id="Edit-' + fieldName + '"></input>')
+                .val(value);
         },
 
         /* Creates a date input for a field.
         *************************************************************************/
         _createDateInputForField: function (field, fieldName, value) {
-            var $input = $('<input class="' + field.inputClass + '" id="Edit-' + fieldName + '" type="text"' + (value != undefined ? 'value="' + value + '"' : '') + ' name="' + fieldName + '"></input>');
+            var $input = $('<input class="' + field.inputClass + '" id="Edit-' + fieldName + '" type="text" name="' + fieldName + '"></input>');
+            if(value != undefined) {
+                $input.val(value);
+            }
+            
             var displayFormat = field.displayFormat || this.options.defaultDateFormat;
             $input.datepicker({ dateFormat: displayFormat });
             return $('<div />')
@@ -111,7 +116,11 @@
         /* Creates a textarea element for a field.
         *************************************************************************/
         _createTextAreaForField: function (field, fieldName, value) {
-            var $textArea = $('<textarea class="' + field.inputClass + '" id="Edit-' + fieldName + '" name="' + fieldName + '">' + (value || '') + '</textarea>');
+            var $textArea = $('<textarea class="' + field.inputClass + '" id="Edit-' + fieldName + '" name="' + fieldName + '"></textarea>');
+            if (value != undefined) {
+                $textArea.val(value);
+            }
+            
             return $('<div />')
                 .addClass('jtable-input jtable-textarea-input')
                 .append($textArea);
@@ -120,7 +129,11 @@
         /* Creates a standart textbox for a field.
         *************************************************************************/
         _createTextInputForField: function (field, fieldName, value) {
-            var $input = $('<input class="' + field.inputClass + '" id="Edit-' + fieldName + '" type="text"' + (value != undefined ? 'value="' + value + '"' : '') + ' name="' + fieldName + '"></input>');
+            var $input = $('<input class="' + field.inputClass + '" id="Edit-' + fieldName + '" type="text" name="' + fieldName + '"></input>');
+            if (value != undefined) {
+                $input.val(value);
+            }
+            
             return $('<div />')
                 .addClass('jtable-input jtable-text-input')
                 .append($input);
@@ -129,7 +142,11 @@
         /* Creates a password input for a field.
         *************************************************************************/
         _createPasswordInputForField: function (field, fieldName, value) {
-            var $input = $('<input class="' + field.inputClass + '" id="Edit-' + fieldName + '" type="password"' + (value != undefined ? 'value="' + value + '"' : '') + ' name="' + fieldName + '"></input>');
+            var $input = $('<input class="' + field.inputClass + '" id="Edit-' + fieldName + '" type="password" name="' + fieldName + '"></input>');
+            if (value != undefined) {
+                $input.val(value);
+            }
+            
             return $('<div />')
                 .addClass('jtable-input jtable-password-input')
                 .append($input);
@@ -150,8 +167,11 @@
                 .addClass('jtable-input jtable-checkbox-input');
 
             //Create checkbox and check if needed
-            var $checkBox = $('<input class="' + field.inputClass + '" id="Edit-' + fieldName + '" type="checkbox" name="' + fieldName + '" value="' + value + '" />')
+            var $checkBox = $('<input class="' + field.inputClass + '" id="Edit-' + fieldName + '" type="checkbox" name="' + fieldName + '" />')
                 .appendTo($containerDiv);
+            if (value != undefined) {
+                $checkBox.val(value);
+            }
 
             //Create display text of checkbox for current state
             var $textSpan = $('<span>' + (field.formText || self._getCheckBoxTextForFieldByValue(fieldName, value)) + '</span>')
@@ -222,7 +242,9 @@
         _fillDropDownListWithOptions: function ($select, options, value) {
             $select.empty();
             for (var i = 0; i < options.length; i++) {
-                $select.append('<option value="' + options[i].Value + '"' + (options[i].Value == value ? ' selected="selected"' : '') + '>' + options[i].DisplayText + '</option>');
+                $('<option' + (options[i].Value == value ? ' selected="selected"' : '') + '>' + options[i].DisplayText + '</option>')
+                    .val(options[i].Value)
+                    .appendTo($select);
             }
         },
 
@@ -266,7 +288,8 @@
                     .addClass('jtable-radio-input')
                     .appendTo($containerDiv);
 
-                var $radioButton = $('<input type="radio" id="Edit-' + fieldName + '-' + i + '" class="' + field.inputClass + '" name="' + fieldName + '" value="' + option.Value + '"' + ((option.Value == (value + '')) ? ' checked="true"' : '') + ' />')
+                var $radioButton = $('<input type="radio" id="Edit-' + fieldName + '-' + i + '" class="' + field.inputClass + '" name="' + fieldName + '"' + ((option.Value == (value + '')) ? ' checked="true"' : '') + ' />')
+                    .val(option.Value)
                     .appendTo($radioButtonDiv);
 
                 var $textSpan = $('<span></span>')

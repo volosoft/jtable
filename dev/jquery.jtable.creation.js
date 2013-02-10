@@ -21,7 +21,7 @@
 
             //Localization
             messages: {
-                addNewRecord: '+ Add new record'
+                addNewRecord: 'Add new record'
             }
         },
 
@@ -93,28 +93,23 @@
                 }
             });
 
-            //If not 'add record button' supplied, create a new one.
-            if (!self.options.addRecordButton) {
-                self.options.addRecordButton = self._createAddRecordButton();
+            if (self.options.addRecordButton) {
+                //If user supplied a button, bind the click event to show dialog form
+                self.options.addRecordButton.click(function (e) {
+                    e.preventDefault();
+                    self._showAddRecordForm();
+                });
+            } else {
+                //If user did not supplied a button, create a 'add record button' toolbar item.
+                self._addToolBarItem({
+                    icon: true,
+                    cssClass: 'jtable-toolbar-item-add-record',
+                    text: self.options.messages.addNewRecord,
+                    click: function () {
+                        self._showAddRecordForm();
+                    }
+                });
             }
-
-            //Bind click event to show dialog form
-            self.options.addRecordButton.click(function (e) {
-                e.preventDefault();
-                self._showAddRecordForm();
-            });
-        },
-
-        /* Creates and returns 'add new record' button/link.
-        *************************************************************************/
-        _createAddRecordButton: function () {
-            var $link = $('<a></a>')
-                .attr('href', '#')
-                .html(this.options.messages.addNewRecord);
-            return $('<span></span>')
-                .addClass('jtable-add-record')
-                .append($link)
-                .appendTo(this._$bottomPanel.find('.jtable-right-area'));
         },
 
         /************************************************************************

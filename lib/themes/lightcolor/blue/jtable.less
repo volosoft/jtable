@@ -1,4 +1,9 @@
-﻿@import "../jtable_lightcolor_base.less";
+﻿/* jTable light color theme - Blue
+ * Created by Halil İbrahim Kalkan
+ * http://www.jtable.org
+ */
+
+@import "../jtable_lightcolor_base.less";
 
 @theme-folder: 'blue';
 
@@ -16,6 +21,19 @@ div.jtable-main-container
             .text-shadow(0 1px 0 #666);
             color: #fff;
         }
+
+		div.jtable-toolbar
+		{
+			span.jtable-toolbar-item
+			{
+				color: white;
+
+				&.jtable-toolbar-item-hover
+				{
+					background-color: #417bb5;
+				}
+			}
+		}
     }
 
     table.jtable
@@ -46,7 +64,7 @@ div.jtable-main-container
     {
         .jtable-page-list
         {
-            .jtable-page-number-active
+            .jtable-page-number-active,.jtable-page-number-active:hover
             {
 				@bgcolor: #2B5177;
 

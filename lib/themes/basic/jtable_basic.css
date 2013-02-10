@@ -17,6 +17,40 @@ div.jtable-main-container div.jtable-title .jtable-close-button {
   bottom: 0px;
   position: absolute;
 }
+div.jtable-main-container div.jtable-title div.jtable-toolbar {
+  bottom: 0px;
+  right: 0px;
+  position: absolute;
+  display: inline-block;
+  margin-right: 5px;
+}
+div.jtable-main-container div.jtable-title div.jtable-toolbar span.jtable-toolbar-item {
+  position: relative;
+  display: inline-block;
+  margin: 0px 0px 0px 5px;
+  cursor: pointer;
+  font-size: 0.9em;
+  padding: 2px;
+  vertical-align: bottom;
+}
+div.jtable-main-container div.jtable-title div.jtable-toolbar span.jtable-toolbar-item span.jtable-toolbar-item-icon {
+  display: inline-block;
+  margin: 2px;
+  vertical-align: middle;
+  width: 16px;
+  height: 16px;
+}
+div.jtable-main-container div.jtable-title div.jtable-toolbar span.jtable-toolbar-item span.jtable-toolbar-item-text {
+  display: inline-block;
+  margin: 2px;
+  vertical-align: middle;
+}
+div.jtable-main-container div.jtable-title div.jtable-toolbar span.jtable-toolbar-item.jtable-toolbar-item-add-record span.jtable-toolbar-item-icon {
+  background-image: url('../../metro/add.png');
+}
+div.jtable-main-container div.jtable-title .jtable-close-button + div.jtable-toolbar {
+  margin-right: 30px;
+}
 div.jtable-main-container table.jtable {
   width: 100%;
 }
@@ -76,53 +110,42 @@ div.jtable-main-container table.jtable tbody tr > td.jtable-selecting-column inp
 div.jtable-main-container table.jtable tbody tr.jtable-no-data-row {
   text-align: center;
 }
-div.jtable-main-container div.jtable-bottom-panel {
+div.jtable-main-container > div.jtable-bottom-panel {
   position: relative;
   min-height: 24px;
 }
-div.jtable-main-container div.jtable-bottom-panel div.jtable-left-area {
+div.jtable-main-container > div.jtable-bottom-panel div.jtable-left-area {
   left: 0px;
   top: 0px;
   bottom: 0px;
   position: absolute;
 }
-div.jtable-main-container div.jtable-bottom-panel div.jtable-right-area {
+div.jtable-main-container > div.jtable-bottom-panel div.jtable-right-area {
   right: 0px;
   top: 0px;
   bottom: 0px;
   position: absolute;
 }
-div.jtable-main-container div.jtable-bottom-panel .jtable-page-list {
+div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list {
   display: inline-block;
 }
-div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number,
-div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-space,
-div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-first,
-div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-last,
-div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-previous,
-div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-next,
-div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-active {
+div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number,
+div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-space,
+div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-first,
+div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-last,
+div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-previous,
+div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-next,
+div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-active {
   padding: 2px 5px;
   display: inline-block;
   cursor: pointer;
 }
-div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-space,
-div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-active {
+div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-space,
+div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-active {
   cursor: default;
 }
-div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-info {
-  display: inline-block;
-  margin-left: 5px;
-  padding: 2px;
-}
-div.jtable-main-container div.jtable-bottom-panel span.jtable-add-record {
-  display: inline-block;
-}
-div.jtable-main-container div.jtable-bottom-panel span.jtable-add-record a {
-  text-decoration: none;
-}
-div.jtable-main-container div.jtable-bottom-panel span.jtable-add-record a:hover {
-  text-decoration: underline;
+div.jtable-main-container > div.jtable-bottom-panel span.jtable-page-size-change {
+  margin-left: 4px;
 }
 div.jtable-main-container div.jtable-column-resize-bar {
   opacity: 0.5;

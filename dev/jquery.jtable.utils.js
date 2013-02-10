@@ -61,7 +61,7 @@
         *  if it is undefined
         *************************************************************************/
         _normalizeNumber: function (number, min, max, defaultValue) {
-            if (number == undefined || number == null) {
+            if (number == undefined || number == null || isNaN(number)) {
                 return defaultValue;
             }
 
