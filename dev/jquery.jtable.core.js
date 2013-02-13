@@ -19,6 +19,7 @@
             dialogHideEffect: 'fade',
             showCloseButton: false,
             loadingAnimationDelay: 500,
+            saveUserPreferences: true,
 
             ajaxSettings: {
                 type: 'POST',
@@ -104,6 +105,8 @@
             this._createBusyPanel();
             this._createErrorDialogDiv();
             this._addNoDataRow();
+            
+            this._cookieKeyPrefix = this._generateCookieKeyPrefix();
         },
 
         /* Normalizes some options for all fields (sets default values).
@@ -861,22 +864,22 @@
         _parseDate: function (dateString) {
             if (dateString.indexOf('Date') >= 0) { //Format: /Date(1320259705710)/
                 return new Date(
-                    parseInt(dateString.substr(6))
+                    parseInt(dateString.substr(6), 10)
                 );
             } else if (dateString.length == 10) { //Format: 2011-01-01
                 return new Date(
-                    parseInt(dateString.substr(0, 4)),
-                    parseInt(dateString.substr(5, 2)) - 1,
-                    parseInt(dateString.substr(8, 2))
+                    parseInt(dateString.substr(0, 4), 10),
+                    parseInt(dateString.substr(5, 2), 10) - 1,
+                    parseInt(dateString.substr(8, 2), 10)
                 );
             } else if (dateString.length == 19) { //Format: 2011-01-01 20:32:42
                 return new Date(
-                    parseInt(dateString.substr(0, 4)),
-                    parseInt(dateString.substr(5, 2)) - 1,
-                    parseInt(dateString.substr(8, 2)),
-                    parseInt(dateString.substr(11, 2)),
-                    parseInt(dateString.substr(14, 2)),
-                    parseInt(dateString.substr(17, 2))
+                    parseInt(dateString.substr(0, 4), 10),
+                    parseInt(dateString.substr(5, 2), 10) - 1,
+                    parseInt(dateString.substr(8, 2, 10)),
+                    parseInt(dateString.substr(11, 2), 10),
+                    parseInt(dateString.substr(14, 2), 10),
+                    parseInt(dateString.substr(17, 2), 10)
                 );
             } else {
                 this._logWarn('Given date is not properly formatted: ' + dateString);
@@ -1068,6 +1071,72 @@
         *************************************************************************/
         _getKeyValueOfRecord: function (record) {
             return record[this._keyField];
+        },
+        
+        /************************************************************************
+        * COOKIE                                                                *
+        *************************************************************************/
+
+        /* Sets a cookie with given key.
+        *************************************************************************/
+        _setCookie: function (key, value) {
+            key = this._cookieKeyPrefix + key;
+
+            var expireDate = new Date();
+            expireDate.setDate(expireDate.getDate() + 30);
+            document.cookie = encodeURIComponent(key) + '=' + encodeURIComponent(value) + "; expires=" + expireDate.toUTCString();
+        },
+
+        /* Gets a cookie with given key.
+        *************************************************************************/
+        _getCookie: function (key) {
+            key = this._cookieKeyPrefix + key;
+
+            var equalities = document.cookie.split('; ');
+            for (var i = 0; i < equalities.length; i++) {
+                if (!equalities[i]) {
+                    continue;
+                }
+
+                var splitted = equalities[i].split('=');
+                if (splitted.length != 2) {
+                    continue;
+                }
+
+                if (decodeURIComponent(splitted[0]) === key) {
+                    return decodeURIComponent(splitted[1] || '');
+                }
+            }
+
+            return null;
+        },
+
+        /* Generates a hash key to be prefix for all cookies for this jtable instance.
+        *************************************************************************/
+        _generateCookieKeyPrefix: function () {
+
+            var simpleHash = function (value) {
+                var hash = 0;
+                if (value.length == 0) {
+                    return hash;
+                }
+
+                for (var i = 0; i < value.length; i++) {
+                    var ch = value.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + ch;
+                    hash = hash & hash;
+                }
+
+                return hash;
+            };
+
+            var strToHash = '';
+            if (this.options.tableId) {
+                strToHash = strToHash + this.options.tableId + '#';
+            }
+
+            strToHash = strToHash + this._columnList.join('$') + '#c' + this._$table.find('thead th').length;
+            return 'jtable#' + simpleHash(strToHash);
         },
 
         /************************************************************************

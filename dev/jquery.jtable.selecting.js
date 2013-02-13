@@ -48,10 +48,9 @@
         _create: function () {
             if (this.options.selecting && this.options.selectingCheckboxes) {
                 ++this._firstDataColumnOffset;
+                this._bindKeyboardEvents();
             }
 
-            this._bindKeyboardEvents();
-            
             //Call base method
             base._create.apply(this, arguments);
         },
@@ -62,18 +61,18 @@
             var self = this;
             //Register to events to set _shiftKeyDown value
             $(document)
-                .keydown(function(event) {
+                .keydown(function (event) {
                     switch (event.which) {
-                    case 16:
-                        self._shiftKeyDown = true;
-                        break;
+                        case 16:
+                            self._shiftKeyDown = true;
+                            break;
                     }
                 })
-                .keyup(function(event) {
+                .keyup(function (event) {
                     switch (event.which) {
-                    case 16:
-                        self._shiftKeyDown = false;
-                        break;
+                        case 16:
+                            self._shiftKeyDown = false;
+                            break;
                     }
                 });
         },
@@ -87,7 +86,7 @@
         selectedRows: function () {
             return this._getSelectedRows();
         },
-        
+
         /* Makes row/rows 'selected'.
         *************************************************************************/
         selectRows: function ($rows) {
@@ -126,21 +125,27 @@
         /* Overrides base event to store selection list
         *************************************************************************/
         _onLoadingRecords: function () {
-            this._storeSelectionList();
+            if (this.options.selecting) {
+                this._storeSelectionList();
+            }
+
             base._onLoadingRecords.apply(this, arguments);
         },
 
         /* Overrides base event to restore selection list
         *************************************************************************/
         _onRecordsLoaded: function () {
-            this._restoreSelectionList();
+            if (this.options.selecting) {
+                this._restoreSelectionList();
+            }
+
             base._onRecordsLoaded.apply(this, arguments);
         },
 
         /* Overrides base event to check is any selected row is being removed.
         *************************************************************************/
         _onRowsRemoved: function ($rows, reason) {
-            if ((reason != 'reloading') && this.options.selecting && ($rows.filter('.jtable-row-selected').length > 0)) {
+            if (this.options.selecting && (reason != 'reloading') && ($rows.filter('.jtable-row-selected').length > 0)) {
                 this._onSelectionChanged();
             }
 
@@ -165,13 +170,13 @@
 
             self._$selectAllCheckbox = $('<input type="checkbox" />')
                 .appendTo($headerContainer)
-                .click(function() {
+                .click(function () {
                     if (self._$tableRows.length <= 0) {
                         self._$selectAllCheckbox.attr('checked', false);
                         return;
                     }
 
-                    var allRows = self._$tableBody.find('tr.jtable-data-row');
+                    var allRows = self._$tableBody.find('>tr.jtable-data-row');
                     if (self._$selectAllCheckbox.is(':checked')) {
                         self._selectRows(allRows);
                     } else {
@@ -229,7 +234,7 @@
         *************************************************************************/
         _getSelectedRows: function () {
             return this._$tableBody
-                .find('.jtable-row-selected');
+                .find('>tr.jtable-row-selected');
         },
 
         /* Adds selectable feature to a row.
@@ -246,10 +251,8 @@
 
             //'select/deselect' checkbox column
             if (self.options.selectingCheckboxes) {
-                var $cell = $('<td></td>')
-                    .addClass('jtable-selecting-column');
-                var $selectCheckbox = $('<input type="checkbox" />')
-                    .appendTo($cell);
+                var $cell = $('<td></td>').addClass('jtable-selecting-column');
+                var $selectCheckbox = $('<input type="checkbox" />').appendTo($cell);
                 if (!self.options.selectOnRowClick) {
                     $selectCheckbox.click(function () {
                         self._invertRowSelection($row);
@@ -318,14 +321,13 @@
         /* Makes row/rows 'selected'.
         *************************************************************************/
         _selectRows: function ($rows) {
-
             if (!this.options.multiselect) {
                 this._deselectRows(this._getSelectedRows());
             }
 
             $rows.addClass('jtable-row-selected');
             if (this.options.selectingCheckboxes) {
-                $rows.find('td.jtable-selecting-column input').attr('checked', true);
+                $rows.find('>td.jtable-selecting-column >input').prop('checked', true);
             }
 
             this._refreshSelectAllCheckboxState();
@@ -336,7 +338,7 @@
         _deselectRows: function ($rows) {
             $rows.removeClass('jtable-row-selected');
             if (this.options.selectingCheckboxes) {
-                $rows.find('td.jtable-selecting-column input').removeAttr('checked');
+                $rows.find('>td.jtable-selecting-column >input').prop('checked', false);
             }
 
             this._refreshSelectAllCheckboxState();
@@ -367,7 +369,7 @@
         /************************************************************************
         * EVENT RAISING METHODS                                                 *
         *************************************************************************/
-        
+
         _onSelectionChanged: function () {
             this._trigger("selectionChanged", null, {});
         }
