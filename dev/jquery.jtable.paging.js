@@ -58,10 +58,24 @@
         _create: function () {
             base._create.apply(this, arguments);
             if (this.options.paging) {
+                this._loadPagingSettings();
                 this._createBottomPanel();
                 this._createPageListArea();
                 this._createGotoPageInput();
                 this._createPageSizeSelection();
+            }
+        },
+
+        /* Loads user preferences for paging.
+        *************************************************************************/
+        _loadPagingSettings: function () {
+            if (!this.options.saveUserPreferences) {
+                return;
+            }
+
+            var pageSize = this._getCookie('page-size');
+            if (pageSize) {
+                this.options.pageSize = this._normalizeNumber(pageSize, 1, 1000000, this.options.pageSize);
             }
         },
 
@@ -205,7 +219,20 @@
                 var currentPageCount = this._calculatePageCount();
                 if (oldPageCount != currentPageCount) {
                     this._$gotoPageInput.empty();
-                    for (var i = 1; i <= currentPageCount; i++) {
+
+                    //Skip some pages is there are too many pages
+                    var pageStep = 1;
+                    if (currentPageCount > 10000) {
+                        pageStep = 100;
+                    } else if (currentPageCount > 5000) {
+                        pageStep = 10;
+                    } else if (currentPageCount > 2000) {
+                        pageStep = 5;
+                    } else if (currentPageCount > 1000) {
+                        pageStep = 2;
+                    }
+
+                    for (var i = pageStep; i <= currentPageCount; i += pageStep) {
                         this._$gotoPageInput.append('<option value="' + i + '">' + i + '</option>');
                     }
 
@@ -253,6 +280,9 @@
             if (this._currentPageNo > pageCount) {
                 this._currentPageNo = pageCount;
             }
+            if (this._currentPageNo <= 0) {
+                this._currentPageNo = 1;
+            }
 
             //if user sets one of the options on the combobox, then select it.
             var $pageSizeChangeCombobox = this._$bottomPanel.find('.jtable-page-size-change select');
@@ -265,7 +295,18 @@
                 }
             }
 
+            this._savePagingSettings();
             this._reloadTable();
+        },
+
+        /* Saves user preferences for paging
+        *************************************************************************/
+        _savePagingSettings: function () {
+            if (!this.options.saveUserPreferences) {
+                return;
+            }
+
+            this._setCookie('page-size', this.options.pageSize);
         },
 
         /* Overrides _createRecordLoadUrl method to add paging info to URL.
@@ -317,10 +358,13 @@
         /* Overrides _onRecordsLoaded method to to do paging specific tasks.
         *************************************************************************/
         _onRecordsLoaded: function (data) {
-            this._totalRecordCount = data.TotalRecordCount;
-            this._createPagingList();
-            this._createPagingInfo();
-            this._refreshGotoPageInput();
+            if (this.options.paging) {
+                this._totalRecordCount = data.TotalRecordCount;
+                this._createPagingList();
+                this._createPagingInfo();
+                this._refreshGotoPageInput();
+            }
+
             base._onRecordsLoaded.apply(this, arguments);
         },
 
@@ -344,7 +388,7 @@
         /* Creates and shows the page list.
         *************************************************************************/
         _createPagingList: function () {
-            if (!this.options.paging || this.options.pageSize <= 0) {
+            if (this.options.pageSize <= 0) {
                 return;
             }
 
@@ -371,13 +415,13 @@
                 .html('&lt&lt')
                 .data('pageNumber', 1)
                 .appendTo(this._$pagingListArea);
-            
+
             var $previous = $('<span></span>')
                 .addClass('jtable-page-number-previous')
                 .html('&lt')
                 .data('pageNumber', this._currentPageNo - 1)
                 .appendTo(this._$pagingListArea);
-            
+
             if (this._currentPageNo <= 1) {
                 $first.addClass('jtable-page-number-disabled');
                 $previous.addClass('jtable-page-number-disabled');
@@ -430,8 +474,8 @@
                 .html(pageNumber)
                 .data('pageNumber', pageNumber)
                 .appendTo(this._$pagingListArea);
-            
-            if(this._currentPageNo == pageNumber) {
+
+            if (this._currentPageNo == pageNumber) {
                 $pageNumber.addClass('jtable-page-number-active');
                 $pageNumber.addClass('jtable-page-number-disabled');
             }
@@ -505,7 +549,7 @@
                 });
         },
 
-        /* Changes current page tp given value.
+        /* Changes current page to given value.
         *************************************************************************/
         _changePage: function (pageNo) {
             pageNo = this._normalizeNumber(pageNo, 1, this._calculatePageCount(), 1);
