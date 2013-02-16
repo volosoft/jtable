@@ -23,8 +23,8 @@
         pagingInfo: 'Afficher {0} a {1} de {2}',
         canNotDeletedRecords: 'Impossible de supprimer {0} sur {1} enregistrement(s)!',
         deleteProggress: 'Supression {0} sur {1} enregistrement(s), en cours d\'exécution...',
-        pageSizeChangeLabel: 'Enregistrement', //New. Must be localized.
-        gotoPageLabel: 'Page' //New. Must be localized.
+        pageSizeChangeLabel: 'Enregistrement',
+        gotoPageLabel: 'Page'
     });
 
 })(jQuery);
