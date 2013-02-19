@@ -3,7 +3,7 @@ require_once("jtable.php");
 require_once("nudb.php");
 $table = NuJTable::getObj();
 $db = NuDB::getObj();
-$table->exc=array("somefields","that","donotwant","toappear);
+$table->exc=array("somefields","that","donotwant","toappear");
 
 //set option for combo box
 $table->options = array(
