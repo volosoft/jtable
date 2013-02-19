@@ -230,7 +230,7 @@ class NuJTable{
 											\$input.focus();
 										}
 									});	
-	
+										$.post('".$this->action['updateAction']."',{".$this->db->primary.":data.record.".$this->db->primary.",$key:$(this).attr('val')});
 									return \$txt;	
     								}";
 						$this->fields[$key]["title"]=strtoupper($key);
@@ -260,6 +260,7 @@ class NuJTable{
 											\$input.focus();
 										}
 									});	
+									$.post('".$this->action['updateAction']."',{".$this->db->primary.":data.record.".$this->db->primary.",$key:$(this).attr('val')});
 									return \$txt;	
     								}";
 						$this->fields[$key]["list"]=false;
@@ -286,7 +287,7 @@ class NuJTable{
 											\$input.focus();
 										}
 									});	
-	
+									$.post('".$this->action['updateAction']."',{".$this->db->primary.":data.record.".$this->db->primary.",$key:$(this).attr('val')});	
 									return \$txt;	
     								}";
 						$this->fields[$key] = array("title"=>strtoupper($key),"width"=>"10%","list"=>false);
@@ -466,4 +467,5 @@ class NuJTable{
 	}	
 }
 ?>
+
 
