@@ -215,8 +215,9 @@ class NuJTable{
 								$text = "obj.fields.$key.options[data.record.$key]";
 							endif;
 							$display = "function (data) {
-        								var \$txt = $('<span>' + $text + '</span>');
-									var \$input = $inputtext;
+										var defaultval = (data.record.$key) ? $text : '&nbsp;&nbsp;&nbsp;';  
+        								var \$txt = $('<span>' + defaultval + '</span>');
+ 									var \$input = $inputtext;
 										
 									\$txt.click(function(){
 										if($(this).children().length < 1){
@@ -225,12 +226,13 @@ class NuJTable{
 											$(this).html(\$input);
 											\$input.bind('change blur focusout',function(){
 												$inputchange;
-												data.record.$key = $(this).val();									
+												data.record.$key = $(this).val();
+												$.post('".$this->action['updateAction']."',{".$this->db->primary.":data.record.".$this->db->primary.",$key:$(this).val()});									
 											});
 											\$input.focus();
 										}
 									});	
-										$.post('".$this->action['updateAction']."',{".$this->db->primary.":data.record.".$this->db->primary.",$key:$(this).attr('val')});
+										
 									return \$txt;	
     								}";
 						$this->fields[$key]["title"]=strtoupper($key);
@@ -247,7 +249,8 @@ class NuJTable{
 						if($this->editinline):
 						if(!array_search($key,$this->exc)):
 							$display = "function (data) {
-        								var \$txt = $('<span>' + data.record.$key + '</span>');
+										var defaultval = (data.record.$key) ? data.record.$key:'&nbsp;&nbsp;&nbsp;';  
+        								var \$txt = $('<span>' + defaultval + '</span>');
 									var \$input = $('<input type=\"text\" value=\"' + data.record.$key + '\"/>');
 									\$input.datepicker({dateFormat:'yy-mm-dd'});	
 									\$txt.click(function(){
@@ -255,12 +258,13 @@ class NuJTable{
 											\$input = $('<input type=\"text\" value=\"' + $(this).html() + '\"/>');	
 											\$input.datepicker({dateFormat:'yy-mm-dd',onClose: function(calDate) {
 								            	\$txt.html($(this).val());
+												$.post('".$this->action['updateAction']."',{".$this->db->primary.":data.record.".$this->db->primary.",$key:$(this).val()});						
 											}});
 											$(this).html(\$input);
 											\$input.focus();
+											
 										}
 									});	
-									$.post('".$this->action['updateAction']."',{".$this->db->primary.":data.record.".$this->db->primary.",$key:$(this).attr('val')});
 									return \$txt;	
     								}";
 						$this->fields[$key]["list"]=false;
@@ -275,19 +279,21 @@ class NuJTable{
 						if($this->editinline):
 						if(!array_search($key,$this->exc)):
 							$display = "function (data) {
-        								var \$txt = $('<span>' + data.record.$key + '</span>');
+										var defaultval = (data.record.$key) ? data.record.$key:'&nbsp;&nbsp;&nbsp;';  
+        								var \$txt = $('<span>' + defaultval + '</span>');
 									var \$input = $('<textarea>' + data.record.$key + '</textarea>');	
 									\$txt.click(function(){
 										if($(this).children().length < 1){
 											\$input = $('<textarea>' + $(this).html() + '</textarea>');
 											$(this).html(\$input);
 											\$input.bind('change blur focusout',function(){
-												\$txt.html($(this).val());									
+												\$txt.html($(this).val());
+												$.post('".$this->action['updateAction']."',{".$this->db->primary.":data.record.".$this->db->primary.",$key:$(this).val()});															
 											});
 											\$input.focus();
 										}
 									});	
-									$.post('".$this->action['updateAction']."',{".$this->db->primary.":data.record.".$this->db->primary.",$key:$(this).attr('val')});	
+								
 									return \$txt;	
     								}";
 						$this->fields[$key] = array("title"=>strtoupper($key),"width"=>"10%","list"=>false);
