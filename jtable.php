@@ -360,11 +360,11 @@ class NuJTable{
 		endif;	
 	}
 	function data(){
-		$offset = JRequest::getVar('jtStartIndex',1);  
-		$rows = JRequest::getVar('jtPageSize',10);
-		$q = JRequest::getVar('q','');
-		$sort = JRequest::getVar('jtSorting',$this->db->primary.' desc'); 
-		$opt = JRequest::getVar('opt',$this->db->primary); 
+		$offset = $_REQUEST['jtStartIndex'];  
+		$rows = $_REQUEST['jtPageSize'];
+		$q = $_REQUEST['q'];
+		$sort = $_REQUEST['jtSorting']; 
+		$opt = $_REQUEST['opt']; 
 		$where = "$opt like '%$q%'";  
 		$q = "select count(*) FROM ".$this->table." where ".$where;
 		$this->db->setQuery($q);
@@ -378,7 +378,7 @@ class NuJTable{
 		die(json_encode($jTableResult));
 	}
 	function create(){
-		$post =  JRequest::get('post');
+		$post =  $_POST;
 		$jTableResult = array();
 		$this->db->bind($post);
 		$this->db->store();
@@ -388,7 +388,7 @@ class NuJTable{
 		die(json_encode($jTableResult));						
 	}
 	function update(){
-		$post =  JRequest::get('post');
+		$post =  $_POST;
 		$this->db->bind($post);
 		$this->db->store();
 		$jTableResult = array();
@@ -396,33 +396,15 @@ class NuJTable{
 		die(json_encode($jTableResult));			
 	}
 	function delete(){
-		$post =  JRequest::get('post');
+		$post = $_POST;
 		$this->db->delete($post);
 		$jTableResult = array();
 		$jTableResult['Result'] = "OK";
 		die(json_encode($jTableResult));			
 	}
-	function dataquery(){
-		$offset = JRequest::getVar('jtStartIndex',1);  
-		$rows = JRequest::getVar('jtPageSize',10);
-		$q = JRequest::getVar('q','');
-		$sort = JRequest::getVar('jtSorting',$this->db->primary.' desc'); 
-		$opt = JRequest::getVar('opt',$this->db->primary); 
-		$where = "$opt like '%$q%'";  
-		$q = $this->qdata." where ".$where;
-		$this->db->setQuery($q);
-		$total= $this->db->loadResult();  
-		$q = "SELECT * FROM ".$this->table." where ".$where." order by ".$sort;  
-		$items = $this->db->getList($q,$offset,$rows);			
-		$jTableResult = array();
-		$jTableResult['Result'] = "OK";
-		$jTableResult['Records'] = $items;
-		$jTableResult['TotalRecordCount'] = $total;
-		die(json_encode($jTableResult));
-
-	}	
+	
 	function cmb(){
-		$combo = JRequest::getVar('combo');  
+		$combo = $_REQUEST['combo'];  
 		$this->db->setQuery($this->combo[$combo]);
 		$rows = $this->db->loadObjectList();
 		$jTableResult = array();
