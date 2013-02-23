@@ -5,13 +5,18 @@ $table = NuJTable::getObj();
 $db = NuDB::getObj();
 $table->exc=array("somefields","that","donotwant","toappear");
 
-//set option for combo box
-$table->options = array(
-"Status"=>array(0=>"Passive",1=>"active")
-);
+// enable edit inline
+$table->editinline['enable'] = true;
+$table->editinline['img'] = 'path/to/image/folder/';
 
-//enable edit inline
-$table->editinline = true;
+// enable toolbar search
+$table->toolbarsearch=true;
+
+// add values to dropdown
+$table->options = array(
+"Status"=>array(0=>"Passive",1=>"active"),
+"Publihed"=>array(0=>"Unpublihed",1=>"Published")
+);
 
 //set title
 $table->setTitle('Students List');

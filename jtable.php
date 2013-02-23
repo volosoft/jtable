@@ -7,17 +7,23 @@ class NuJTable{
 	var $jtable;
 	var $table;
 	var $title;
-	var $toolbar;
+	var $toolbar=array();
 	var $fields;
 	var $opt;
 	var $combo;
 	var $options;
 	var $qdata;
 	var $custom;
-	var $func;
-	var $exc;
-	var $editinline;
-
+	var $func=array();
+	var $exc=array();
+	var $details;
+	var $childkey;
+	var $isdetail;
+	var $editable=true;
+	var $app;
+	var $selects;
+	var $toolbarsearch=false;		
+	var $editinline=array();
 	function &getObj(){
 		static $instance;
 		if(!$instance):
@@ -28,7 +34,10 @@ class NuJTable{
 	function __construct(){
 		$this->setUrl($_SERVER['REQUEST_URI']);
 		$this->setDiv("jtable-data");
-		$this->editinline = false;
+		$this->editinline = array("enable"=>false,"img"=>"");
+		$this->isdetail=false;
+		$this->app = ArminaApp::getInstance();
+		
 	}
 	function setUrl($url){
 		$this->url = $url;
@@ -68,15 +77,16 @@ class NuJTable{
 		$this->div = $div;
 	}
 	
-	function setTable($db,$t,$key='id',$auto=true){
-		$this->auto = $auto;
+	function setTable($db,$t,$key='id',$detail=false){
+		$this->jtable['defaultSorting'] ="$key DESC";
+		if($detail):
+			$this->isdetail=true;
+			$this->action['updateAction'] = $this->action['updateAction']."&detail=null";
+		endif;
 		$this->db = $db;
 		$this->table = $t;
 		$this->db->setTable($t,$key);
 		$this->getFields();
-		if($auto!=true):
-			$this->setManual();
-		endif;
 	}
 	function setTitle($title){
 		$this->jtable['title'] = $title;
@@ -84,7 +94,8 @@ class NuJTable{
 		$this->jtable['pageSize'] = 10;
 		$this->jtable['sorting'] = true;
 		$this->jtable['width'] ='100%';
-		
+		$this->jtable['editinline'] =$this->editinline;
+		$this->jtable['toolbarsearch'] =$this->toolbarsearch;		
 	}
 	function addToolbar($link,$title){
 		$this->toolbar[] = "{
@@ -179,162 +190,38 @@ class NuJTable{
 					"sorting"=>false);
 		$this->fields[$this->db->primary] = array(
 					"title"=>"ID",
+					"width"=>'2%',
                     "key"=>true,
                     "edit"=>false,
                     "create"=>false,
                     "list"=>true
                 );
 		$rows = $this->db->getFields();
-		foreach($rows as $key => $val){
-			
+		foreach($rows as $key => $val){			
 			if($key!=$this->db->primary):
-				$this->fields[$key] = array("title"=>strtoupper($key),"width"=>"10%");
+				if(!array_search($key,$this->exc)):
 				$vals = explode("(",$val);
 				switch($vals[0]):
 					default:
-						if($this->editinline):
-						$option = '';
-						if(!array_search($key,$this->exc)):
-							$inputtext = "$('<input type=\"text\" value=\"' + data.record.$key + '\"/>')";
-							$inputhtml = "$('<input type=\"text\" value=\"' + $(this).html() + '\"/>')";
-							$inputchange = "\$txt.html($(this).val())";
-							$text = "data.record.$key";
-							if(isset($this->options[$key])):
-								$this->fields[$key] ['options'] = $this->options[$key];
-								$inputtext = "$('<select>";
-											foreach($this->options[$key] as $k => $v):
-								$inputtext .=	"<option value=\"$k\">$v</option>";
-											endforeach;	
-								$inputtext .= "</select>')";
-								$inputhtml = "$('<select>";
-											foreach($this->options[$key] as $k => $v):
-								$inputhtml .=	"<option value=\"$k\">$v</option>";
-											endforeach;	
-								$inputhtml .= "</select>')";
-								$inputchange = "\$txt.html(obj.fields.$key.options[$(this).val()])";
-								$text = "obj.fields.$key.options[data.record.$key]";
-							endif;
-							$display = "function (data) {
-										var defaultval = (data.record.$key) ? $text : '&nbsp;&nbsp;&nbsp;';  
-        								var \$txt = $('<span>' + defaultval + '</span>');
- 									var \$input = $inputtext;
-										
-									\$txt.click(function(){
-										if($(this).children().length < 1){
-											\$input = $inputhtml;
-											\$input.val(data.record.$key);	
-											$(this).html(\$input);
-											\$input.bind('change blur focusout',function(){
-												$inputchange;
-												data.record.$key = $(this).val();
-												$.post('".$this->action['updateAction']."',{".$this->db->primary.":data.record.".$this->db->primary.",$key:$(this).val()});									
-											});
-											\$input.focus();
-										}
-									});	
-										
-									return \$txt;	
-    								}";
-						$this->fields[$key]["title"]=strtoupper($key);
-						$this->fields[$key]["width"]="10%";
-						$this->fields[$key]["list"]=false;
-						$this->fields[$key.'txt'] = array("title"=>strtoupper($key),"edit"=>false,"create"=>false,"width"=>"10%","display"=>'');			
-						$this->func[$key.'txt'] = array("display"=>$display);
-
-						endif;			
-						endif;					
+						$this->fields[$key] = array("title"=>$key,"width"=>"10%","type"=>"text");
 					break;
 					case 'date':
-						$this->fields[$key] = array("title"=>strtoupper($key),"width"=>"10%","type"=>"date");
-						if($this->editinline):
-						if(!array_search($key,$this->exc)):
-							$display = "function (data) {
-										var defaultval = (data.record.$key) ? data.record.$key:'&nbsp;&nbsp;&nbsp;';  
-        								var \$txt = $('<span>' + defaultval + '</span>');
-									var \$input = $('<input type=\"text\" value=\"' + data.record.$key + '\"/>');
-									\$input.datepicker({dateFormat:'yy-mm-dd'});	
-									\$txt.click(function(){
-										if(\$txt.children().length < 1){
-											\$input = $('<input type=\"text\" value=\"' + $(this).html() + '\"/>');	
-											\$input.datepicker({dateFormat:'yy-mm-dd',onClose: function(calDate) {
-								            	\$txt.html($(this).val());
-												$.post('".$this->action['updateAction']."',{".$this->db->primary.":data.record.".$this->db->primary.",$key:$(this).val()});						
-											}});
-											$(this).html(\$input);
-											\$input.focus();
-											
-										}
-									});	
-									return \$txt;	
-    								}";
-						$this->fields[$key]["list"]=false;
-						$this->fields[$key.'txt'] = array("title"=>strtoupper($key),"edit"=>false,"create"=>false,"width"=>"10%","display"=>'');			
-						$this->func[$key.'txt'] = array("display"=>$display);
-						endif;			
-						endif;					
-						
+						$this->fields[$key] = array("title"=>$key,"width"=>"10%","type"=>"date");						
 					break;
 					case 'text':
-							$this->fields[$key] = array("title"=>strtoupper($key),"width"=>"10%","type"=>"textarea");					
-						if($this->editinline):
-						if(!array_search($key,$this->exc)):
-							$display = "function (data) {
-										var defaultval = (data.record.$key) ? data.record.$key:'&nbsp;&nbsp;&nbsp;';  
-        								var \$txt = $('<span>' + defaultval + '</span>');
-									var \$input = $('<textarea>' + data.record.$key + '</textarea>');	
-									\$txt.click(function(){
-										if($(this).children().length < 1){
-											\$input = $('<textarea>' + $(this).html() + '</textarea>');
-											$(this).html(\$input);
-											\$input.bind('change blur focusout',function(){
-												\$txt.html($(this).val());
-												$.post('".$this->action['updateAction']."',{".$this->db->primary.":data.record.".$this->db->primary.",$key:$(this).val()});															
-											});
-											\$input.focus();
-										}
-									});	
-								
-									return \$txt;	
-    								}";
-						$this->fields[$key] = array("title"=>strtoupper($key),"width"=>"10%","list"=>false);
-						$this->fields[$key.'txt'] = array("title"=>strtoupper($key),"edit"=>false,"create"=>false,"width"=>"10%","display"=>'');			
-						$this->func[$key.'txt'] = array("display"=>$display);
-						endif;			
-						endif;					
+						$this->fields[$key] = array("title"=>$key,"width"=>"10%","type"=>"textarea");					
 					break;
 					case 'tinyint':
-						$imgtrue = '<img src="../images/apply.png"></img>';
-						$imgfalse = '<img src="../images/cross.png"></img>';
-						$this->fields[$key] = array("title"=>strtoupper($key),"width"=>"10%","type"=>"checkbox",
-						"values"=>array(0=>"False",1=>"True"),"list"=>false);	
-						if(!array_search($key,$this->exc)):
-						$display = "function (data) {
-        								var \$img = (data.record.$key != 0) ? $('<img val=\"1\" style=\"cursor:pointer;\" title=\"click to uncheck\" src=\"../images/apply.png\"></img>') : $('<img val=\"0\" style=\"cursor:pointer;\" title=\"click to check\" src=\"../images/cross.png\"></img>');
-									\$img.click(function(){
-										if($(this).attr('val')=='0'){
-											$(this).attr('title','click to uncheck');
-											$(this).attr('val','1');
-											$(this).attr('src','../images/apply.png');	
-										}else{
-											$(this).attr('title','click to check');
-											$(this).attr('val','0');
-											$(this).attr('src','../images/cross.png');	
-										}
-										$.post('".$this->action['updateAction']."',{".$this->db->primary.":data.record.".$this->db->primary.",$key:$(this).attr('val')});
-									});	
-									return \$img;	
-    								}";
-									
-						$this->fields[$key.'img'] = array("title"=>strtoupper($key),"edit"=>false,"create"=>false,"width"=>"10%","display"=>'');			
-						$this->func[$key.'img'] = array("display"=>$display);
-						endif;										
+						$this->fields[$key] = array("title"=>$key,"width"=>"10%","type"=>"checkbox",
+						"values"=>array(0=>"False",1=>"True"),"defaultValue"=>0);					
 					break;
 				endswitch;
+				if(isset($this->options[$key])):
+					$this->fields[$key]['options'] = $this->options[$key];
+				endif;
+				endif;
 			endif;
 		}
-		if(count($this->exc)>=1):
-			$this->doexclude();
-		endif;
 		return $this->fields;		
 	}
 	function pushFields($rows){
@@ -360,22 +247,50 @@ class NuJTable{
 		endif;	
 	}
 	function data(){
-		$offset = $_REQUEST['jtStartIndex'];  
-		$rows = $_REQUEST['jtPageSize'];
-		$q = $_REQUEST['q'];
-		$sort = $_REQUEST['jtSorting']; 
-		$opt = $_REQUEST['opt']; 
-		$where = "$opt like '%$q%'";  
-		$q = "select count(*) FROM ".$this->table." where ".$where;
+		if(isset($_REQUEST['detail'])):
+			$this->datadetail();
+		endif;
+		$offset = isset($_REQUEST['jtStartIndex']) ? $_REQUEST['jtStartIndex']:1 ;  
+		$rows = isset($_REQUEST['jtPageSize']) ? $_REQUEST['jtStartIndex']:10 ;
+		$q = $_REQUEST['opt'];
+		$sort = isset($_REQUEST['jtSorting']) ? $_REQUEST['jtSorting']:$this->db->primary.' desc';
+		$opt = $_REQUEST['opt'];
+		$where ='';
+		if($q):
+		for($i = 0; $i < count($opt); $i++):  
+			$where[] = $opt[$i]." like '".$q[$i]."%'";
+		endfor;
+		$where = " where ".implode(" And ",$where);  
+		endif;
+		$q = "select count(*) FROM ".$this->table.$where;
 		$this->db->setQuery($q);
 		$total= $this->db->loadResult();  
-		$q = "SELECT * FROM ".$this->table." where ".$where." order by ".$sort;  
+		$q = "SELECT * FROM ".$this->table.$where." order by ".$sort;  
 		$items = $this->db->getList($q,$offset,$rows);			
 		$jTableResult = array();
 		$jTableResult['Result'] = "OK";
 		$jTableResult['Records'] = $items;
 		$jTableResult['TotalRecordCount'] = $total;
 		die(json_encode($jTableResult));
+	}
+	function datadetail(){
+		$detail = JRequest::getVar('detail');
+		$offset = JRequest::getVar('jtStartIndex',1);  
+		$rows = JRequest::getVar('jtPageSize',10);
+		$sort = JRequest::getVar('jtSorting',$this->db->primary.' desc'); 
+		  
+		$q = "select count(*) FROM ".$this->table." where ".$this->childkey." = '$detail'";
+		$this->db->setQuery($q);
+		$total= $this->db->loadResult();  
+		$q = "SELECT * FROM ".$this->table." where ".$this->childkey." = '$detail' order by ".$sort;  
+		$items = $this->db->getList($q,$offset,$rows);			
+		$jTableResult = array();
+		$jTableResult['Result'] = "OK";
+		$jTableResult['Records'] = $items;
+		$jTableResult['TotalRecordCount'] = $total;
+		die(json_encode($jTableResult));
+		
+	
 	}
 	function create(){
 		$post =  $_POST;
@@ -385,26 +300,62 @@ class NuJTable{
 		$post[$this->db->primary] = $this->db->lastId();
 		$jTableResult['Record'] = $post;
 		$jTableResult['Result'] = "OK";
+		$log['action'] = "create";
+		$log['table'] = $this->db->table;
+		$log['key'] = $this->db->primary;
+		$log['data'] = $post;
+		$this->app->addLog(json_encode($log));		
 		die(json_encode($jTableResult));						
 	}
 	function update(){
 		$post =  $_POST;
-		$this->db->bind($post);
-		$this->db->store();
+		$log['action'] = "update";
+		$log['table'] = $this->db->table;
+		$log['key'] = $this->db->primary;
+		$log['data'] = $post;
+		if($this->editable):
+			$this->db->bind($post);
+			$this->db->store();
+		endif;
+		$this->app->addLog(json_encode($log));			
 		$jTableResult = array();
 		$jTableResult['Result'] = "OK";
 		die(json_encode($jTableResult));			
 	}
 	function delete(){
-		$post = $_POST;
+		$post =  $_POST;
+		$post =  JRequest::get('post');
 		$this->db->delete($post);
 		$jTableResult = array();
 		$jTableResult['Result'] = "OK";
+		$log['action'] = "delete";
+		$log['table'] = $this->db->table;
+		$log['key'] = $this->db->primary;
+		$log['data'] = $post;
+		$this->app->addLog(json_encode($log));		
 		die(json_encode($jTableResult));			
 	}
-	
+	function dataquery(){
+		$offset = JRequest::getVar('jtStartIndex',1);  
+		$rows = JRequest::getVar('jtPageSize',10);
+		$q = JRequest::getVar('q','');
+		$sort = JRequest::getVar('jtSorting',$this->db->primary.' desc'); 
+		$opt = JRequest::getVar('opt',$this->db->primary); 
+		$where = "$opt like '%$q%'";  
+		$q = $this->qdata." where ".$where;
+		$this->db->setQuery($q);
+		$total= $this->db->loadResult();  
+		$q = "SELECT * FROM ".$this->table." where ".$where." order by ".$sort;  
+		$items = $this->db->getList($q,$offset,$rows);			
+		$jTableResult = array();
+		$jTableResult['Result'] = "OK";
+		$jTableResult['Records'] = $items;
+		$jTableResult['TotalRecordCount'] = $total;
+		die(json_encode($jTableResult));
+
+	}	
 	function cmb(){
-		$combo = $_REQUEST['combo'];  
+		$combo = JRequest::getVar('combo');  
 		$this->db->setQuery($this->combo[$combo]);
 		$rows = $this->db->loadObjectList();
 		$jTableResult = array();
@@ -428,16 +379,6 @@ class NuJTable{
 			}
 		endforeach;
 	}
-	function exclude(){
-	    $this->exc = func_get_args();
-	}
-
-	function doexclude(){
-    	for ($i = 0; $i < count($this->exc); $i++) {
-			$m = $this->exc[$i];
-			unset($this->fields[$m]);	
-    	}		
-	}
 	function justInclude(){
    		$numargs = func_num_args();
 	    $arg_list = func_get_args();
@@ -448,12 +389,66 @@ class NuJTable{
     	}
 		$this->fields =$f;		
 	}
+	function hideInList(){
+   		$numargs = func_num_args();
+	    $arg_list = func_get_args();
+    	$f = array();
+		for ($i = 0; $i < $numargs; $i++) {
+			$m = $arg_list[$i];
+			$this->fields[$m]['list']=false;
+    	}	
+	}
 	function setTH($arr){
     	foreach ($arr as $key => $val) {
 			$this->fields[$key]['title'] = $val;
     	}		
+	}
+	function getTable(){
+		return $this->jtable;
+	}
+	function addDetail($tbl,$name,$parent){
+			$this->fields[$name]['display'] ='';
+			$this->fields[$name]['edit'] =false;
+			$this->fields[$name]['create'] =false;
+			$this->fields[$name]['width'] ='5%';
+			$tbl->render();
+			$table = $tbl->jtable;
+			$table['fields'][$parent] = array("type"=>"hidden","defaultValue"=>"");
+			
+			$im = "../components/com_armina/asset/".JTABLE."/content/list_metro.png";			
+			$func = "function (data) {
+                        var \$img = $('<img src=\"$im\" title=\"Lihat/Edit Detail\" />');
+                        \$img.click(function () {
+var objdetail = \$.parseJSON('".json_encode($table)."');
+							objdetail.actions.listAction = '".$this->url."&action=data&detail=' + data.record.$parent;
+							objdetail.actions.createAction = '".$this->url."&action=create&detail=' + data.record.$parent;
+							objdetail.actions.updateAction = '".$this->url."&action=update&detail=' + data.record.$parent;
+							objdetail.actions.deleteAction = '".$this->url."&action=delete&detail=' + data.record.$parent;";
+											if(count($tbl->func)>=1):
+			foreach($tbl->func as $key => $val):
+				$func.= "
+				";
+				foreach($val as $k => $v):
+					$func.= "
+					";
+					$func.="objdetail.fields.$key.$k=$v;";
+				endforeach;							
+			endforeach;
+		endif;				
+							
+                        $func .=  "$('#".$this->div."').jtable('openChildTable',\$img.closest('tr'),objdetail,
+							function (data) { //opened handler
+                                    data.childTable.jtable('load');
+                                });
+													});";
+
+													
+				$func.="		return \$img;
+					}";
+			$this->func[$name]['display'] = $func;							
+								 	 
+			
+			
 	}	
 }
 ?>
-
-
