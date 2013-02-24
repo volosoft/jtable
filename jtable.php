@@ -20,7 +20,6 @@ class NuJTable{
 	var $childkey;
 	var $isdetail;
 	var $editable=true;
-	var $app;
 	var $selects;
 	var $toolbarsearch=false;		
 	var $editinline=array();
@@ -32,11 +31,11 @@ class NuJTable{
 		return $instance;			
 	}
 	function __construct(){
-		$this->setUrl($_SERVER['REQUEST_URI']);
+		$this->setUrl($_SERVER['REQUEST_URI']."?");
 		$this->setDiv("jtable-data");
 		$this->editinline = array("enable"=>false,"img"=>"");
 		$this->isdetail=false;
-		$this->app = ArminaApp::getInstance();
+		
 		
 	}
 	function setUrl($url){
@@ -141,6 +140,7 @@ class NuJTable{
 
 		$html.= "
 		$('#".$this->div."').jtable(obj);";
+		if(count($this->opt)>=1):
 		$html.="
 				 $('#ResetButton').click(function (e) {
 		      e.preventDefault();
@@ -157,11 +157,16 @@ class NuJTable{
  
         //Load all records when page is first shown
         $('#LoadRecordsButton').click();";
-
+		else:
+            $html.="
+			$('#".$this->div."').jtable('load');";		
+		endif;
 		return $html;
 	}
 	function gethtml(){
-		$html = '<div class="filtering">
+		$html='';
+	if(count($this->opt)>=1):
+		$html.= '<div class="filtering">
     <form>
         Cari: 
           <input type="text" name="q" id="q" value="'.$_REQUEST['q'].'"/>
@@ -177,8 +182,9 @@ class NuJTable{
         <button type="submit" id="LoadRecordsButton">Search</button>
         <button type="submit" id="ResetButton">Reset</button>
     </form>
-</div>
-<div id="'.$this->div.'" style="width:100%;"></div>';
+</div>';
+	endif;
+		$html.='<div id="'.$this->div.'" style="width:100%;"></div>';
 		return $html;	
 	}
 	function getFields(){
@@ -251,16 +257,20 @@ class NuJTable{
 			$this->datadetail();
 		endif;
 		$offset = isset($_REQUEST['jtStartIndex']) ? $_REQUEST['jtStartIndex']:1 ;  
-		$rows = isset($_REQUEST['jtPageSize']) ? $_REQUEST['jtStartIndex']:10 ;
-		$q = $_REQUEST['opt'];
+		$rows = isset($_REQUEST['jtPageSize']) ? $_REQUEST['jtPageSize']:10 ;
+		$q = $_REQUEST['q'];
 		$sort = isset($_REQUEST['jtSorting']) ? $_REQUEST['jtSorting']:$this->db->primary.' desc';
 		$opt = $_REQUEST['opt'];
 		$where ='';
 		if($q):
-		for($i = 0; $i < count($opt); $i++):  
-			$where[] = $opt[$i]." like '".$q[$i]."%'";
-		endfor;
-		$where = " where ".implode(" And ",$where);  
+			if(!is_array($q)):
+				$where = " where $opt like '%$q%'";
+			else:
+				for($i = 0; $i < count($opt); $i++):  
+					$where[] = $opt[$i]." like '%".$q[$i]."%'";
+				endfor;
+				$where = " where ".implode(" And ",$where);  
+			endif;
 		endif;
 		$q = "select count(*) FROM ".$this->table.$where;
 		$this->db->setQuery($q);
@@ -304,7 +314,6 @@ class NuJTable{
 		$log['table'] = $this->db->table;
 		$log['key'] = $this->db->primary;
 		$log['data'] = $post;
-		$this->app->addLog(json_encode($log));		
 		die(json_encode($jTableResult));						
 	}
 	function update(){
@@ -317,7 +326,6 @@ class NuJTable{
 			$this->db->bind($post);
 			$this->db->store();
 		endif;
-		$this->app->addLog(json_encode($log));			
 		$jTableResult = array();
 		$jTableResult['Result'] = "OK";
 		die(json_encode($jTableResult));			
@@ -332,7 +340,6 @@ class NuJTable{
 		$log['table'] = $this->db->table;
 		$log['key'] = $this->db->primary;
 		$log['data'] = $post;
-		$this->app->addLog(json_encode($log));		
 		die(json_encode($jTableResult));			
 	}
 	function dataquery(){

@@ -7,12 +7,12 @@ class NuDB{
 	var $fields;
 	var $assign;
 	var $primary;
-	var $master= "master_host";
-	var $master_user ="master_user";
-	var $master_pass="master_password";	
-	var $host = "slave_host";
-	var $user ="slave_user";
-	var $pass="slave_pass";
+	var $master= "localhost";
+	var $master_user ="root";
+	var $master_pass="";	
+	var $host = "localhost";
+	var $user ="root";
+	var $pass="";
 	var $db="db_name";
 	function __construct(){
 		$this->connect();
