@@ -19,8 +19,8 @@ $table->toolbarsearch=true;
 $table->setUrl('example.jtable.php?');
 $table->setTitle('Invoice');
 
-//set table from database
-$table->setTable($db,"invoice","otonumb");
+//set table from database setTable("DB Resource","Table Name","Primary key, default=id")
+$table->setTable($db,"invoice","id_invoice");
 
 
 //create search option
