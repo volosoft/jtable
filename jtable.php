@@ -8,6 +8,7 @@ class NuJTable{
 	var $table;
 	var $title;
 	var $toolbar=array();
+	var $clicktoolbar=array();
 	var $fields;
 	var $opt;
 	var $combo;
@@ -96,19 +97,23 @@ class NuJTable{
 		$this->jtable['editinline'] =$this->editinline;
 		$this->jtable['toolbarsearch'] =$this->toolbarsearch;		
 	}
-	function addToolbar($link,$title){
-		$this->toolbar[] = "{
-        			text: '".$title."',
-        			click: function () {
-						var status ='status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=yes,resizable=yes,left=200,top=200,width=800,height=300,directories=no,location=no';
-            			var href = '".$link."';
-						window.open(href,'".$title."',status); return false;
- 			       }}";
+	function addToolbar(){
+		$arg = func_get_args();
+		if(count($arg)>=1):
+			for($i = 0; $i < count($arg); $i++):
+				$click=$arg[$i]['click'];
+				unset($arg[$i]['click']);
+				$this->toolbar['items'][] = $arg[$i];
+				$this->clicktoolbar[]=$click;
+			endfor;
+		endif;
 	}
 	function render(){
 		$this->jtable['actions'] = $this->action;
-		if(count($this->toolbar)>=1):
-		$this->jtable['toolbar'] = $this->toolbar;
+		if(count($this->toolbar['items'])>=1):
+			$this->toolbar['hoverAnimation']= true;
+			$this->toolbar['hoverAnimationDuration']=60;
+			$this->jtable['toolbar'] = $this->toolbar;
 		endif;
 		$this->jtable['fields'] = $this->fields;
 	    $html = "var obj = $.parseJSON('".json_encode($this->jtable)."');";
@@ -118,6 +123,13 @@ class NuJTable{
 		$html = str_replace($p,$r,$html);
 		if(count($this->options)>=1):
 		$html.= $this->getoption();
+		endif;
+		if(count($this->clicktoolbar)>=1):
+			for($i = 0; $i < count($this->clicktoolbar); $i++):
+				$html.= "
+				";
+				$html.="obj.toolbar.items[$i].click=".$this->clicktoolbar[$i];
+			endfor;								
 		endif;
 		if(count($this->custom)>=1):
 			for($i = 0; $i < count($this->custom); $i++):
