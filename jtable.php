@@ -116,8 +116,8 @@ class NuJTable{
 			$this->jtable['toolbar'] = $this->toolbar;
 		endif;
 		$this->jtable['fields'] = $this->fields;
-	    $html = "var obj = $.parseJSON('".json_encode($this->jtable)."');";
- 		//$html.= "$('#".$this->div."').jtable(obj);";
+		$html = "var obj =".$this->json_encok($this->jtable).";";
+		//$html.= "$('#".$this->div."').jtable(obj);";
 		$p = array('"%%%','%%%"');
 		$r = array('','');
 		$html = str_replace($p,$r,$html);
@@ -468,6 +468,30 @@ var objdetail = \$.parseJSON('".json_encode($table)."');
 								 	 
 			
 			
+	}
+	function json_encok($arr){
+	$str = "{";
+	$str2=array();
+	foreach($arr as $key => $val):
+		$value = $val;
+		switch(gettype($val)):
+			case "string":
+				if(strpos(trim($val),"function(")===false):
+					$value = '"'.$val.'"';
+				endif;
+			break;
+			case "boolean":
+				$value = ($val) ? "true" : "false";			
+			break;
+			case "array":
+				$value = $this->json_encok($val);
+			break;
+		endswitch;
+		$str2[]=$key.":".$value;
+	endforeach;
+	$str.=implode(",",$str2);
+	$str.="}";
+	return $str;
 	}	
 }
 ?>
