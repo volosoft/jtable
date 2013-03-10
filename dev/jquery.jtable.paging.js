@@ -86,6 +86,8 @@
                 .addClass('jtable-bottom-panel')
                 .insertAfter(this._$table);
 
+            this._jqueryuiThemeAddClass(this._$bottomPanel, 'ui-state-default');
+
             $('<div />').addClass('jtable-left-area').appendTo(this._$bottomPanel);
             $('<div />').addClass('jtable-right-area').appendTo(this._$bottomPanel);
         },
@@ -422,9 +424,14 @@
                 .data('pageNumber', this._currentPageNo - 1)
                 .appendTo(this._$pagingListArea);
 
+            this._jqueryuiThemeAddClass($first, 'ui-button ui-state-default', 'ui-state-hover');
+            this._jqueryuiThemeAddClass($previous, 'ui-button ui-state-default', 'ui-state-hover');
+
             if (this._currentPageNo <= 1) {
                 $first.addClass('jtable-page-number-disabled');
                 $previous.addClass('jtable-page-number-disabled');
+                this._jqueryuiThemeAddClass($first, 'ui-state-disabled');
+                this._jqueryuiThemeAddClass($previous, 'ui-state-disabled');
             }
         },
 
@@ -442,9 +449,14 @@
                 .data('pageNumber', pageCount)
                 .appendTo(this._$pagingListArea);
 
+            this._jqueryuiThemeAddClass($next, 'ui-button ui-state-default', 'ui-state-hover');
+            this._jqueryuiThemeAddClass($last, 'ui-button ui-state-default', 'ui-state-hover');
+
             if (this._currentPageNo >= pageCount) {
                 $next.addClass('jtable-page-number-disabled');
                 $last.addClass('jtable-page-number-disabled');
+                this._jqueryuiThemeAddClass($next, 'ui-state-disabled');
+                this._jqueryuiThemeAddClass($last, 'ui-state-disabled');
             }
         },
 
@@ -475,9 +487,11 @@
                 .data('pageNumber', pageNumber)
                 .appendTo(this._$pagingListArea);
 
+            this._jqueryuiThemeAddClass($pageNumber, 'ui-button ui-state-default', 'ui-state-hover');
+            
             if (this._currentPageNo == pageNumber) {
-                $pageNumber.addClass('jtable-page-number-active');
-                $pageNumber.addClass('jtable-page-number-disabled');
+                $pageNumber.addClass('jtable-page-number-active jtable-page-number-disabled');
+                this._jqueryuiThemeAddClass($pageNumber, 'ui-state-active');
             }
         },
 

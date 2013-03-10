@@ -163,6 +163,7 @@
 
             var $columnHeader = $('<th class=""></th>')
                 .addClass('jtable-command-column-header jtable-column-header-selecting');
+            this._jqueryuiThemeAddClass($columnHeader, 'ui-state-default');
 
             var $headerContainer = $('<div />')
                 .addClass('jtable-column-header-container')
@@ -326,6 +327,8 @@
             }
 
             $rows.addClass('jtable-row-selected');
+            this._jqueryuiThemeAddClass($rows, 'ui-state-highlight');
+
             if (this.options.selectingCheckboxes) {
                 $rows.find('>td.jtable-selecting-column >input').prop('checked', true);
             }
@@ -336,7 +339,7 @@
         /* Makes row/rows 'non selected'.
         *************************************************************************/
         _deselectRows: function ($rows) {
-            $rows.removeClass('jtable-row-selected');
+            $rows.removeClass('jtable-row-selected ui-state-highlight');
             if (this.options.selectingCheckboxes) {
                 $rows.find('>td.jtable-selecting-column >input').prop('checked', false);
             }
