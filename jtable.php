@@ -344,7 +344,6 @@ class NuJTable{
 	}
 	function delete(){
 		$post =  $_POST;
-		$post =  JRequest::get('post');
 		$this->db->delete($post);
 		$jTableResult = array();
 		$jTableResult['Result'] = "OK";
