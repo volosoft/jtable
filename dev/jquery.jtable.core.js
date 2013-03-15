@@ -20,6 +20,7 @@
             showCloseButton: false,
             loadingAnimationDelay: 500,
             saveUserPreferences: true,
+            jqueryuiTheme: false,
 
             ajaxSettings: {
                 type: 'POST',
@@ -105,7 +106,7 @@
             this._createBusyPanel();
             this._createErrorDialogDiv();
             this._addNoDataRow();
-            
+
             this._cookieKeyPrefix = this._generateCookieKeyPrefix();
         },
 
@@ -176,6 +177,8 @@
             this._$mainContainer = $('<div />')
                 .addClass('jtable-main-container')
                 .appendTo(this.element);
+
+            this._jqueryuiThemeAddClass(this._$mainContainer, 'ui-widget');
         },
 
         /* Creates title of the table if a title supplied in options.
@@ -190,6 +193,8 @@
             var $titleDiv = $('<div />')
                 .addClass('jtable-title')
                 .appendTo(self._$mainContainer);
+
+            self._jqueryuiThemeAddClass($titleDiv, 'ui-widget-header');
 
             $('<div />')
                 .addClass('jtable-title-text')
@@ -222,6 +227,12 @@
             this._$table = $('<table></table>')
                 .addClass('jtable')
                 .appendTo(this._$mainContainer);
+
+            if (this.options.tableId) {
+                this._$table.attr('id', this.options.tableId);
+            }
+
+            this._jqueryuiThemeAddClass(this._$table, 'ui-widget-content');
 
             this._createTableHead();
             this._createTableBody();
@@ -271,9 +282,12 @@
 
             var $th = $('<th></th>')
                 .addClass('jtable-column-header')
+                .addClass(field.listClass)
                 .css('width', field.width)
                 .data('fieldName', fieldName)
                 .append($headerContainerDiv);
+
+            this._jqueryuiThemeAddClass($th, 'ui-state-default');
 
             return $th;
         },
@@ -281,9 +295,13 @@
         /* Creates an empty header cell that can be used as command column headers.
         *************************************************************************/
         _createEmptyCommandHeader: function () {
-            return $('<th></th>')
+            var $th = $('<th></th>')
                 .addClass('jtable-command-column-header')
                 .css('width', '1%');
+
+            this._jqueryuiThemeAddClass($th, 'ui-state-default');
+
+            return $th;
         },
 
         /* Creates tbody tag and adds to the table.
@@ -297,6 +315,7 @@
         _createBusyPanel: function () {
             this._$busyMessageDiv = $('<div />').addClass('jtable-busy-message').prependTo(this._$mainContainer);
             this._$busyDiv = $('<div />').addClass('jtable-busy-panel-background').prependTo(this._$mainContainer);
+            this._jqueryuiThemeAddClass(this._$busyMessageDiv, 'ui-widget-header');
             this._hideBusy();
         },
 
@@ -528,8 +547,13 @@
         * TODO: Make this animation cofigurable and changable
         *************************************************************************/
         _showNewRowAnimation: function ($tableRow) {
-            $tableRow.addClass('jtable-row-created', 'slow', '', function () {
-                $tableRow.removeClass('jtable-row-created', 5000);
+            var className = 'jtable-row-created';
+            if (this.options.jqueryuiTheme) {
+                className = className + ' ui-state-highlight';
+            }
+
+            $tableRow.addClass(className, 'slow', '', function () {
+                $tableRow.removeClass(className, 5000);
             });
         },
 
@@ -916,6 +940,8 @@
                 .addClass('jtable-toolbar-item')
                 .appendTo(this._$toolbarDiv);
 
+            this._jqueryuiThemeAddClass($toolBarItem, 'ui-widget ui-state-default ui-corner-all', 'ui-state-hover');
+
             //cssClass property
             if (item.cssClass) {
                 $toolBarItem
@@ -959,7 +985,7 @@
                 hoverAnimationDuration = this.options.toolbar.hoverAnimationDuration;
                 hoverAnimationEasing = this.options.toolbar.hoverAnimationEasing;
             }
-            
+
             //change class on hover
             $toolBarItem.hover(function () {
                 $toolBarItem.addClass('jtable-toolbar-item-hover', hoverAnimationDuration, hoverAnimationEasing);
@@ -983,27 +1009,30 @@
         /* Shows busy indicator and blocks table UI.
         * TODO: Make this cofigurable and changable
         *************************************************************************/
-        _setBusyTimer: null, //TODO: Think for a better way!
+        _setBusyTimer: null,
         _showBusy: function (message, delay) {
-            var self = this;
+            var self = this;  //
 
-            var show = function () {
-                if (!self._$busyMessageDiv.is(':visible')) {
-                    self._$busyDiv.width(self._$mainContainer.width());
-                    self._$busyDiv.height(self._$mainContainer.height());
-                    self._$busyDiv.show();
-                    self._$busyMessageDiv.show();
-                }
+            //Show a transparent overlay to prevent clicking to the table
+            self._$busyDiv
+                .width(self._$mainContainer.width())
+                .height(self._$mainContainer.height())
+                .addClass('jtable-busy-panel-background-invisible')
+                .show();
 
-                self._$busyMessageDiv.html(message);
+            var makeVisible = function () {
+                self._$busyDiv.removeClass('jtable-busy-panel-background-invisible');
+                self._$busyMessageDiv.html(message).show();
             };
 
-            //TODO: Put an overlay always (without color) to not allow to click the table
-            //TODO: and change it visible when timeout occurs.
             if (delay) {
-                self._setBusyTimer = setTimeout(show, delay);
+                if (self._setBusyTimer) {
+                    return;
+                }
+
+                self._setBusyTimer = setTimeout(makeVisible, delay);
             } else {
-                show();
+                makeVisible();
             }
         },
 
@@ -1011,6 +1040,7 @@
         *************************************************************************/
         _hideBusy: function () {
             clearTimeout(this._setBusyTimer);
+            this._setBusyTimer = null;
             this._$busyDiv.hide();
             this._$busyMessageDiv.html('').hide();
         },
@@ -1019,6 +1049,24 @@
         *************************************************************************/
         _isBusy: function () {
             return this._$busyMessageDiv.is(':visible');
+        },
+
+        /* Adds jQueryUI class to an item.
+        *************************************************************************/
+        _jqueryuiThemeAddClass: function ($elm, className, hoverClassName) {
+            if (!this.options.jqueryuiTheme) {
+                return;
+            }
+
+            $elm.addClass(className);
+
+            if (hoverClassName) {
+                $elm.hover(function () {
+                    $elm.addClass(hoverClassName);
+                }, function () {
+                    $elm.removeClass(hoverClassName);
+                });
+            }
         },
 
         /* COMMON METHODS *******************************************************/
@@ -1072,7 +1120,7 @@
         _getKeyValueOfRecord: function (record) {
             return record[this._keyField];
         },
-        
+
         /************************************************************************
         * COOKIE                                                                *
         *************************************************************************/

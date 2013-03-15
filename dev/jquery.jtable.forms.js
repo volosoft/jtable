@@ -28,7 +28,7 @@
             //TODO: May create label tag instead of a div.
             return $('<div />')
                 .addClass('jtable-input-label')
-                .html(this.options.fields[fieldName].title);
+                .html(this.options.fields[fieldName].inputTitle || this.options.fields[fieldName].title);
         },
 
         /* Creates an input element according to field type.

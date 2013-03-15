@@ -1,10 +1,4 @@
-﻿/* These file is a start point for who wants to create a fully custom
- * theme for jTable. jtable_theme_base.less (or css) file is needed
- * for functionality of jTable. This file does not add any color or shape
- * modifications. It just shows how to set icons. You can change them too.
- * Halil ibrahim Kalkan / http://www.jtable.org
- */
-div.jtable-main-container {
+﻿div.jtable-main-container {
   position: relative;
 }
 div.jtable-main-container div.jtable-title {
@@ -247,14 +241,52 @@ div.jtable-contextmenu-overlay {
   height: 100%;
   z-index: 100;
 }
-div.jtable-main-container div.jtable-title div.jtable-title-text {
-  font-size: 16px;
-  font-weight: bold;
+div.jtable-main-container div.jtable-title {
+  position: relative;
+  line-height: 34px;
+  padding-left: 10px;
 }
 div.jtable-main-container div.jtable-title .jtable-close-button {
+  right: 6px;
+  top: 6px;
+  bottom: 6px;
+  position: absolute;
+  opacity: 0.8;
+  filter: alpha(opacity=50);
   background: url('close.png') no-repeat;
-  width: 16px;
-  height: 16px;
+  width: 22px;
+  height: 22px;
+}
+div.jtable-main-container div.jtable-title .jtable-close-button:hover {
+  opacity: 1;
+  filter: alpha(opacity=50);
+}
+div.jtable-main-container div.jtable-title div.jtable-toolbar {
+  bottom: 0px;
+  right: 0px;
+  position: absolute;
+  line-height: 20px;
+  margin-right: 2px;
+  margin-bottom: 2px;
+}
+div.jtable-main-container div.jtable-title div.jtable-toolbar span.jtable-toolbar-item.jtable-toolbar-item-add-record span.jtable-toolbar-item-icon {
+  background-image: url('add.png');
+}
+div.jtable-main-container table.jtable {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+div.jtable-main-container table.jtable thead th {
+  padding: 4px 3px 4px 6px;
+}
+div.jtable-main-container table.jtable thead th.jtable-column-header div.jtable-column-header-container {
+  height: 20px;
+}
+div.jtable-main-container table.jtable thead th.jtable-column-header span.jtable-column-header-text {
+  margin-top: 3px;
+}
+div.jtable-main-container table.jtable thead th.jtable-column-header-selecting {
+  padding: 5px;
 }
 div.jtable-main-container table.jtable thead th.jtable-column-header-sortable div.jtable-column-header-container {
   background: url('column-sortable.png') no-repeat right;
@@ -264,6 +296,17 @@ div.jtable-main-container table.jtable thead th.jtable-column-header-sorted-asc 
 }
 div.jtable-main-container table.jtable thead th.jtable-column-header-sorted-desc div.jtable-column-header-container {
   background: url('column-desc.png') no-repeat right;
+}
+div.jtable-main-container table.jtable tbody > tr {
+  padding: 2px;
+  height: 30px;
+}
+div.jtable-main-container table.jtable tbody > tr > td {
+  padding: 5px;
+  border: 1px solid #ddd;
+}
+div.jtable-main-container table.jtable tbody > tr > td:first-child {
+  border-left: none;
 }
 div.jtable-main-container table.jtable tbody > tr > td .jtable-edit-command-button {
   background: url('edit.png') no-repeat;
@@ -275,8 +318,81 @@ div.jtable-main-container table.jtable tbody > tr > td .jtable-delete-command-bu
   width: 16px;
   height: 16px;
 }
+div.jtable-main-container table.jtable tbody > tr.jtable-child-row > td {
+  padding: 2px 1px 2px 2px;
+}
+div.jtable-main-container table.jtable tbody > tr.jtable-child-row > td div.jtable-toolbar {
+  margin-right: 33px;
+}
+div.jtable-main-container table.jtable tbody > tr.jtable-child-row > td .jtable {
+  border: none;
+}
+div.jtable-main-container table.jtable tbody > tr.jtable-child-row > td .jtable-title,
+div.jtable-main-container table.jtable tbody > tr.jtable-child-row > td .jtable-bottom-panel {
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  border-radius: 0px;
+  border: none;
+}
+div.jtable-main-container div.jtable-bottom-panel {
+  padding: 1px;
+  min-height: 24px;
+  line-height: 16px;
+  font-size: 0.9em;
+}
+div.jtable-main-container div.jtable-bottom-panel div.jtable-right-area {
+  padding: 2px;
+}
+div.jtable-main-container div.jtable-bottom-panel .jtable-page-list {
+  margin: 3px;
+}
+div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number,
+div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-space,
+div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-first,
+div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-last,
+div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-previous,
+div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-next,
+div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-active {
+  padding: 2px 5px;
+}
+div.jtable-main-container div.jtable-bottom-panel span.jtable-page-size-change {
+  vertical-align: middle;
+}
+div.jtable-main-container div.jtable-bottom-panel span.jtable-goto-page {
+  vertical-align: middle;
+}
+div.jtable-main-container div.jtable-bottom-panel .jtable-page-info {
+  display: inline-block;
+  padding: 4px;
+}
+div.jtable-main-container div.jtable-bottom-panel span.jtable-add-record {
+  margin: 3px;
+}
+div.jtable-main-container div.jtable-bottom-panel span.jtable-add-record a {
+  font-weight: bold;
+  text-decoration: none;
+}
+div.jtable-main-container div.jtable-bottom-panel span.jtable-add-record a:hover {
+  text-decoration: underline;
+}
+div.jtable-main-container div.jtable-column-selection-container {
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  -webkit-box-shadow: 2px 2px 4px rgba(50, 51, 50, 0.75);
+  -moz-box-shadow: 2px 2px 4px rgba(50, 51, 50, 0.75);
+  box-shadow: 2px 2px 4px rgba(50, 51, 50, 0.75);
+}
+form.jtable-dialog-form div.jtable-input-label {
+  font-weight: bold;
+}
 div.jtable-busy-message {
-  color: #000;
-  background-color: #ddd;
-  font-size: 1.25em;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  -webkit-box-shadow: 2px 2px 4px rgba(50, 51, 50, 0.75);
+  -moz-box-shadow: 2px 2px 4px rgba(50, 51, 50, 0.75);
+  box-shadow: 2px 2px 4px rgba(50, 51, 50, 0.75);
+  padding: 5px;
+  color: none;
 }
