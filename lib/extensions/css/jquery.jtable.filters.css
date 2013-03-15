@@ -1,0 +1,30 @@
+/* FILTER EXTENSION styles */
+/**************************************************************************/
+div.jtable-main-container div.jtable-filter-panel {
+    border: 1px solid;
+    padding: 10px;
+}
+div.jtable-main-container-filtered {
+    border: 2px dashed #FF0000;
+}
+div.jtable-main-container div.jtable-input-field-container{
+    text-align: center;
+}
+div.jtable-main-container table.jtable thead th.jtable-column-filter-header {
+    font-weight: normal;
+}
+div.jtable-main-container table.jtable thead th.jtable-column-filter-header div.jtable-column-header-container div.jtable-input-field-container input,
+div.jtable-main-container table.jtable thead th.jtable-column-filter-header div.jtable-column-header-container div.jtable-input-field-container select,
+div.jtable-main-container table.jtable thead th.jtable-column-filter-header div.jtable-column-header-container div.jtable-input-field-container label
+{
+    width: 90%;
+    display: block;
+    margin: auto;
+}
+div.jtable-main-container table.jtable thead th.jtable-column-filter-header {
+    vertical-align: bottom;
+}
+div.jtable-main-container table.jtable thead th.jtable-column-filter-header div.jtable-column-header-container div.jtable-input-field-container div.jtable-input-field-container-group {
+    display: inline-block;
+    width: 50%;
+}
