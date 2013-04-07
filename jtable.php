@@ -32,6 +32,9 @@ class NuJTable{
 		return $instance;			
 	}
 	function __construct(){
+		if(!isset($_SESSION)) {
+    		 session_start();
+		}	
 		$this->setUrl($_SERVER['REQUEST_URI']."?");
 		$this->setDiv("jtable-data");
 		$this->editinline = array("enable"=>false,"img"=>"");
@@ -491,6 +494,44 @@ var objdetail = \$.parseJSON('".json_encode($table)."');
 	$str.=implode(",",$str2);
 	$str.="}";
 	return $str;
+	}	
+	function getoptions(){
+		$request =  $_REQUEST;
+		$key = $request['key'];
+		$options = $_SESSION['options'];
+		$option = $options[$key];
+		$where = "";
+		if(isset($option['dependsOn'])){
+			if($request[$option['dependsOn']]!=0){
+				$where = "where ".$option['dependsOn']."='".$request[$option['dependsOn']]."'";
+			}
+		}
+		$q = "select ".$option['id']." as Value,".$option['field']." as DisplayText from ".$option['table']." $where order by ".$option['field'];
+		$this->db->setQuery($q);
+		$rows = $this->db->loadObjectList();
+		$jTableResult = array();
+		$jTableResult['Result'] = "OK";
+		$jTableResult['Options'] = $rows;
+		die(json_encode($jTableResult));
+	
+	}		
+	function setOptions($key,$table=null,$relationkey='id',$field=null,$depends=NULL,$depend=NULL){
+		$options = $_SESSION['options'];
+		$options[$key] = array("table"=>$table,"id"=>$key,"field"=>$field);
+		$this->fields[$key]['options'] =  $this->url."&action=getoptions&key=".$key;
+		if(!is_null($depends)){
+			$depend = is_null($depend) ? $depends : $depend;
+			$options[$key]['dependsOn'] = $depend;
+			$this->fields[$key]['options'] =  "function(data){
+				if(data.sorce=='list'){
+					return '".$this->url."&action=getoptions&key=$key&$depend=0'; 
+				}
+					return '".$this->url."&action=getoptions&key=$key&$depend=' + data.dependedValues.$depends; 				
+			}";
+			$this->fields[$key]['dependsOn']=$depends;
+
+		}
+		$_SESSION['options'] = $options;
 	}	
 }
 ?>
