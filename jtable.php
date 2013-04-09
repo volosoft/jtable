@@ -23,7 +23,12 @@ class NuJTable{
 	var $editable=true;
 	var $selects;
 	var $toolbarsearch=false;		
+	var $toolbarleft=false;		
 	var $editinline=array();
+	var $maxtext = 0;
+	var $titletext = 'ucfirst';
+	var $showkey = false;
+	var $DateFormat="yy-mm-dd";
 	function &getObj(){
 		static $instance;
 		if(!$instance):
@@ -97,8 +102,11 @@ class NuJTable{
 		$this->jtable['pageSize'] = 10;
 		$this->jtable['sorting'] = true;
 		$this->jtable['width'] ='100%';
+		$this->jtable['defaultDateFormat']=$this->DateFormat;
 		$this->jtable['editinline'] =$this->editinline;
-		$this->jtable['toolbarsearch'] =$this->toolbarsearch;		
+		$this->jtable['toolbarsearch'] =$this->toolbarsearch;
+		$this->jtable['toolbarleft'] =$this->toolbarleft;
+		$this->jtable['maxtext'] =$this->maxtext;		
 	}
 	function addToolbar(){
 		$arg = func_get_args();
@@ -202,8 +210,21 @@ class NuJTable{
 		$html.='<div id="'.$this->div.'" style="width:100%;"></div>';
 		return $html;	
 	}
+	function getTitle($text){
+		switch($this->titletext){
+			case 'ucase':
+				$text = strtoupper($text);
+			case 'lcase':
+				$text = strtolower($text);			
+			case 'ucfirst':
+			default:
+				$text = ucfirst($text);			
+			break;
+		}
+		return $text;	
+	}
 	function getFields(){
-		$this->fields['id_urut'] = array(
+		$this->fields['record_number'] = array(
                     "title"=>'#',
                     "width"=>'2%',
                     "edit"=>false,
@@ -215,8 +236,11 @@ class NuJTable{
                     "key"=>true,
                     "edit"=>false,
                     "create"=>false,
-                    "list"=>true
+                    "list"=>false
                 );
+		if($this->showkey){			
+			$this->fields[$this->db->primary]['list']=true;
+		}
 		$rows = $this->db->getFields();
 		foreach($rows as $key => $val){			
 			if($key!=$this->db->primary):
@@ -224,16 +248,16 @@ class NuJTable{
 				$vals = explode("(",$val);
 				switch($vals[0]):
 					default:
-						$this->fields[$key] = array("title"=>$key,"width"=>"10%","type"=>"text");
+						$this->fields[$key] = array("title"=>$this->getTitle($key),"width"=>"10%","type"=>"text");
 					break;
 					case 'date':
-						$this->fields[$key] = array("title"=>$key,"width"=>"10%","type"=>"date");						
+						$this->fields[$key] = array("title"=>$this->getTitle($key),"width"=>"10%","type"=>"date");						
 					break;
 					case 'text':
-						$this->fields[$key] = array("title"=>$key,"width"=>"10%","type"=>"textarea");					
+						$this->fields[$key] = array("title"=>$this->getTitle($key),"width"=>"10%","type"=>"textarea");					
 					break;
 					case 'tinyint':
-						$this->fields[$key] = array("title"=>$key,"width"=>"10%","type"=>"checkbox",
+						$this->fields[$key] = array("title"=>$this->getTitle($key),"width"=>"10%","type"=>"checkbox",
 						"values"=>array(0=>"False",1=>"True"),"defaultValue"=>0);					
 					break;
 				endswitch;
@@ -271,27 +295,32 @@ class NuJTable{
 		if(isset($_REQUEST['detail'])):
 			$this->datadetail();
 		endif;
-		$offset = isset($_REQUEST['jtStartIndex']) ? $_REQUEST['jtStartIndex']:1 ;  
+		$offset = isset($_REQUEST['jtStartIndex']) ? $_REQUEST['jtStartIndex']:0;  
 		$rows = isset($_REQUEST['jtPageSize']) ? $_REQUEST['jtPageSize']:10 ;
 		$q = $_REQUEST['q'];
 		$sort = isset($_REQUEST['jtSorting']) ? $_REQUEST['jtSorting']:$this->db->primary.' desc';
 		$opt = $_REQUEST['opt'];
+		$options = $_SESSION['options'];
+		$join = array();
 		$where ='';
-		if($q):
-			if(!is_array($q)):
-				$where = " where $opt like '%$q%'";
-			else:
-				for($i = 0; $i < count($opt); $i++):  
-					$where[] = $opt[$i]." like '%".$q[$i]."%'";
-				endfor;
-				$where = " where ".implode(" And ",$where);  
-			endif;
-		endif;
-		$q = "select count(*) FROM ".$this->table.$where;
+		if($q){
+			for($i = 0; $i < count($opt); $i++):  
+				$fld = $opt[$i];
+				if(isset($options[$opt[$i]])){
+					$option = $options[$opt[$i]];
+					$fld="t$i.".$option['field'];
+					$join[] = " INNER JOIN ".$option['table']." as t$i on ".$this->table.".".$option['id']."=t$i.".$option['relkey'];
+				}
+				$where[] = $fld." like '%".$q[$i]."%'";
+			endfor;
+			$where = " where ".implode(" And ",$where);
+		}  
+		$join = count($join)<1?"":implode("",$join);  
+		$q = "select count(*) FROM ".$this->table.$join.$where;
 		$this->db->setQuery($q);
-		$total= $this->db->loadResult();  
-		$q = "SELECT * FROM ".$this->table.$where." order by ".$sort;  
-		$items = $this->db->getList($q,$offset,$rows);			
+		$total= $this->db->loadResult();
+		$q = "SELECT * FROM ".$this->table.$join.$where." order by ".$sort;  
+		$items = $this->db->getList($q,$offset,$rows);	
 		$jTableResult = array();
 		$jTableResult['Result'] = "OK";
 		$jTableResult['Records'] = $items;
@@ -471,30 +500,52 @@ var objdetail = \$.parseJSON('".json_encode($table)."');
 			
 			
 	}
-	function json_encok($arr){
-	$str = "{";
-	$str2=array();
-	foreach($arr as $key => $val):
-		$value = $val;
-		switch(gettype($val)):
-			case "string":
-				if(strpos(trim($val),"function(")===false):
-					$value = '"'.$val.'"';
-				endif;
-			break;
-			case "boolean":
-				$value = ($val) ? "true" : "false";			
-			break;
-			case "array":
-				$value = $this->json_encok($val);
-			break;
-		endswitch;
-		$str2[]=$key.":".$value;
-	endforeach;
-	$str.=implode(",",$str2);
-	$str.="}";
-	return $str;
-	}	
+  function json_encok($a=false)
+  {
+    if (is_null($a)) return 'null';
+    if ($a === false) return 'false';
+    if ($a === true) return 'true';
+    if (is_scalar($a))
+    {
+      if (is_float($a))
+      {
+        // Always use "." for floats.
+        return floatval(str_replace(",", ".", strval($a)));
+      }
+
+      if (is_string($a))
+      {
+        static $jsonReplaces = array(array("\\", "/", "\n", "\t", "\r", "\b", "\f", '"'), array('\\\\', '\\/', '\\n', '\\t', '\\r', '\\b', '\\f', '\"'));
+		if(strpos(trim($a),"function(")===false):
+        	return '"' . str_replace($jsonReplaces[0], $jsonReplaces[1], $a) . '"';
+		else:
+			return $a;
+		endif;
+      }
+      else
+        return $a;
+    }
+    $isList = true;
+    for ($i = 0, reset($a); $i < count($a); $i++, next($a))
+    {
+      if (key($a) !== $i)
+      {
+        $isList = false;
+        break;
+      }
+    }
+    $result = array();
+    if ($isList)
+    {
+      foreach ($a as $v) $result[] = $this->json_encok($v);
+      return '[' . join(',', $result) . ']';
+    }
+    else
+    {
+      foreach ($a as $k => $v) $result[] = $k.':'.$this->json_encok($v);
+      return '{' . join(',', $result) . '}';
+    }
+  }
 	function getoptions(){
 		$request =  $_REQUEST;
 		$key = $request['key'];
@@ -506,7 +557,7 @@ var objdetail = \$.parseJSON('".json_encode($table)."');
 				$where = "where ".$option['dependsOn']."='".$request[$option['dependsOn']]."'";
 			}
 		}
-		$q = "select ".$option['id']." as Value,".$option['field']." as DisplayText from ".$option['table']." $where order by ".$option['field'];
+		$q = "select ".$option['relkey']." as Value,".$option['field']." as DisplayText from ".$option['table']." $where order by ".$option['field'];
 		$this->db->setQuery($q);
 		$rows = $this->db->loadObjectList();
 		$jTableResult = array();
@@ -515,9 +566,9 @@ var objdetail = \$.parseJSON('".json_encode($table)."');
 		die(json_encode($jTableResult));
 	
 	}		
-	function setOptions($key,$table=null,$relationkey='id',$field=null,$depends=NULL,$depend=NULL){
+	function setOptions($key,$table=null,$relkey='id',$field=null,$depends=NULL,$depend=NULL){
 		$options = $_SESSION['options'];
-		$options[$key] = array("table"=>$table,"id"=>$key,"field"=>$field);
+		$options[$key] = array("table"=>$table,"id"=>$key,"relkey"=>$relkey,"field"=>$field);
 		$this->fields[$key]['options'] =  $this->url."&action=getoptions&key=".$key;
 		if(!is_null($depends)){
 			$depend = is_null($depend) ? $depends : $depend;
@@ -532,6 +583,26 @@ var objdetail = \$.parseJSON('".json_encode($table)."');
 
 		}
 		$_SESSION['options'] = $options;
-	}	
+	}
+	function fieldCustom($field,$param){
+		$this->fields[$field] = array_merge($this->fields[$field],$param);
+	}
+	function moveAfter($fieldname,$target){
+		$field = $this->fields[$fieldname];
+		$arr = array();
+		foreach($this->fields as $key => $val){
+			$arr[$key] = $val;
+			if($key == $target){
+				unset($this->fields[$fieldname]);
+				$arr[$fieldname] = $field;
+			}			
+		}	
+		$this->fields=$arr;
+	}
+	function fieldMerge($param){
+		foreach($param as $key => $val){
+			$this->fieldCustom($key,$val);
+		}
+	}
 }
 ?>
