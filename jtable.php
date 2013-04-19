@@ -552,9 +552,9 @@ var objdetail = \$.parseJSON('".json_encode($table)."');
 		$options = $_SESSION['options'];
 		$option = $options[$key];
 		$where = "";
-		if(isset($option['dependsOn'])){
-			if($request[$option['dependsOn']]!=0){
-				$where = "where ".$option['dependsOn']."='".$request[$option['dependsOn']]."'";
+		if($option['dependsOn']){
+			if($request[$option['depend']]!=0){
+				$where = "where ".$option['depends']."='".$request[$option['depend']]."'";
 			}
 		}
 		$q = "select ".$option['relkey']." as Value,".$option['field']." as DisplayText from ".$option['table']." $where order by ".$option['field'];
@@ -566,24 +566,32 @@ var objdetail = \$.parseJSON('".json_encode($table)."');
 		die(json_encode($jTableResult));
 	
 	}		
-	function setOptions($key,$table=null,$relkey='id',$field=null,$depends=NULL,$depend=NULL){
+	function setOptions($key,$table=null,$relkey='id',$field=null,$depends=NULL,$depend=NULL,$dependson=false,$freetext=false){
 		$options = $_SESSION['options'];
-		$options[$key] = array("table"=>$table,"id"=>$key,"relkey"=>$relkey,"field"=>$field);
-		$this->fields[$key]['options'] =  $this->url."&action=getoptions&key=".$key;
-		if(!is_null($depends)){
-			$depend = is_null($depend) ? $depends : $depend;
-			$options[$key]['dependsOn'] = $depend;
-			$this->fields[$key]['options'] =  "function(data){
-				if(data.sorce=='list'){
+		$options[$key] = array("table"=>$table,"id"=>$key,"relkey"=>$relkey,"field"=>$field,"depend"=>$depend,"depends"=>$depends,"dependsOn"=>$dependson);
+		$opt = "function(data){";
+		$opt.="
+			return '".$this->url."&action=getoptions&key=$key'; 				
+		}";
+				
+		$this->fields[$key]['options'] = $opt;
+		if($dependson){
+			//$depend = is_null($depend) ? $depends : $depend;
+			 $opt = "function(data){
+				if(data.source=='list'){
 					return '".$this->url."&action=getoptions&key=$key&$depend=0'; 
-				}
-					return '".$this->url."&action=getoptions&key=$key&$depend=' + data.dependedValues.$depends; 				
+				}";
+			$opt.="return '".$this->url."&action=getoptions&key=$key&$depend=' + data.dependedValues.$depend; 				
 			}";
-			$this->fields[$key]['dependsOn']=$depends;
+			$this->fields[$key]['options'] = $opt;
+			$this->fields[$key]['dependsOn']=$depend;
 
 		}
+		if($freetext){
+			$this->fields[$key]['freetext']=true;
+		}
 		$_SESSION['options'] = $options;
-	}
+	}		
 	function fieldCustom($field,$param){
 		$this->fields[$field] = array_merge($this->fields[$field],$param);
 	}
