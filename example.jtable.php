@@ -19,10 +19,21 @@ $table->toolbarsearch=true;
 $table->setUrl('example.jtable.php?');
 $table->setTitle('Invoice');
 
-//set table from database
+//set table from database setTable("DB Resource","Table Name","Primary key, default=id")
 $table->setTable($db,"invoice","otonumb");
 
+$toolbar1 =  array("icon"=>"/images/excel.png",
+        		"text"=>'Export to Excel',
+        		"click"=>"function () {
+            		alert('tolbar1');
+        		}");
+$toolbar2 =  array("icon"=>"/images/excel.png",
+        		"text"=>'Export to Excel',
+        		"click"=>"function () {
+            		alert('tolbar2');
+        		}");
 
+$table->addToolbar($toolbar1,$toolbar2);
 //create search option
 $opt = array("No_Invoice"=>"No.Invoice");
 $table->setOpt($opt);
