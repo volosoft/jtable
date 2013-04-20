@@ -351,8 +351,13 @@
         /* Shows 'updated' animation for a table row.
         *************************************************************************/
         _showUpdateAnimationForRow: function ($tableRow) {
-            $tableRow.stop(true, true).addClass('jtable-row-updated', 'slow', '', function () {
-                $tableRow.removeClass('jtable-row-updated', 5000);
+            var className = 'jtable-row-updated';
+            if (this.options.jqueryuiTheme) {
+                className = className + ' ui-state-highlight';
+            }
+            
+            $tableRow.stop(true, true).addClass(className, 'slow', '', function () {
+                $tableRow.removeClass(className, 5000);
             });
         },
 

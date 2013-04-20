@@ -348,6 +348,11 @@
 					width:22px;
 				}
 			}
+
+			span.jtable-page-info
+			{
+				vertical-align: middle;
+			}
         }
 
         div.jtable-column-resize-bar
@@ -484,6 +489,11 @@
         z-index: 998;
         position: absolute;
         background-color: #000;
+
+		&.jtable-busy-panel-background-invisible
+		{
+			background-color: transparent;
+		}
     }
 
     div.jtable-busy-message
@@ -492,9 +502,6 @@
         z-index: 999;
         position: absolute;
         margin: 5px;
-        font-size: 1.25em;
-        color: #000;
-        background-color: #ddd;
     }
 
     div.jtable-contextmenu-overlay

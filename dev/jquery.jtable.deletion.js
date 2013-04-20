@@ -380,8 +380,13 @@
             }
 
             if (animationsEnabled) {
+                var className = 'jtable-row-deleting';
+                if (this.options.jqueryuiTheme) {
+                    className = className + ' ui-state-disabled';
+                }
+                
                 //Stop current animation (if does exists) and begin 'deleting' animation.
-                $rows.stop(true, true).addClass('jtable-row-deleting', 'slow', '').promise().done(function () {
+                $rows.stop(true, true).addClass(className, 'slow', '').promise().done(function () {
                     self._removeRowsFromTable($rows, 'deleted');
                 });
             } else {

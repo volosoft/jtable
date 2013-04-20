@@ -1,4 +1,4 @@
-﻿/* jTable light color theme - Blue
+﻿/* jTable light color theme - Gray
  * Created by Halil İbrahim Kalkan
  * http://www.jtable.org
  */
@@ -144,6 +144,9 @@ div.jtable-main-container > div.jtable-bottom-panel span.jtable-goto-page {
 div.jtable-main-container > div.jtable-bottom-panel span.jtable-goto-page input[type=text] {
   width: 22px;
 }
+div.jtable-main-container > div.jtable-bottom-panel span.jtable-page-info {
+  vertical-align: middle;
+}
 div.jtable-main-container div.jtable-column-resize-bar {
   opacity: 0.5;
   filter: alpha(opacity=50);
@@ -225,14 +228,14 @@ div.jtable-busy-panel-background {
   position: absolute;
   background-color: #000;
 }
+div.jtable-busy-panel-background.jtable-busy-panel-background-invisible {
+  background-color: transparent;
+}
 div.jtable-busy-message {
   cursor: wait;
   z-index: 999;
   position: absolute;
   margin: 5px;
-  font-size: 1.25em;
-  color: #000;
-  background-color: #ddd;
 }
 div.jtable-contextmenu-overlay {
   position: fixed;
