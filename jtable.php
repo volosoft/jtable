@@ -446,8 +446,33 @@ class NuJTable{
 		for ($i = 0; $i < $numargs; $i++) {
 			$m = $arg_list[$i];
 			$this->fields[$m]['list']=false;
-    	}	
+    	}    	
 	}
+	function hideIn(){
+   		$numargs = func_num_args();
+	    $arg_list = func_get_args();
+    	$f = array();
+		$action = $arg_list[0]; 
+		for ($i = 1; $i < $numargs; $i++) {
+			$m = $arg_list[$i];
+			switch($action){
+				case 'all':
+					$this->fields[$m]['list']=false;
+					$this->fields[$m]['create']=false;
+					$this->fields[$m]['edit']=false;
+				break;	
+				case 'list':
+					$this->fields[$m]['list']=false;
+				break;	
+				case 'create':
+					$this->fields[$m]['create']=false;
+				break;
+				case 'edit':
+					$this->fields[$m]['edit']=false;
+				break;						
+			}
+    	}	
+	}	
 	function setTH($arr){
     	foreach ($arr as $key => $val) {
 			$this->fields[$key]['title'] = $val;
