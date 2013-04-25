@@ -81,7 +81,7 @@
                                     return;
                                 }
 
-                                var $saveButton = self._$editDiv.find('#EditDialogSaveButton');
+                                var $saveButton = $('#EditDialogSaveButton');
                                 var $editForm = self._$editDiv.find('form');
                                 if (self._trigger("formSubmitting", null, { form: $editForm, formType: 'edit', row: self._$editingRow }) != false) {
                                     self._setEnabledOfDialogButton($saveButton, false, self.options.messages.saving);
