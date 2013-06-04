@@ -375,6 +375,19 @@
             this.element.empty();
             $.Widget.prototype.destroy.call(this);
         },
+        
+        /* Block the table while performing actions on it.
+        *************************************************************************/
+        showBusy: function (message,delay) {
+            this._showBusy(message,delay);
+        },
+        
+        /* UnBlock the table
+        *************************************************************************/
+        hideBusy: function (message) {
+            this._hideBusy();
+        },
+
 
         /************************************************************************
         * PRIVATE METHODS                                                       *
