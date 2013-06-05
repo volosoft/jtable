@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
 * CREATE RECORD extension for jTable                                    *
 *************************************************************************/
 (function ($) {
@@ -75,7 +75,7 @@
                             id: 'AddRecordDialogSaveButton',
                             text: self.options.messages.save,
                             click: function () {
-                                var $saveButton = $('#AddRecordDialogSaveButton');
+                                var $saveButton = self._$addRecordDiv.parent().find('#AddRecordDialogSaveButton');
                                 var $addRecordForm = self._$addRecordDiv.find('form');
 
                                 if (self._trigger("formSubmitting", null, { form: $addRecordForm, formType: 'create' }) != false) {
@@ -86,7 +86,7 @@
                         }],
                 close: function () {
                     var $addRecordForm = self._$addRecordDiv.find('form').first();
-                    var $saveButton = $('#AddRecordDialogSaveButton');
+                    var $saveButton = self._$addRecordDiv.parent().find('#AddRecordDialogSaveButton');
                     self._trigger("formClosed", null, { form: $addRecordForm, formType: 'create' });
                     self._setEnabledOfDialogButton($saveButton, true, self.options.messages.save);
                     $addRecordForm.remove();
@@ -145,7 +145,7 @@
                         isNewRow: true,
                         animationsEnabled: options.animationsEnabled
                     });
-                
+
                 options.success();
                 return;
             }
@@ -159,7 +159,7 @@
                         options.error(data);
                         return;
                     }
-                    
+
                     if(!data.Record) {
                         self._logError('Server must return the created Record object.');
                         options.error(data);
@@ -167,7 +167,7 @@
                     }
 
                     self._onRecordAdded(data);
-                    
+
                     self._addRow(
                         self._createRowFromRecord(data.Record), {
                             isNewRow: true,
@@ -251,13 +251,13 @@
                 $addRecordForm.attr('action'),
                 $addRecordForm.serialize(),
                 function (data) {
-                    
+
                     if (data.Result != 'OK') {
                         self._showError(data.Message);
                         self._setEnabledOfDialogButton($saveButton, true, self.options.messages.save);
                         return;
                     }
-                    
+
                     if (!data.Record) {
                         self._logError('Server must return the created Record object.');
                         self._setEnabledOfDialogButton($saveButton, true, self.options.messages.save);

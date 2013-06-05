@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
 * DELETION extension for jTable                                         *
 *************************************************************************/
 (function ($) {
@@ -77,14 +77,14 @@
                             id: 'DeleteDialogButton',
                             text: self.options.messages.deleteText,
                             click: function () {
-                                
+
                                 //row maybe removed by another source, if so, do nothing
                                 if (self._$deletingRow.hasClass('jtable-row-removed')) {
                                     self._$deleteRecordDiv.dialog('close');
                                     return;
                                 }
 
-                                var $deleteButton = $('#DeleteDialogButton');
+                                var $deleteButton = self._$deleteRecordDiv.parent().find('#DeleteDialogButton');
                                 self._setEnabledOfDialogButton($deleteButton, false, self.options.messages.deleting);
                                 self._deleteRecordFromServer(
                                     self._$deletingRow,
@@ -100,7 +100,7 @@
                             }
                         }],
                 close: function () {
-                    var $deleteButton = $('#DeleteDialogButton');
+                    var $deleteButton = self._$deleteRecordDiv.parent().find('#DeleteDialogButton');
                     self._setEnabledOfDialogButton($deleteButton, true, self.options.messages.deleteText);
                 }
             });
@@ -119,7 +119,7 @@
                 self._logWarn('No rows specified to jTable deleteRows method.');
                 return;
             }
-            
+
             if (self._isBusy()) {
                 self._logWarn('Can not delete rows since jTable is busy!');
                 return;
@@ -344,8 +344,8 @@
             this._ajax({
                 url: (url || self.options.actions.deleteAction),
                 data: postData,
-                success: function (data) { 
-                    
+                success: function (data) {
+
                     if (data.Result != 'OK') {
                         $row.data('deleting', false);
                         if (error) {
@@ -384,7 +384,7 @@
                 if (this.options.jqueryuiTheme) {
                     className = className + ' ui-state-disabled';
                 }
-                
+
                 //Stop current animation (if does exists) and begin 'deleting' animation.
                 $rows.stop(true, true).addClass(className, 'slow', '').promise().done(function () {
                     self._removeRowsFromTable($rows, 'deleted');
