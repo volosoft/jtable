@@ -200,8 +200,12 @@
             }
 
             self._selectedRecordIdsBeforeLoad = [];
+            //self._getSelectedRows().each(function () {
+            //    self._selectedRecordIdsBeforeLoad.push(self._getKeyValueOfRecord($(this).data('record')));
+            //});
+            //RS multi-key
             self._getSelectedRows().each(function () {
-                self._selectedRecordIdsBeforeLoad.push(self._getKeyValueOfRecord($(this).data('record')));
+                self._selectedRecordIdsBeforeLoad.push(self._getKeyValuesOfRecord($(this).data('record')));
             });
         },
 
@@ -215,14 +219,21 @@
             }
 
             var selectedRowCount = 0;
+            //for (var i = 0; i < self._$tableRows.length; ++i) {
+            //    var recordId = self._getKeyValueOfRecord(self._$tableRows[i].data('record'));
+            //    if ($.inArray(recordId, self._selectedRecordIdsBeforeLoad) > -1) {
+            //        self._selectRows(self._$tableRows[i]);
+            //        ++selectedRowCount;
+            //    }
+            //}
+            //RS multi -key
             for (var i = 0; i < self._$tableRows.length; ++i) {
-                var recordId = self._getKeyValueOfRecord(self._$tableRows[i].data('record'));
+                var recordId = self._getKeyValuesOfRecord(self._$tableRows[i].data('record'));
                 if ($.inArray(recordId, self._selectedRecordIdsBeforeLoad) > -1) {
                     self._selectRows(self._$tableRows[i]);
                     ++selectedRowCount;
                 }
             }
-
             if (self._selectedRecordIdsBeforeLoad.length > 0 && self._selectedRecordIdsBeforeLoad.length != selectedRowCount) {
                 self._onSelectionChanged();
             }
