@@ -244,8 +244,16 @@
                 }
 
                 //Hidden field
-                if (field.type == 'hidden') {
-                    $editForm.append(self._createInputForHidden(fieldName, fieldValue));
+                if (field.editHidden == true) {           
+                    var hiddenVal = "";
+
+                    if (field.defaultValue == undefined || field.defaultValue == null){
+                        hiddenVal = self._getValueForRecordField(record, fieldName);
+                    } else {
+                        hiddenVal = field.defaultValue;
+                    }
+
+                    $editForm.append(self._createInputForHidden(fieldName, hiddenVal));
                     continue;
                 }
 
