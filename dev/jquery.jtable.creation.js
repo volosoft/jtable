@@ -210,8 +210,18 @@
                     continue;
                 }
 
-                if (field.type == 'hidden') {
-                    $addRecordForm.append(self._createInputForHidden(fieldName, field.defaultValue));
+                //Hidden field
+                if (field.createHidden == true) {            
+                    
+                    var hiddenVal = "";
+
+                    if (field.defaultValue == undefined || field.defaultValue == null){
+                        hiddenVal = self._getValueForRecordField(record, fieldName);
+                    } else {
+                        hiddenVal = field.defaultValue;
+                    }
+
+                    $editForm.append(self._createInputForHidden(fieldName, hiddenVal));
                     continue;
                 }
 
