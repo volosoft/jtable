@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
 * CORE jTable module                                                    *
 *************************************************************************/
 (function ($) {
@@ -13,6 +13,7 @@
             //Options
             actions: {},
             fields: {},
+            fieldOrder: [],
             animationsEnabled: true,
             defaultDateFormat: 'yy-mm-dd',
             dialogShowEffect: 'fade',
@@ -153,6 +154,11 @@
         *************************************************************************/
         _createFieldAndColumnList: function () {
             var self = this;
+            $.each(self.options.fieldOrder, function (index, value) {
+                if (value in self.options.fields) {
+                    self._columnList.push(value);
+                }
+            });
 
             $.each(self.options.fields, function (name, props) {
 
@@ -166,7 +172,9 @@
 
                 //Add field to column list if it is shown in the table
                 if (props.list != false && props.type != 'hidden') {
-                    self._columnList.push(name);
+                    if ( $.inArray(name,self._columnList) == -1) {
+                        self._columnList.push(name);
+                    }
                 }
             });
         },
