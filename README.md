@@ -1,3 +1,9 @@
+wickedreaver fork Changes (original README below):
+=================
+* Added 'fieldOrder' option that takes an array of fields keys to explicity set column order.
+
+
+
 What is jTable
 ======
 
