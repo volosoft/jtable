@@ -1,4 +1,4 @@
-﻿/* 
+/* 
 
 jTable 2.3.0
 http://www.jtable.org
