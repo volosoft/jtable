@@ -26,8 +26,9 @@ uglifyjs \
 uglifyjs \
 	../../lib/jquery.jtable.js \
 	--comments '/@license/' \
-	--compress \
-	--mangle -r '$,require,exports' \
+	-c \
+	-m -r '$' \
+	-b beautify=false,max-line-len=500 \
 	--output ../../lib/jquery.jtable.min.js
 
 
