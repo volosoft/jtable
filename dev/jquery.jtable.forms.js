@@ -67,6 +67,11 @@
                     .addClass('jtable-input jtable-custom-input')
                     .append($input);
             }
+            
+            // Use custom inputName if supplied
+            if (field.inputName) {
+                fieldName = field.inputName;
+            }
 
             //Create input according to field type
             if (field.type == 'date') {

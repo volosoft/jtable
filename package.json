@@ -1,0 +1,23 @@
+{
+  "name": "jTable",
+  "version": "2.3.0",
+  "description": "A JQuery plugin to create AJAX based CRUD tables (grids). It supports paging, sorting, selecting, master/child tables, show/hide/resize columns, localization, themes and more.",
+  "main": "jTable",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hikalkan/jtable.git"
+  },
+  "author": "Halil ibrahim Kalkan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hikalkan/jtable/issues"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-uglify": "~0.2.2",
+    "grunt-contrib-concat": "~0.3.0"
+  }
+}
