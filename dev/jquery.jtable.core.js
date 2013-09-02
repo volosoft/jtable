@@ -46,7 +46,7 @@
 
             //Localization
             messages: {
-                serverCommunicationError: 'An error occured while communicating to the server.',
+                serverCommunicationError: 'An error occurred while communicating to the server.',
                 loadingMessage: 'Loading records...',
                 noDataAvailable: 'No data available!',
                 areYouSure: 'Are you sure?',

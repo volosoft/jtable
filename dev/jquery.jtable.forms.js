@@ -260,7 +260,8 @@
             for (var i = 0; i < dependsOn.length; i++) {
                 var dependedField = dependsOn[i];
 
-                var $dependsOn = $form.find('select[name=' + dependedField + ']');
+                //Allow dependsOn for any input field type
+                var $dependsOn = $form.find(':input[name=' + dependedField + ']');
                 if ($dependsOn.length <= 0) {
                     continue;
                 }
@@ -381,10 +382,11 @@
 
                     //for each dependency
                     $.each(field.dependsOn, function (index, dependsOnField) {
-                        //find the depended combobox
-                        var $dependsOnDropdown = $form.find('select[name=' + dependsOnField + ']');
-                        //when depended combobox changes
-                        $dependsOnDropdown.change(function () {
+                        //Allow dependsOn for any input field type
+                        //find the depended field
+                        var $dependsOnField = $form.find(':input[name=' + dependsOnField + ']');
+                        //when depended field changes
+                        $dependsOnField.change(function () {
 
                             //Refresh options
                             var funcParams = {
@@ -396,8 +398,8 @@
                             funcParams.dependedValues = self._createDependedValuesUsingForm($form, field.dependsOn);
                             var options = self._getOptionsForField(fieldName, funcParams);
 
-                            //Fill combobox with new options
-                            self._fillDropDownListWithOptions($thisDropdown, options, undefined);
+                            //Fill combobox with new options; select previous value if match in new options
+                            self._fillDropDownListWithOptions($thisDropdown, options, $thisDropdown.val());
 
                             //Thigger change event to refresh multi cascade dropdowns.
                             $thisDropdown.change();
