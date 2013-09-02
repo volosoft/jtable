@@ -84,7 +84,7 @@
                     if (fieldProps.sorting) {
                         var colOffset = orderValue.indexOf(fieldName);
                         if (colOffset > -1) {
-                            if (orderValue.toUpperCase().indexOf('DESC', colOffset) > -1) {
+                            if (orderValue.toUpperCase().indexOf(' DESC', colOffset) > -1) {
                                 self._lastSorting.push({
                                     fieldName: fieldName,
                                     sortOrder: 'DESC'
