@@ -398,11 +398,14 @@
 
             //Generate URL (with query string parameters) to load records
             var loadUrl = self._createRecordLoadUrl();
+            //Get http method
+            var loadMethod = self._createRecordLoadMethod();
 
             //Load data from server
             self._onLoadingRecords();
             self._ajax({
                 url: loadUrl,
+                type: loadMethod,
                 data: self._lastPostData,
                 success: function (data) {
                     self._hideBusy();
@@ -434,7 +437,13 @@
         /* Creates URL to load records.
         *************************************************************************/
         _createRecordLoadUrl: function () {
-            return this.options.actions.listAction;
+            return this.options.actions.listAction.url || this.options.actions.listAction;
+        },
+        
+        /* Get HTTP method to load records.
+        *************************************************************************/
+        _createRecordLoadMethod: function () {
+            return this.options.actions.listAction.type || this.options.ajaxSettings.type;
         },
 
         /* TABLE MANIPULATION METHODS *******************************************/
