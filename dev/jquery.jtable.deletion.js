@@ -226,7 +226,8 @@
                         self._showError(message);
                         options.error(message);
                     },
-                    options.url
+                    options.url,
+                    options.type || self.options.ajaxSettings.type
                 );
         },
 
@@ -328,7 +329,7 @@
         /* Performs an ajax call to server to delete record
         *  and removesd row of record from table if ajax call success.
         *************************************************************************/
-        _deleteRecordFromServer: function ($row, success, error, url) {
+        _deleteRecordFromServer: function ($row, success, error, url, type) {
             var self = this;
 
             //Check if it is already being deleted right now
@@ -337,12 +338,22 @@
             }
 
             $row.data('deleting', true);
+            
+            var _url = self.options.actions.deleteAction.url || self.options.actions.deleteAction;
+            if (url) {
+                _url = url;
+            }
+            var _type = self.options.actions.deleteAction.type || self.options.ajaxSettings.type;
+            if (type) {
+                _type = type;
+            }
 
             var postData = {};
             postData[self._keyField] = self._getKeyValueOfRecord($row.data('record'));
 
             this._ajax({
-                url: (url || self.options.actions.deleteAction),
+                url: _url.replace('{key}', postData[self._keyField]),
+                type: _type,
                 data: postData,
                 success: function (data) { 
                     

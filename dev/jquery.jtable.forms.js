@@ -13,9 +13,10 @@
         *  This method is needed, since form submitting logic can be overrided
         *  by extensions.
         *************************************************************************/
-        _submitFormUsingAjax: function (url, formData, success, error) {
+        _submitFormUsingAjax: function (url, type, formData, success, error) {
             this._ajax({
                 url: url,
+                type: type,
                 data: formData,
                 success: success,
                 error: error

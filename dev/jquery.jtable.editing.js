@@ -107,10 +107,17 @@
         *************************************************************************/
         updateRecord: function (options) {
             var self = this;
+            var _url = self.options.actions.updateAction.url || self.options.actions.updateAction;
+            if (options.url) {
+                _url = options.url;
+            }
+            var _type = self.options.actions.updateAction.type || self.options.ajaxSettings.type;
+            if (options.type) {
+                _type = options.type;
+            }
             options = $.extend({
                 clientOnly: false,
                 animationsEnabled: self.options.animationsEnabled,
-                url: self.options.actions.updateAction,
                 success: function () { },
                 error: function () { }
             }, options);
@@ -145,7 +152,8 @@
             }
 
             self._submitFormUsingAjax(
-                options.url,
+                _url.replace('{key}', key),
+                _type,
                 $.param(options.record),
                 function (data) {
                     if (data.Result != 'OK') {
@@ -279,8 +287,11 @@
         *************************************************************************/
         _saveEditForm: function ($editForm, $saveButton) {
             var self = this;
+            var _url = self.options.actions.updateAction.url || self.options.actions.updateAction;
+            var _type = self.options.actions.updateAction.type || self.options.ajaxSettings.type;
             self._submitFormUsingAjax(
-                $editForm.attr('action'),
+                _url.replace('{key}', self._getKeyValueOfRecord(self._serializeFormJSON($editForm))),
+                _type,
                 $editForm.serialize(),
                 function (data) {
                     //Check for errors

@@ -126,19 +126,27 @@
         *************************************************************************/
         addRecord: function (options) {
             var self = this;
+            var _url = self.options.actions.createAction.url || self.options.actions.createAction;
+            if (options.url) {
+                _url = options.url;
+            }
+            var _type = self.options.actions.createAction.type || self.options.ajaxSettings.type;
+            if (options.type) {
+                _type = options.type;
+            }
+            
             options = $.extend({
                 clientOnly: false,
                 animationsEnabled: self.options.animationsEnabled,
-                url: self.options.actions.createAction,
                 success: function () { },
                 error: function () { }
             }, options);
-
+            
             if (!options.record) {
                 self._logWarn('options parameter in addRecord method must contain a record property.');
                 return;
             }
-
+            
             if (options.clientOnly) {
                 self._addRow(
                     self._createRowFromRecord(options.record), {
@@ -151,7 +159,8 @@
             }
 
             self._submitFormUsingAjax(
-                options.url,
+                _url,
+                _type,
                 $.param(options.record),
                 function (data) {
                     if (data.Result != 'OK') {
@@ -243,12 +252,15 @@
         *************************************************************************/
         _saveAddRecordForm: function ($addRecordForm, $saveButton) {
             var self = this;
+            var _url = self.options.actions.createAction.url || self.options.actions.createAction;
+            var _type = self.options.actions.createAction.type || self.options.ajaxSettings.type;
 
             //Make an Ajax call to update record
             $addRecordForm.data('submitting', true);
 
             self._submitFormUsingAjax(
-                $addRecordForm.attr('action'),
+                _url,
+                _type,
                 $addRecordForm.serialize(),
                 function (data) {
                     
