@@ -43,6 +43,11 @@
         *************************************************************************/
         _create: function () {
             base._create.apply(this, arguments);
+            
+            if (!this.options.actions.updateAction) {
+                return;
+            }
+            
             this._createEditDialogDiv();
         },
 
@@ -74,19 +79,7 @@
                             id: 'EditDialogSaveButton',
                             text: self.options.messages.save,
                             click: function () {
-                                
-                                //row maybe removed by another source, if so, do nothing
-                                if (self._$editingRow.hasClass('jtable-row-removed')) {
-                                    self._$editDiv.dialog('close');
-                                    return;
-                                }
-
-                                var $saveButton = self._$editDiv.find('#EditDialogSaveButton');
-                                var $editForm = self._$editDiv.find('form');
-                                if (self._trigger("formSubmitting", null, { form: $editForm, formType: 'edit', row: self._$editingRow }) != false) {
-                                    self._setEnabledOfDialogButton($saveButton, false, self.options.messages.saving);
-                                    self._saveEditForm($editForm, $saveButton);
-                                }
+                                self._onSaveClickedOnEditForm();
                             }
                         }],
                 close: function () {
@@ -99,8 +92,27 @@
             });
         },
 
+        /* Saves editing form to server.
+        *************************************************************************/
+        _onSaveClickedOnEditForm: function () {
+            var self = this;
+            
+            //row maybe removed by another source, if so, do nothing
+            if (self._$editingRow.hasClass('jtable-row-removed')) {
+                self._$editDiv.dialog('close');
+                return;
+            }
+
+            var $saveButton = $('#EditDialogSaveButton');
+            var $editForm = self._$editDiv.find('form');
+            if (self._trigger("formSubmitting", null, { form: $editForm, formType: 'edit', row: self._$editingRow }) != false) {
+                self._setEnabledOfDialogButton($saveButton, false, self.options.messages.saving);
+                self._saveEditForm($editForm, $saveButton);
+            }
+        },
+
         /************************************************************************
-        * PUNLIC METHODS                                                        *
+        * PUBLIC METHODS                                                        *
         *************************************************************************/
 
         /* Updates a record on the table (optionally on the server also)
@@ -218,7 +230,7 @@
             var record = $tableRow.data('record');
 
             //Create edit form
-            var $editForm = $('<form id="jtable-edit-form" class="jtable-dialog-form jtable-edit-form" action="' + self.options.actions.updateAction + '" method="POST"></form>');
+            var $editForm = $('<form id="jtable-edit-form" class="jtable-dialog-form jtable-edit-form"></form>');
 
             //Create input fields
             for (var i = 0; i < self._fieldList.length; i++) {
@@ -266,8 +278,13 @@
                         form: $editForm
                     }));
             }
-
+            
             self._makeCascadeDropDowns($editForm, record, 'edit');
+
+            $editForm.submit(function () {
+                self._onSaveClickedOnEditForm();
+                return false;
+            });
 
             //Open dialog
             self._$editingRow = $tableRow;
@@ -280,7 +297,7 @@
         _saveEditForm: function ($editForm, $saveButton) {
             var self = this;
             self._submitFormUsingAjax(
-                $editForm.attr('action'),
+                self.options.actions.updateAction,
                 $editForm.serialize(),
                 function (data) {
                     //Check for errors

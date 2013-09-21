@@ -56,6 +56,11 @@
         *************************************************************************/
         _createDeleteDialogDiv: function () {
             var self = this;
+            
+            //Check if deleteAction is supplied
+            if (!self.options.actions.deleteAction) {
+                return;
+            }
 
             //Create div element for delete confirmation dialog
             self._$deleteRecordDiv = $('<div><p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span><span class="jtable-delete-confirm-message"></span></p></div>').appendTo(self._$mainContainer);

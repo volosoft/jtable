@@ -133,14 +133,14 @@
         /* Overrides _removeRowsFromTable method to remove child rows of deleted rows.
         *************************************************************************/
         _removeRowsFromTable: function ($rows, reason) {
-            var self = this;
+            //var self = this;
 
             if (reason == 'deleted') {
                 $rows.each(function () {
                     var $row = $(this);
                     var $childRow = $row.data('childRow');
                     if ($childRow) {
-                        self.closeChildTable($row);
+                        //self.closeChildTable($row); //Removed since it causes "Uncaught Error: cannot call methods on jtable prior to initialization; attempted to call method 'destroy'"
                         $childRow.remove();
                     }
                 });

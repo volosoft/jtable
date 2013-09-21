@@ -3,6 +3,15 @@
 *************************************************************************/
 (function ($) {
 
+    var unloadingPage;
+    
+    $(window).on('beforeunload', function () {
+        unloadingPage = true;
+    });
+    $(window).on('unload', function () {
+        unloadingPage = false;
+    });
+
     $.widget("hik.jtable", {
 
         /************************************************************************
@@ -107,7 +116,7 @@
             this._createErrorDialogDiv();
             this._addNoDataRow();
 
-            this._cookieKeyPrefix = this._generateCookieKeyPrefix();
+            this._cookieKeyPrefix = this._generateCookieKeyPrefix();            
         },
 
         /* Normalizes some options for all fields (sets default values).
@@ -1099,9 +1108,14 @@
             };
 
             //Override error
-            opts.error = function () {
+            opts.error = function (jqXHR, textStatus, errorThrown) {
+                if (unloadingPage) {
+                    jqXHR.abort();
+                    return;
+                }
+                
                 if (options.error) {
-                    options.error();
+                    options.error(arguments);
                 }
             };
 
