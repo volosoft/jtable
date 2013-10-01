@@ -87,6 +87,12 @@
             return this._getSelectedRows();
         },
 
+        /* Gets jQuery selection for all rows.
+        *************************************************************************/
+        allRows: function() {
+            return this._getAllRows();
+        },
+
         /* Makes row/rows 'selected'.
         *************************************************************************/
         selectRows: function ($rows) {
@@ -236,6 +242,13 @@
         _getSelectedRows: function () {
             return this._$tableBody
                 .find('>tr.jtable-row-selected');
+        },
+
+        /* Gets all rows (selected or not).
+        *************************************************************************/
+        _getAllRows: function () {
+            return this._$tableBody
+                .find('>tr.jtable-data-row');
         },
 
         /* Adds selectable feature to a row.

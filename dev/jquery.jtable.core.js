@@ -24,6 +24,8 @@
             fields: {},
             animationsEnabled: true,
             defaultDateFormat: 'yy-mm-dd',
+            defaultDateChangeYear: false,   /* Default: Let the year be modified in this jTable's create/edit calendar popup */
+            defaultDateChangeMonth: false,  /* Default: Let the month be modified in this jTable's create/edit calendar popup */
             dialogShowEffect: 'fade',
             dialogHideEffect: 'fade',
             showCloseButton: false,

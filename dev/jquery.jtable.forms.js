@@ -107,7 +107,9 @@
             }
             
             var displayFormat = field.displayFormat || this.options.defaultDateFormat;
-            $input.datepicker({ dateFormat: displayFormat });
+            /* changeYear and changeMonth are jQuery UI datepicker modal options ... make Year/Month optionally editable */
+            /* datepicker year and month are editable depending on options.defaultDateChangeYear, options.defaultDateChangeMonth */
+            $input.datepicker({ dateFormat: displayFormat, changeYear: this.options.defaultDateChangeYear, changeMonth: this.options.defaultDateChangeMonth });
             return $('<div />')
                 .addClass('jtable-input jtable-date-input')
                 .append($input);
