@@ -27,6 +27,11 @@
         openChildTable: function ($row, tableOptions, opened) {
             var self = this;
 
+            //Apply theming as same as parent table unless explicitily set
+            if (tableOptions.jqueryuiTheme == undefined) {
+                tableOptions.jqueryuiTheme = self.options.jqueryuiTheme;
+            }
+
             //Show close button as default
             tableOptions.showCloseButton = (tableOptions.showCloseButton != false);
 
@@ -128,14 +133,14 @@
         /* Overrides _removeRowsFromTable method to remove child rows of deleted rows.
         *************************************************************************/
         _removeRowsFromTable: function ($rows, reason) {
-            var self = this;
+            //var self = this;
 
             if (reason == 'deleted') {
                 $rows.each(function () {
                     var $row = $(this);
                     var $childRow = $row.data('childRow');
                     if ($childRow) {
-                        self.closeChildTable($row);
+                        //self.closeChildTable($row); //Removed since it causes "Uncaught Error: cannot call methods on jtable prior to initialization; attempted to call method 'destroy'"
                         $childRow.remove();
                     }
                 });

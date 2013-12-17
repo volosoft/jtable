@@ -22,8 +22,7 @@
         options: {
             tableId: undefined,
             columnResizable: true,
-            columnSelectable: true,
-            saveUserPreferences: true
+            columnSelectable: true
         },
 
         /************************************************************************
@@ -48,7 +47,6 @@
             this._createColumnResizeBar();
             this._createColumnSelection();
 
-            this._cookieKeyPrefix = this._generateCookieKeyPrefix();
             if (this.options.saveUserPreferences) {
                 this._loadColumnSettings();
             }
@@ -440,7 +438,7 @@
                 columnSettings[fieldName] = {
                     columnVisibility: settings[0],
                     columnWidth: settings[1]
-                }; ;
+                };
             });
 
             var headerCells = this._$table.find('>thead >tr >th.jtable-column-header');
@@ -456,72 +454,6 @@
                     $cell.data('width-in-percent', columnSettings[fieldName].columnWidth).css('width', columnSettings[fieldName].columnWidth + '%');
                 }
             });
-        },
-
-        /************************************************************************
-        * COOKIE                                                                *
-        *************************************************************************/
-
-        /* Sets a cookie with given key.
-        *************************************************************************/
-        _setCookie: function (key, value) {
-            key = this._cookieKeyPrefix + key;
-
-            var expireDate = new Date();
-            expireDate.setDate(expireDate.getDate() + 30);
-            document.cookie = encodeURIComponent(key) + '=' + encodeURIComponent(value) + "; expires=" + expireDate.toUTCString();
-        },
-
-        /* Gets a cookie with given key.
-        *************************************************************************/
-        _getCookie: function (key) {
-            key = this._cookieKeyPrefix + key;
-
-            var equalities = document.cookie.split('; ');
-            for (var i = 0; i < equalities.length; i++) {
-                if (!equalities[i]) {
-                    continue;
-                }
-
-                var splitted = equalities[i].split('=');
-                if (splitted.length != 2) {
-                    continue;
-                }
-
-                if (decodeURIComponent(splitted[0]) === key) {
-                    return decodeURIComponent(splitted[1] || '');
-                }
-            }
-
-            return null;
-        },
-
-        /* Generates a hash key to be prefix for all cookies for this jtable instance.
-        *************************************************************************/
-        _generateCookieKeyPrefix: function () {
-
-            var simpleHash = function (value) {
-                var hash = 0;
-                if (value.length == 0) {
-                    return hash;
-                }
-
-                for (var i = 0; i < value.length; i++) {
-                    var ch = value.charCodeAt(i);
-                    hash = ((hash << 5) - hash) + ch;
-                    hash = hash & hash;
-                }
-
-                return hash;
-            };
-
-            var strToHash = '';
-            if (this.options.tableId) {
-                strToHash = strToHash + this.options.tableId + '#';
-            }
-
-            strToHash = strToHash + this._columnList.join('$') + '#c' + this._$table.find('thead th').length;
-            return 'jtable#' + simpleHash(strToHash);
         }
 
     });

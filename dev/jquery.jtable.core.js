@@ -3,6 +3,15 @@
 *************************************************************************/
 (function ($) {
 
+    var unloadingPage;
+    
+    $(window).on('beforeunload', function () {
+        unloadingPage = true;
+    });
+    $(window).on('unload', function () {
+        unloadingPage = false;
+    });
+
     $.widget("hik.jtable", {
 
         /************************************************************************
@@ -19,9 +28,19 @@
             dialogHideEffect: 'fade',
             showCloseButton: false,
             loadingAnimationDelay: 500,
+            saveUserPreferences: true,
+            jqueryuiTheme: false,
+
             ajaxSettings: {
                 type: 'POST',
                 dataType: 'json'
+            },
+
+            toolbar: {
+                hoverAnimation: true,
+                hoverAnimationDuration: 60,
+                hoverAnimationEasing: undefined,
+                items: []
             },
 
             //Events
@@ -55,11 +74,12 @@
 
         _$mainContainer: null, //Reference to the main container of all elements that are created by this plug-in (jQuery object)
 
+        _$titleDiv: null, //Reference to the title div (jQuery object)
+        _$toolbarDiv: null, //Reference to the toolbar div (jQuery object)
+
         _$table: null, //Reference to the main <table> (jQuery object)
         _$tableBody: null, //Reference to <body> in the table (jQuery object)
         _$tableRows: null, //Array of all <tr> in the table (except "no data" row) (jQuery object array)
-
-        _$bottomPanel: null, //Reference to the panel at the bottom of the table (jQuery object)
 
         _$busyDiv: null, //Reference to the div that is used to block UI while busy (jQuery object)
         _$busyMessageDiv: null, //Reference to the div that is used to show some message when UI is blocked (jQuery object)
@@ -90,11 +110,13 @@
             //Creating DOM elements
             this._createMainContainer();
             this._createTableTitle();
+            this._createToolBar();
             this._createTable();
-            this._createBottomPanel();
             this._createBusyPanel();
             this._createErrorDialogDiv();
             this._addNoDataRow();
+
+            this._cookieKeyPrefix = this._generateCookieKeyPrefix();            
         },
 
         /* Normalizes some options for all fields (sets default values).
@@ -109,8 +131,21 @@
         /* Normalizes some options for a field (sets default values).
         *************************************************************************/
         _normalizeFieldOptions: function (fieldName, props) {
-            props.listClass = props.listClass || '';
-            props.inputClass = props.inputClass || '';
+            if (props.listClass == undefined) {
+                props.listClass = '';
+            }
+            if (props.inputClass == undefined) {
+                props.inputClass = '';
+            }
+
+            //Convert dependsOn to array if it's a comma seperated lists
+            if (props.dependsOn && $.type(props.dependsOn) === 'string') {
+                var dependsOnArray = props.dependsOn.split(',');
+                props.dependsOn = [];
+                for (var i = 0; i < dependsOnArray.length; i++) {
+                    props.dependsOn.push($.trim(dependsOnArray[i]));
+                }
+            }
         },
 
         /* Intializes some private variables.
@@ -151,6 +186,8 @@
             this._$mainContainer = $('<div />')
                 .addClass('jtable-main-container')
                 .appendTo(this.element);
+
+            this._jqueryuiThemeAddClass(this._$mainContainer, 'ui-widget');
         },
 
         /* Creates title of the table if a title supplied in options.
@@ -165,6 +202,8 @@
             var $titleDiv = $('<div />')
                 .addClass('jtable-title')
                 .appendTo(self._$mainContainer);
+
+            self._jqueryuiThemeAddClass($titleDiv, 'ui-widget-header');
 
             $('<div />')
                 .addClass('jtable-title-text')
@@ -187,6 +226,8 @@
                         self._onCloseRequested();
                     });
             }
+
+            self._$titleDiv = $titleDiv;
         },
 
         /* Creates the table.
@@ -195,6 +236,12 @@
             this._$table = $('<table></table>')
                 .addClass('jtable')
                 .appendTo(this._$mainContainer);
+
+            if (this.options.tableId) {
+                this._$table.attr('id', this.options.tableId);
+            }
+
+            this._jqueryuiThemeAddClass(this._$table, 'ui-widget-content');
 
             this._createTableHead();
             this._createTableBody();
@@ -244,9 +291,12 @@
 
             var $th = $('<th></th>')
                 .addClass('jtable-column-header')
+                .addClass(field.listClass)
                 .css('width', field.width)
                 .data('fieldName', fieldName)
                 .append($headerContainerDiv);
+
+            this._jqueryuiThemeAddClass($th, 'ui-state-default');
 
             return $th;
         },
@@ -254,9 +304,13 @@
         /* Creates an empty header cell that can be used as command column headers.
         *************************************************************************/
         _createEmptyCommandHeader: function () {
-            return $('<th></th>')
+            var $th = $('<th></th>')
                 .addClass('jtable-command-column-header')
                 .css('width', '1%');
+
+            this._jqueryuiThemeAddClass($th, 'ui-state-default');
+
+            return $th;
         },
 
         /* Creates tbody tag and adds to the table.
@@ -265,22 +319,12 @@
             this._$tableBody = $('<tbody></tbody>').appendTo(this._$table);
         },
 
-        /* Creates bottom panel and adds to the page.
-        *************************************************************************/
-        _createBottomPanel: function () {
-            this._$bottomPanel = $('<div />')
-                .addClass('jtable-bottom-panel')
-                .appendTo(this._$mainContainer);
-
-            $('<div />').addClass('jtable-left-area').appendTo(this._$bottomPanel);
-            $('<div />').addClass('jtable-right-area').appendTo(this._$bottomPanel);
-        },
-
         /* Creates a div to block UI while jTable is busy.
         *************************************************************************/
         _createBusyPanel: function () {
             this._$busyMessageDiv = $('<div />').addClass('jtable-busy-message').prependTo(this._$mainContainer);
             this._$busyDiv = $('<div />').addClass('jtable-busy-panel-background').prependTo(this._$mainContainer);
+            this._jqueryuiThemeAddClass(this._$busyMessageDiv, 'ui-widget-header');
             this._hideBusy();
         },
 
@@ -344,6 +388,12 @@
         /************************************************************************
         * PRIVATE METHODS                                                       *
         *************************************************************************/
+
+        /* Used to change options dynamically after initialization.
+        *************************************************************************/
+        _setOption: function (key, value) {
+
+        },
 
         /* LOADING RECORDS  *****************************************************/
 
@@ -506,8 +556,13 @@
         * TODO: Make this animation cofigurable and changable
         *************************************************************************/
         _showNewRowAnimation: function ($tableRow) {
-            $tableRow.addClass('jtable-row-created', 'slow', '', function () {
-                $tableRow.removeClass('jtable-row-created', 5000);
+            var className = 'jtable-row-created';
+            if (this.options.jqueryuiTheme) {
+                className = className + ' ui-state-highlight';
+            }
+
+            $tableRow.addClass(className, 'slow', '', function () {
+                $tableRow.removeClass(className, 5000);
             });
         },
 
@@ -522,11 +577,14 @@
             }
 
             //remove from DOM
-            $rows.remove();
+            $rows.addClass('jtable-row-removed').remove();
 
             //remove from _$tableRows array
             $rows.each(function () {
-                self._$tableRows.splice(self._findRowIndex($(this)), 1);
+                var index = self._findRowIndex($(this));
+                if (index >= 0) {
+                    self._$tableRows.splice(index, 1);
+                }
             });
 
             self._onRowsRemoved($rows, reason);
@@ -571,6 +629,10 @@
         /* Adds "no data available" row to the table.
         *************************************************************************/
         _addNoDataRow: function () {
+            if (this._$tableBody.find('>tr.jtable-no-data-row').length > 0) {
+                return;
+            }
+
             var $tr = $('<tr></tr>')
                 .addClass('jtable-no-data-row')
                 .appendTo(this._$tableBody);
@@ -620,6 +682,7 @@
             } else if (field.options) { //combobox or radio button list since there are options.
                 var options = this._getOptionsForField(fieldName, {
                     record: record,
+                    value: fieldValue,
                     source: 'list',
                     dependedValues: this._createDependedValuesUsingRecord(record, field.dependsOn)
                 });
@@ -628,17 +691,24 @@
                 return fieldValue;
             }
         },
-        
+
+        /* Creates and returns an object that's properties are depended values of a record.
+        *************************************************************************/
         _createDependedValuesUsingRecord: function (record, dependsOn) {
             if (!dependsOn) {
                 return {};
             }
 
             var dependedValues = {};
-            dependedValues[dependsOn] = record[dependsOn];
+            for (var i = 0; i < dependsOn.length; i++) {
+                dependedValues[dependsOn[i]] = record[dependsOn[i]];
+            }
+
             return dependedValues;
         },
 
+        /* Finds an option object by given value.
+        *************************************************************************/
         _findOptionByValue: function (options, value) {
             for (var i = 0; i < options.length; i++) {
                 if (options[i].Value == value) {
@@ -668,7 +738,6 @@
             var optionsSource = field.options;
 
             if ($.isFunction(optionsSource)) {
-
                 //prepare parameter to the function
                 funcParams = $.extend(true, {
                     _cacheCleared: false,
@@ -686,10 +755,22 @@
 
             //Build options according to it's source type
             if (typeof optionsSource == 'string') { //It is an Url to download options
-                var cacheKey = 'options_' + fieldName + '_' + optionsSource;
+                var cacheKey = 'options_' + fieldName + '_' + optionsSource; //create a unique cache key
                 if (funcParams._cacheCleared || (!this._cache[cacheKey])) {
-                    this._cache[cacheKey] = this._downloadOptions(fieldName, optionsSource);
+                    //if user calls clearCache() or options are not found in the cache, download options
+                    this._cache[cacheKey] = this._buildOptionsFromArray(this._downloadOptions(fieldName, optionsSource));
                     this._sortFieldOptions(this._cache[cacheKey], field.optionsSorting);
+                } else {
+                    //found on cache..
+                    //if this method (_getOptionsForField) is called to get option for a specific value (on funcParams.source == 'list')
+                    //and this value is not in cached options, we need to re-download options to get the unfound (probably new) option.
+                    if (funcParams.value != undefined) {
+                        var optionForValue = this._findOptionByValue(this._cache[cacheKey], funcParams.value);
+                        if (optionForValue.DisplayText == undefined) { //this value is not in cached options...
+                            this._cache[cacheKey] = this._buildOptionsFromArray(this._downloadOptions(fieldName, optionsSource));
+                            this._sortFieldOptions(this._cache[cacheKey], field.optionsSorting);
+                        }
+                    }
                 }
 
                 options = this._cache[cacheKey];
@@ -704,16 +785,45 @@
             return options;
         },
 
+        /* Download options for a field from server.
+        *************************************************************************/
+        _downloadOptions: function (fieldName, url) {
+            var self = this;
+            var options = [];
+
+            self._ajax({
+                url: url,
+                async: false,
+                success: function (data) {
+                    if (data.Result != 'OK') {
+                        self._showError(data.Message);
+                        return;
+                    }
+
+                    options = data.Options;
+                },
+                error: function () {
+                    var errMessage = self._formatString(self.options.messages.cannotLoadOptionsFor, fieldName);
+                    self._showError(errMessage);
+                }
+            });
+
+            return options;
+        },
+
+        /* Sorts given options according to sorting parameter.
+        *  sorting can be: 'value', 'value-desc', 'text' or 'text-desc'.
+        *************************************************************************/
         _sortFieldOptions: function (options, sorting) {
-            
+
             if ((!options) || (!options.length) || (!sorting)) {
                 return;
             }
-            
+
             //Determine using value of text
             var dataSelector;
             if (sorting.indexOf('value') == 0) {
-                dataSelector = function(option) {
+                dataSelector = function (option) {
                     return option.Value;
                 };
             } else { //assume as text
@@ -744,6 +854,8 @@
             }
         },
 
+        /* Creates an array of options from given object.
+        *************************************************************************/
         _buildOptionsArrayFromObject: function (options) {
             var list = [];
 
@@ -757,14 +869,13 @@
             return list;
         },
 
-        /* Creates an options object (that it's property is value, value is displaytext)
-        *  from a simple array.
+        /* Creates array of options from giving options array.
         *************************************************************************/
         _buildOptionsFromArray: function (optionsArray) {
             var list = [];
 
             for (var i = 0; i < optionsArray.length; i++) {
-                if ($.isPlainObject) {
+                if ($.isPlainObject(optionsArray[i])) {
                     list.push(optionsArray[i]);
                 } else { //assumed as primitive type (int, string...)
                     list.push({
@@ -786,27 +897,112 @@
         _parseDate: function (dateString) {
             if (dateString.indexOf('Date') >= 0) { //Format: /Date(1320259705710)/
                 return new Date(
-                    parseInt(dateString.substr(6))
+                    parseInt(dateString.substr(6), 10)
                 );
             } else if (dateString.length == 10) { //Format: 2011-01-01
                 return new Date(
-                    parseInt(dateString.substr(0, 4)),
-                    parseInt(dateString.substr(5, 2)) - 1,
-                    parseInt(dateString.substr(8, 2))
+                    parseInt(dateString.substr(0, 4), 10),
+                    parseInt(dateString.substr(5, 2), 10) - 1,
+                    parseInt(dateString.substr(8, 2), 10)
                 );
             } else if (dateString.length == 19) { //Format: 2011-01-01 20:32:42
                 return new Date(
-                    parseInt(dateString.substr(0, 4)),
-                    parseInt(dateString.substr(5, 2)) - 1,
-                    parseInt(dateString.substr(8, 2)),
-                    parseInt(dateString.substr(11, 2)),
-                    parseInt(dateString.substr(14, 2)),
-                    parseInt(dateString.substr(17, 2))
+                    parseInt(dateString.substr(0, 4), 10),
+                    parseInt(dateString.substr(5, 2), 10) - 1,
+                    parseInt(dateString.substr(8, 2, 10)),
+                    parseInt(dateString.substr(11, 2), 10),
+                    parseInt(dateString.substr(14, 2), 10),
+                    parseInt(dateString.substr(17, 2), 10)
                 );
             } else {
                 this._logWarn('Given date is not properly formatted: ' + dateString);
                 return 'format error!';
             }
+        },
+
+        /* TOOL BAR *************************************************************/
+
+        /* Creates the toolbar.
+        *************************************************************************/
+        _createToolBar: function () {
+            this._$toolbarDiv = $('<div />')
+            .addClass('jtable-toolbar')
+            .appendTo(this._$titleDiv);
+
+            for (var i = 0; i < this.options.toolbar.items.length; i++) {
+                this._addToolBarItem(this.options.toolbar.items[i]);
+            }
+        },
+
+        /* Adds a new item to the toolbar.
+        *************************************************************************/
+        _addToolBarItem: function (item) {
+
+            //Check if item is valid
+            if ((item == undefined) || (item.text == undefined && item.icon == undefined)) {
+                this._logWarn('Can not add tool bar item since it is not valid!');
+                this._logWarn(item);
+                return null;
+            }
+
+            var $toolBarItem = $('<span></span>')
+                .addClass('jtable-toolbar-item')
+                .appendTo(this._$toolbarDiv);
+
+            this._jqueryuiThemeAddClass($toolBarItem, 'ui-widget ui-state-default ui-corner-all', 'ui-state-hover');
+
+            //cssClass property
+            if (item.cssClass) {
+                $toolBarItem
+                    .addClass(item.cssClass);
+            }
+
+            //tooltip property
+            if (item.tooltip) {
+                $toolBarItem
+                    .attr('title', item.tooltip);
+            }
+
+            //icon property
+            if (item.icon) {
+                var $icon = $('<span class="jtable-toolbar-item-icon"></span>').appendTo($toolBarItem);
+                if (item.icon === true) {
+                    //do nothing
+                } else if ($.type(item.icon === 'string')) {
+                    $icon.css('background', 'url("' + item.icon + '")');
+                }
+            }
+
+            //text property
+            if (item.text) {
+                $('<span class=""></span>')
+                    .html(item.text)
+                    .addClass('jtable-toolbar-item-text').appendTo($toolBarItem);
+            }
+
+            //click event
+            if (item.click) {
+                $toolBarItem.click(function () {
+                    item.click();
+                });
+            }
+
+            //set hover animation parameters
+            var hoverAnimationDuration = undefined;
+            var hoverAnimationEasing = undefined;
+            if (this.options.toolbar.hoverAnimation) {
+                hoverAnimationDuration = this.options.toolbar.hoverAnimationDuration;
+                hoverAnimationEasing = this.options.toolbar.hoverAnimationEasing;
+            }
+
+            //change class on hover
+            $toolBarItem.hover(function () {
+                $toolBarItem.addClass('jtable-toolbar-item-hover', hoverAnimationDuration, hoverAnimationEasing);
+            }, function () {
+                $toolBarItem.removeClass('jtable-toolbar-item-hover', hoverAnimationDuration, hoverAnimationEasing);
+            });
+
+            return $toolBarItem;
         },
 
         /* ERROR DIALOG *********************************************************/
@@ -822,27 +1018,30 @@
         /* Shows busy indicator and blocks table UI.
         * TODO: Make this cofigurable and changable
         *************************************************************************/
-        _setBusyTimer: null, //TODO: Think for a better way!
+        _setBusyTimer: null,
         _showBusy: function (message, delay) {
-            var self = this;
+            var self = this;  //
 
-            var show = function () {
-                if (!self._$busyMessageDiv.is(':visible')) {
-                    self._$busyDiv.width(self._$mainContainer.width());
-                    self._$busyDiv.height(self._$mainContainer.height());
-                    self._$busyDiv.show();
-                    self._$busyMessageDiv.show();
-                }
+            //Show a transparent overlay to prevent clicking to the table
+            self._$busyDiv
+                .width(self._$mainContainer.width())
+                .height(self._$mainContainer.height())
+                .addClass('jtable-busy-panel-background-invisible')
+                .show();
 
-                self._$busyMessageDiv.html(message);
+            var makeVisible = function () {
+                self._$busyDiv.removeClass('jtable-busy-panel-background-invisible');
+                self._$busyMessageDiv.html(message).show();
             };
 
-            //TODO: Put an overlay always (without color) to not allow to click the table
-            //TODO: and change it visible when timeout occurs.
             if (delay) {
-                self._setBusyTimer = setTimeout(show, delay);
+                if (self._setBusyTimer) {
+                    return;
+                }
+
+                self._setBusyTimer = setTimeout(makeVisible, delay);
             } else {
-                show();
+                makeVisible();
             }
         },
 
@@ -850,6 +1049,7 @@
         *************************************************************************/
         _hideBusy: function () {
             clearTimeout(this._setBusyTimer);
+            this._setBusyTimer = null;
             this._$busyDiv.hide();
             this._$busyMessageDiv.html('').hide();
         },
@@ -858,6 +1058,24 @@
         *************************************************************************/
         _isBusy: function () {
             return this._$busyMessageDiv.is(':visible');
+        },
+
+        /* Adds jQueryUI class to an item.
+        *************************************************************************/
+        _jqueryuiThemeAddClass: function ($elm, className, hoverClassName) {
+            if (!this.options.jqueryuiTheme) {
+                return;
+            }
+
+            $elm.addClass(className);
+
+            if (hoverClassName) {
+                $elm.hover(function () {
+                    $elm.addClass(hoverClassName);
+                }, function () {
+                    $elm.removeClass(hoverClassName);
+                });
+            }
         },
 
         /* COMMON METHODS *******************************************************/
@@ -890,9 +1108,14 @@
             };
 
             //Override error
-            opts.error = function () {
+            opts.error = function (jqXHR, textStatus, errorThrown) {
+                if (unloadingPage) {
+                    jqXHR.abort();
+                    return;
+                }
+                
                 if (options.error) {
-                    options.error();
+                    options.error(arguments);
                 }
             };
 
@@ -910,6 +1133,72 @@
         *************************************************************************/
         _getKeyValueOfRecord: function (record) {
             return record[this._keyField];
+        },
+
+        /************************************************************************
+        * COOKIE                                                                *
+        *************************************************************************/
+
+        /* Sets a cookie with given key.
+        *************************************************************************/
+        _setCookie: function (key, value) {
+            key = this._cookieKeyPrefix + key;
+
+            var expireDate = new Date();
+            expireDate.setDate(expireDate.getDate() + 30);
+            document.cookie = encodeURIComponent(key) + '=' + encodeURIComponent(value) + "; expires=" + expireDate.toUTCString();
+        },
+
+        /* Gets a cookie with given key.
+        *************************************************************************/
+        _getCookie: function (key) {
+            key = this._cookieKeyPrefix + key;
+
+            var equalities = document.cookie.split('; ');
+            for (var i = 0; i < equalities.length; i++) {
+                if (!equalities[i]) {
+                    continue;
+                }
+
+                var splitted = equalities[i].split('=');
+                if (splitted.length != 2) {
+                    continue;
+                }
+
+                if (decodeURIComponent(splitted[0]) === key) {
+                    return decodeURIComponent(splitted[1] || '');
+                }
+            }
+
+            return null;
+        },
+
+        /* Generates a hash key to be prefix for all cookies for this jtable instance.
+        *************************************************************************/
+        _generateCookieKeyPrefix: function () {
+
+            var simpleHash = function (value) {
+                var hash = 0;
+                if (value.length == 0) {
+                    return hash;
+                }
+
+                for (var i = 0; i < value.length; i++) {
+                    var ch = value.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + ch;
+                    hash = hash & hash;
+                }
+
+                return hash;
+            };
+
+            var strToHash = '';
+            if (this.options.tableId) {
+                strToHash = strToHash + this.options.tableId + '#';
+            }
+
+            strToHash = strToHash + this._columnList.join('$') + '#c' + this._$table.find('thead th').length;
+            return 'jtable#' + simpleHash(strToHash);
         },
 
         /************************************************************************

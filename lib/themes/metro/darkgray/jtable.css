@@ -1,3 +1,7 @@
+﻿/* jTable metro style theme - Dark gray
+ * Created by Halil İbrahim Kalkan
+ * http://www.jtable.org
+ */
 @font-face {
   font-family: 'Open Sans';
   font-style: normal;
@@ -59,6 +63,37 @@ div.jtable-main-container div.jtable-title .jtable-close-button {
   bottom: 0px;
   position: absolute;
 }
+div.jtable-main-container div.jtable-title div.jtable-toolbar {
+  bottom: 0px;
+  right: 0px;
+  position: absolute;
+  display: inline-block;
+  margin-right: 5px;
+}
+div.jtable-main-container div.jtable-title div.jtable-toolbar span.jtable-toolbar-item {
+  position: relative;
+  display: inline-block;
+  margin: 0px 0px 0px 5px;
+  cursor: pointer;
+  font-size: 0.9em;
+  padding: 2px;
+  vertical-align: bottom;
+}
+div.jtable-main-container div.jtable-title div.jtable-toolbar span.jtable-toolbar-item span.jtable-toolbar-item-icon {
+  display: inline-block;
+  margin: 2px;
+  vertical-align: middle;
+  width: 16px;
+  height: 16px;
+}
+div.jtable-main-container div.jtable-title div.jtable-toolbar span.jtable-toolbar-item span.jtable-toolbar-item-text {
+  display: inline-block;
+  margin: 2px;
+  vertical-align: middle;
+}
+div.jtable-main-container div.jtable-title .jtable-close-button + div.jtable-toolbar {
+  margin-right: 30px;
+}
 div.jtable-main-container table.jtable {
   width: 100%;
 }
@@ -118,53 +153,47 @@ div.jtable-main-container table.jtable tbody tr > td.jtable-selecting-column inp
 div.jtable-main-container table.jtable tbody tr.jtable-no-data-row {
   text-align: center;
 }
-div.jtable-main-container div.jtable-bottom-panel {
+div.jtable-main-container > div.jtable-bottom-panel {
   position: relative;
   min-height: 24px;
+  text-align: left;
 }
-div.jtable-main-container div.jtable-bottom-panel div.jtable-left-area {
-  left: 0px;
-  top: 0px;
-  bottom: 0px;
-  position: absolute;
-}
-div.jtable-main-container div.jtable-bottom-panel div.jtable-right-area {
+div.jtable-main-container > div.jtable-bottom-panel div.jtable-right-area {
   right: 0px;
   top: 0px;
   bottom: 0px;
   position: absolute;
 }
-div.jtable-main-container div.jtable-bottom-panel .jtable-page-list {
+div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list {
   display: inline-block;
 }
-div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number,
-div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-space,
-div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-first,
-div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-last,
-div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-previous,
-div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-next,
-div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-active {
+div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number,
+div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-space,
+div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-first,
+div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-last,
+div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-previous,
+div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-next,
+div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-active {
   padding: 2px 5px;
   display: inline-block;
   cursor: pointer;
 }
-div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-space,
-div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-number-active {
+div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-space,
+div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-active,
+div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-disabled {
   cursor: default;
 }
-div.jtable-main-container div.jtable-bottom-panel .jtable-page-list .jtable-page-info {
-  display: inline-block;
+div.jtable-main-container > div.jtable-bottom-panel span.jtable-page-size-change {
   margin-left: 5px;
-  padding: 2px;
 }
-div.jtable-main-container div.jtable-bottom-panel span.jtable-add-record {
-  display: inline-block;
+div.jtable-main-container > div.jtable-bottom-panel span.jtable-goto-page {
+  margin-left: 5px;
 }
-div.jtable-main-container div.jtable-bottom-panel span.jtable-add-record a {
-  text-decoration: none;
+div.jtable-main-container > div.jtable-bottom-panel span.jtable-goto-page input[type=text] {
+  width: 22px;
 }
-div.jtable-main-container div.jtable-bottom-panel span.jtable-add-record a:hover {
-  text-decoration: underline;
+div.jtable-main-container > div.jtable-bottom-panel span.jtable-page-info {
+  vertical-align: middle;
 }
 div.jtable-main-container div.jtable-column-resize-bar {
   opacity: 0.5;
@@ -247,14 +276,14 @@ div.jtable-busy-panel-background {
   position: absolute;
   background-color: #000;
 }
+div.jtable-busy-panel-background.jtable-busy-panel-background-invisible {
+  background-color: transparent;
+}
 div.jtable-busy-message {
   cursor: wait;
   z-index: 999;
   position: absolute;
   margin: 5px;
-  font-size: 1.25em;
-  color: #000;
-  background-color: #ddd;
 }
 div.jtable-contextmenu-overlay {
   position: fixed;
@@ -296,6 +325,22 @@ div.jtable-main-container > div.jtable-title .jtable-close-button {
 div.jtable-main-container > div.jtable-title .jtable-close-button:hover {
   opacity: 1;
   filter: alpha(opacity=50);
+}
+div.jtable-main-container > div.jtable-title div.jtable-toolbar {
+  bottom: 0px;
+  right: 0px;
+  position: absolute;
+}
+div.jtable-main-container > div.jtable-title div.jtable-toolbar span.jtable-toolbar-item {
+  background-color: #2d2d2d;
+  color: white;
+}
+div.jtable-main-container > div.jtable-title div.jtable-toolbar span.jtable-toolbar-item.jtable-toolbar-item-add-record span.jtable-toolbar-item-icon {
+  background-image: url('../../metro/add.png');
+}
+div.jtable-main-container > div.jtable-title div.jtable-toolbar span.jtable-toolbar-item.jtable-toolbar-item-hover {
+  background-color: #343434;
+  padding-bottom: 6px;
 }
 div.jtable-main-container > table.jtable {
   border: 1px solid #454545;
@@ -378,7 +423,7 @@ div.jtable-main-container > table.jtable > tbody > tr.jtable-row-deleting {
   color: #fff;
 }
 div.jtable-main-container > table.jtable > tbody > tr.jtable-child-row > td {
-  padding: 0px;
+  padding: 2px;
   background-color: #fff;
 }
 div.jtable-main-container > div.jtable-bottom-panel {
@@ -411,19 +456,26 @@ div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-pa
 div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-next:hover {
   background-color: #676767;
 }
-div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-active {
+div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-disabled {
+  opacity: 0.75;
+  filter: alpha(opacity=50);
   color: #ccc;
   cursor: default;
 }
-div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-info {
-  margin-left: 5px;
-  padding: 2px;
+div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-disabled:hover {
+  background-color: #454545;
 }
-div.jtable-main-container > div.jtable-bottom-panel span.jtable-add-record {
-  margin: 4px;
+div.jtable-main-container > div.jtable-bottom-panel span.jtable-page-info {
+  display: inline-block;
+  padding: 4px;
 }
-div.jtable-main-container > div.jtable-bottom-panel span.jtable-add-record a {
-  color: #fff;
+div.jtable-main-container > div.jtable-bottom-panel span.jtable-page-size-change {
+  display: inline-block;
+  padding: 2px 0px 2px 0px;
+}
+div.jtable-main-container > div.jtable-bottom-panel span.jtable-goto-page {
+  display: inline-block;
+  padding: 2px 0px 2px 0px;
 }
 form.jtable-dialog-form {
   font-family: 'Segoe UI Semilight', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;

@@ -61,7 +61,7 @@
         *  if it is undefined
         *************************************************************************/
         _normalizeNumber: function (number, min, max, defaultValue) {
-            if (number == undefined || number == null) {
+            if (number == undefined || number == null || isNaN(number)) {
                 return defaultValue;
             }
 
@@ -129,5 +129,25 @@
         }
 
     });
+
+    /* Fix for array.indexOf method in IE7.
+     * This code is taken from http://www.tutorialspoint.com/javascript/array_indexof.htm */
+    if (!Array.prototype.indexOf) {
+        Array.prototype.indexOf = function (elt) {
+            var len = this.length;
+            var from = Number(arguments[1]) || 0;
+            from = (from < 0)
+                 ? Math.ceil(from)
+                 : Math.floor(from);
+            if (from < 0)
+                from += len;
+            for (; from < len; from++) {
+                if (from in this &&
+                    this[from] === elt)
+                    return from;
+            }
+            return -1;
+        };
+    }
 
 })(jQuery);

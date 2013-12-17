@@ -21,7 +21,7 @@
 
             //Localization
             messages: {
-                addNewRecord: '+ Add new record'
+                addNewRecord: 'Add new record'
             }
         },
 
@@ -39,6 +39,11 @@
         *************************************************************************/
         _create: function () {
             base._create.apply(this, arguments);
+            
+            if (!this.options.actions.createAction) {
+                return;
+            }
+            
             this._createAddRecordDialogDiv();
         },
 
@@ -46,11 +51,6 @@
         *************************************************************************/
         _createAddRecordDialogDiv: function () {
             var self = this;
-
-            //Check if createAction is supplied
-            if (!self.options.actions.createAction) {
-                return;
-            }
 
             //Create a div for dialog and add to container element
             self._$addRecordDiv = $('<div />')
@@ -75,13 +75,7 @@
                             id: 'AddRecordDialogSaveButton',
                             text: self.options.messages.save,
                             click: function () {
-                                var $saveButton = $('#AddRecordDialogSaveButton');
-                                var $addRecordForm = self._$addRecordDiv.find('form');
-
-                                if (self._trigger("formSubmitting", null, { form: $addRecordForm, formType: 'create' }) != false) {
-                                    self._setEnabledOfDialogButton($saveButton, false, self.options.messages.saving);
-                                    self._saveAddRecordForm($addRecordForm, $saveButton);
-                                }
+                                self._onSaveClickedOnCreateForm();
                             }
                         }],
                 close: function () {
@@ -93,28 +87,35 @@
                 }
             });
 
-            //If not 'add record button' supplied, create a new one.
-            if (!self.options.addRecordButton) {
-                self.options.addRecordButton = self._createAddRecordButton();
+            if (self.options.addRecordButton) {
+                //If user supplied a button, bind the click event to show dialog form
+                self.options.addRecordButton.click(function (e) {
+                    e.preventDefault();
+                    self._showAddRecordForm();
+                });
+            } else {
+                //If user did not supplied a button, create a 'add record button' toolbar item.
+                self._addToolBarItem({
+                    icon: true,
+                    cssClass: 'jtable-toolbar-item-add-record',
+                    text: self.options.messages.addNewRecord,
+                    click: function () {
+                        self._showAddRecordForm();
+                    }
+                });
             }
-
-            //Bind click event to show dialog form
-            self.options.addRecordButton.click(function (e) {
-                e.preventDefault();
-                self._showAddRecordForm();
-            });
         },
+        
+        _onSaveClickedOnCreateForm: function () {
+            var self = this;
+            
+            var $saveButton = $('#AddRecordDialogSaveButton');
+            var $addRecordForm = self._$addRecordDiv.find('form');
 
-        /* Creates and returns 'add new record' button/link.
-        *************************************************************************/
-        _createAddRecordButton: function () {
-            var $link = $('<a></a>')
-                .attr('href', '#')
-                .html(this.options.messages.addNewRecord);
-            return $('<span></span>')
-                .addClass('jtable-add-record')
-                .append($link)
-                .appendTo(this._$bottomPanel.find('.jtable-right-area'));
+            if (self._trigger("formSubmitting", null, { form: $addRecordForm, formType: 'create' }) != false) {
+                self._setEnabledOfDialogButton($saveButton, false, self.options.messages.saving);
+                self._saveAddRecordForm($addRecordForm, $saveButton);
+            }
         },
 
         /************************************************************************
@@ -197,7 +198,7 @@
             var self = this;
 
             //Create add new record form
-            var $addRecordForm = $('<form id="jtable-create-form" class="jtable-dialog-form jtable-create-form" action="' + self.options.actions.createAction + '" method="POST"></form>');
+            var $addRecordForm = $('<form id="jtable-create-form" class="jtable-dialog-form jtable-create-form"></form>');
 
             //Create input elements
             for (var i = 0; i < self._fieldList.length; i++) {
@@ -239,6 +240,11 @@
 
             self._makeCascadeDropDowns($addRecordForm, undefined, 'create');
 
+            $addRecordForm.submit(function () {
+                self._onSaveClickedOnCreateForm();
+                return false;
+            });
+
             //Open the form
             self._$addRecordDiv.append($addRecordForm).dialog('open');
             self._trigger("formCreated", null, { form: $addRecordForm, formType: 'create' });
@@ -253,7 +259,7 @@
             $addRecordForm.data('submitting', true);
 
             self._submitFormUsingAjax(
-                $addRecordForm.attr('action'),
+                self.options.actions.createAction,
                 $addRecordForm.serialize(),
                 function (data) {
                     

@@ -56,6 +56,11 @@
         *************************************************************************/
         _createDeleteDialogDiv: function () {
             var self = this;
+            
+            //Check if deleteAction is supplied
+            if (!self.options.actions.deleteAction) {
+                return;
+            }
 
             //Create div element for delete confirmation dialog
             self._$deleteRecordDiv = $('<div><p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span><span class="jtable-delete-confirm-message"></span></p></div>').appendTo(self._$mainContainer);
@@ -77,6 +82,13 @@
                             id: 'DeleteDialogButton',
                             text: self.options.messages.deleteText,
                             click: function () {
+                                
+                                //row maybe removed by another source, if so, do nothing
+                                if (self._$deletingRow.hasClass('jtable-row-removed')) {
+                                    self._$deleteRecordDiv.dialog('close');
+                                    return;
+                                }
+
                                 var $deleteButton = $('#DeleteDialogButton');
                                 self._setEnabledOfDialogButton($deleteButton, false, self.options.messages.deleting);
                                 self._deleteRecordFromServer(
@@ -373,8 +385,13 @@
             }
 
             if (animationsEnabled) {
+                var className = 'jtable-row-deleting';
+                if (this.options.jqueryuiTheme) {
+                    className = className + ' ui-state-disabled';
+                }
+                
                 //Stop current animation (if does exists) and begin 'deleting' animation.
-                $rows.stop(true, true).addClass('jtable-row-deleting', 'slow', '').promise().done(function () {
+                $rows.stop(true, true).addClass(className, 'slow', '').promise().done(function () {
                     self._removeRowsFromTable($rows, 'deleted');
                 });
             } else {
