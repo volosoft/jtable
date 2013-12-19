@@ -939,7 +939,7 @@
         _addToolBarItem: function (item) {
 
             //Check if item is valid
-            if ((item == undefined) || (item.text == undefined && item.icon == undefined)) {
+            if ((item == undefined) || (item.text == undefined && item.icon == undefined && item.uiIcon == undefined)) {
                 this._logWarn('Can not add tool bar item since it is not valid!');
                 this._logWarn(item);
                 return null;
@@ -972,6 +972,11 @@
                     $icon.css('background', 'url("' + item.icon + '")');
                 }
             }
+
+           //uiIcon property
+           if (item.uiIcon) {
+              var $icon = $('<span class="ui-icon '+item.uiIcon+'"></span>').appendTo($toolBarItem);
+           }
 
             //text property
             if (item.text) {
