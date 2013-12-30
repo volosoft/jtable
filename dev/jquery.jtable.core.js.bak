@@ -40,7 +40,6 @@
                 hoverAnimation: true,
                 hoverAnimationDuration: 60,
                 hoverAnimationEasing: undefined,
-		jQueryUIicons:false,
                 items: []
             },
 
@@ -940,7 +939,7 @@
         _addToolBarItem: function (item) {
 
             //Check if item is valid
-            if ((item == undefined) || (item.text == undefined && item.icon == undefined)) {
+            if ((item == undefined) || (item.text == undefined && item.icon == undefined && item.uiIcon == undefined)) {
                 this._logWarn('Can not add tool bar item since it is not valid!');
                 this._logWarn(item);
                 return null;
@@ -964,32 +963,20 @@
                     .attr('title', item.tooltip);
             }
 
-           //icon property
-           var $icon;
-           if (item.icon) {
-              if (this.options.toolbar.jQueryUIicons) {
-                 $icon = $('<span class="ui-icon '+item.icon+'"></span>').appendTo($toolBarItem);
-              } else {
-                 $icon = $('<span class="jtable-toolbar-item-icon"></span>').appendTo($toolBarItem);
-                 if (item.icon === true) {
+            //icon property
+            if (item.icon) {
+                var $icon = $('<span class="jtable-toolbar-item-icon"></span>').appendTo($toolBarItem);
+                if (item.icon === true) {
                     //do nothing
-                 } else if ($.type(item.icon === 'string')) {
+                } else if ($.type(item.icon === 'string')) {
                     $icon.css('background', 'url("' + item.icon + '")');
-                 }
-              }
-           }
+                }
+            }
 
-           // Reduce line height if jQueryUI icons are used
-           if (this.options.toolbar.jQueryUIicons) {
-              this._$titleDiv.css('line-height','26px');
+           //uiIcon property
+           if (item.uiIcon) {
+              var $icon = $('<span class="ui-icon '+item.uiIcon+'"></span>').appendTo($toolBarItem);
            }
-
-           //id property
-           if (item.id) {
-              $toolBarItem
-                 .attr('id', item.id);
-           }
-
 
             //text property
             if (item.text) {
