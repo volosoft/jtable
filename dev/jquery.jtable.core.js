@@ -1194,11 +1194,11 @@
 
             var strToHash = '';
             if (this.options.tableId) {
-                strToHash = strToHash + this.options.tableId + '#';
+                strToHash = strToHash + this.options.tableId + '_';
             }
 
             strToHash = strToHash + this._columnList.join('$') + '#c' + this._$table.find('thead th').length;
-            return 'jtable#' + simpleHash(strToHash);
+            return 'jtable_' + simpleHash(strToHash);
         },
 
         /************************************************************************
