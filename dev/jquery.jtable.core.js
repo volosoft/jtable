@@ -1026,8 +1026,15 @@
         /* ERROR DIALOG *********************************************************/
 
         /* Shows error message dialog with given message.
+        ** Messages of the form "ServerMessage nnn" will display message number
+        ** nnn in the array self.options.messages.serverMessage
         *************************************************************************/
         _showError: function (message) {
+           var self = this;
+           if (message.substr(0,13)== 'ServerMessage') {
+              var messageNr=message.substr(14,3);
+              message = self.options.messages.serverMessage[ parseInt(messageNr)];
+           }
             this._$errorDialogDiv.html(message).dialog('open');
         },
 
