@@ -664,11 +664,21 @@
 
         /* RENDERING FIELD VALUES ***********************************************/
 
+        /* Gets value by fieldname including nested properties.
+        *************************************************************************/
+        _getFieldValue: function (obj, fieldName) {
+            if (fieldName.indexOf(".") == -1)
+                return obj[fieldName];
+            var arr = fieldName.split(".");
+            while(arr.length && (obj = obj[arr.shift()]));
+            return obj;
+        },
+
         /* Gets text for a field of a record according to it's type.
         *************************************************************************/
         _getDisplayTextForRecordField: function (record, fieldName) {
             var field = this.options.fields[fieldName];
-            var fieldValue = record[fieldName];
+            var fieldValue = this._getFieldValue(record, fieldName);
 
             //if this is a custom field, call display function
             if (field.display) {
