@@ -105,7 +105,7 @@
         *************************************************************************/
         _makeColumnSortable: function ($columnHeader, fieldName) {
             var self = this;
-            
+
             $columnHeader
                 .addClass('jtable-column-header-sortable')
                 .click(function (e) {
@@ -114,7 +114,7 @@
                     if (!self.options.multiSorting || !e.ctrlKey) {
                         self._lastSorting = []; //clear previous sorting
                     }
-                    
+
                     self._sortTableByColumn($columnHeader);
                 });
 
@@ -150,13 +150,13 @@
                 $columnHeader.removeClass('jtable-column-header-sorted-asc').addClass('jtable-column-header-sorted-desc');
                 this._lastSorting.push({
                     'fieldName': $columnHeader.data('fieldName'),
-                    sortOrder: 'DESC'
+                    sortOrder: 'jtSortDesc'
                 });
             } else {
                 $columnHeader.removeClass('jtable-column-header-sorted-desc').addClass('jtable-column-header-sorted-asc');
                 this._lastSorting.push({
                     'fieldName': $columnHeader.data('fieldName'),
-                    sortOrder: 'ASC'
+                    sortOrder: 'jtSortAsc'
                 });
             }
 
@@ -173,10 +173,10 @@
 
             var sorting = [];
             $.each(this._lastSorting, function (idx, value) {
-                sorting.push(value.fieldName + ' ' + value.sortOrder);
+                sorting.push(value.sortOrder + '=' + value.fieldName);
             });
 
-            return (url + (url.indexOf('?') < 0 ? '?' : '&') + 'jtSorting=' + sorting.join(","));
+            return (url + (url.indexOf('?') < 0 ? '?' : '&') + sorting.join("&"));
         }
 
     });
