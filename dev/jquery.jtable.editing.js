@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
 * EDIT RECORD extension for jTable                                      *
 *************************************************************************/
 (function ($) {
@@ -84,7 +84,7 @@
                         }],
                 close: function () {
                     var $editForm = self._$editDiv.find('form:first');
-                    var $saveButton = $('#EditDialogSaveButton');
+                    var $saveButton = self._$editDiv.parent().find('#EditDialogSaveButton');
                     self._trigger("formClosed", null, { form: $editForm, formType: 'edit', row: self._$editingRow });
                     self._setEnabledOfDialogButton($saveButton, true, self.options.messages.save);
                     $editForm.remove();
@@ -103,7 +103,7 @@
                 return;
             }
 
-            var $saveButton = $('#EditDialogSaveButton');
+            var $saveButton = self._$editDiv.parent().find('#EditDialogSaveButton');
             var $editForm = self._$editDiv.find('form');
             if (self._trigger("formSubmitting", null, { form: $editForm, formType: 'edit', row: self._$editingRow }) != false) {
                 self._setEnabledOfDialogButton($saveButton, false, self.options.messages.saving);
@@ -373,7 +373,7 @@
             if (this.options.jqueryuiTheme) {
                 className = className + ' ui-state-highlight';
             }
-            
+
             $tableRow.stop(true, true).addClass(className, 'slow', '', function () {
                 $tableRow.removeClass(className, 5000);
             });
