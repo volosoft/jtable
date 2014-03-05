@@ -9,6 +9,7 @@
         _create: $.hik.jtable.prototype._create,
         _setOption: $.hik.jtable.prototype._setOption,
         _createRecordLoadUrl: $.hik.jtable.prototype._createRecordLoadUrl,
+        _createJtParamsForLoading: $.hik.jtable.prototype._createJtParamsForLoading,
         _addRowToTable: $.hik.jtable.prototype._addRowToTable,
         _addRow: $.hik.jtable.prototype._addRow,
         _removeRowsFromTable: $.hik.jtable.prototype._removeRowsFromTable,
@@ -55,7 +56,7 @@
 
         /* Overrides base method to do paging-specific constructions.
         *************************************************************************/
-        _create: function () {
+        _create: function() {
             base._create.apply(this, arguments);
             if (this.options.paging) {
                 this._loadPagingSettings();
@@ -68,7 +69,7 @@
 
         /* Loads user preferences for paging.
         *************************************************************************/
-        _loadPagingSettings: function () {
+        _loadPagingSettings: function() {
             if (!this.options.saveUserPreferences) {
                 return;
             }
@@ -81,7 +82,7 @@
 
         /* Creates bottom panel and adds to the page.
         *************************************************************************/
-        _createBottomPanel: function () {
+        _createBottomPanel: function() {
             this._$bottomPanel = $('<div />')
                 .addClass('jtable-bottom-panel')
                 .insertAfter(this._$table);
@@ -94,7 +95,7 @@
 
         /* Creates page list area.
         *************************************************************************/
-        _createPageListArea: function () {
+        _createPageListArea: function() {
             this._$pagingListArea = $('<span></span>')
                 .addClass('jtable-page-list')
                 .appendTo(this._$bottomPanel.find('.jtable-left-area'));
@@ -106,7 +107,7 @@
 
         /* Creates page list change area.
         *************************************************************************/
-        _createPageSizeSelection: function () {
+        _createPageSizeSelection: function() {
             var self = this;
 
             if (!self.options.pageSizeChangeArea) {
@@ -116,7 +117,7 @@
             //Add current page size to page sizes list if not contains it
             if (self._findIndexInArray(self.options.pageSize, self.options.pageSizes) < 0) {
                 self.options.pageSizes.push(parseInt(self.options.pageSize));
-                self.options.pageSizes.sort(function (a, b) { return a - b; });
+                self.options.pageSizes.sort(function(a, b) { return a - b; });
             }
 
             //Add a span to contain page size change items
@@ -139,14 +140,14 @@
             $pageSizeChangeCombobox.val(self.options.pageSize);
 
             //Change page size on combobox change
-            $pageSizeChangeCombobox.change(function () {
+            $pageSizeChangeCombobox.change(function() {
                 self._changePageSize(parseInt($(this).val()));
             });
         },
 
         /* Creates go to page area.
         *************************************************************************/
-        _createGotoPageInput: function () {
+        _createGotoPageInput: function() {
             var self = this;
 
             if (!self.options.gotoPageArea || self.options.gotoPageArea == 'none') {
@@ -167,7 +168,7 @@
                 self._$gotoPageInput = $('<select></select>')
                     .appendTo(this._$gotoPageArea)
                     .data('pageCount', 1)
-                    .change(function () {
+                    .change(function() {
                         self._changePage(parseInt($(this).val()));
                     });
                 self._$gotoPageInput.append('<option value="1">1</option>');
@@ -176,7 +177,7 @@
 
                 self._$gotoPageInput = $('<input type="text" maxlength="10" value="' + self._currentPageNo + '" />')
                     .appendTo(this._$gotoPageArea)
-                    .keypress(function (event) {
+                    .keypress(function(event) {
                         if (event.which == 13) { //enter
                             event.preventDefault();
                             self._changePage(parseInt(self._$gotoPageInput.val()));
@@ -205,7 +206,7 @@
 
         /* Refreshes the 'go to page' input.
         *************************************************************************/
-        _refreshGotoPageInput: function () {
+        _refreshGotoPageInput: function() {
             if (!this.options.gotoPageArea || this.options.gotoPageArea == 'none') {
                 return;
             }
@@ -252,7 +253,7 @@
 
         /* Overrides load method to set current page to 1.
         *************************************************************************/
-        load: function () {
+        load: function() {
             this._currentPageNo = 1;
 
             base.load.apply(this, arguments);
@@ -260,7 +261,7 @@
 
         /* Used to change options dynamically after initialization.
         *************************************************************************/
-        _setOption: function (key, value) {
+        _setOption: function(key, value) {
             base._setOption.apply(this, arguments);
 
             if (key == 'pageSize') {
@@ -270,7 +271,7 @@
 
         /* Changes current page size with given value.
         *************************************************************************/
-        _changePageSize: function (pageSize) {
+        _changePageSize: function(pageSize) {
             if (pageSize == this.options.pageSize) {
                 return;
             }
@@ -303,7 +304,7 @@
 
         /* Saves user preferences for paging
         *************************************************************************/
-        _savePagingSettings: function () {
+        _savePagingSettings: function() {
             if (!this.options.saveUserPreferences) {
                 return;
             }
@@ -313,10 +314,23 @@
 
         /* Overrides _createRecordLoadUrl method to add paging info to URL.
         *************************************************************************/
-        _createRecordLoadUrl: function () {
+        _createRecordLoadUrl: function() {
             var loadUrl = base._createRecordLoadUrl.apply(this, arguments);
             loadUrl = this._addPagingInfoToUrl(loadUrl, this._currentPageNo);
             return loadUrl;
+        },
+
+        /* Overrides _createJtParamsForLoading method to add paging parameters to jtParams object.
+        *************************************************************************/
+        _createJtParamsForLoading: function () {
+            var jtParams = base._createJtParamsForLoading.apply(this, arguments);
+            
+            if (this.options.paging) {
+                jtParams.jtStartIndex = (this._currentPageNo - 1) * this.options.pageSize;
+                jtParams.jtPageSize = this.options.pageSize;
+            }
+
+            return jtParams;
         },
 
         /* Overrides _addRowToTable method to re-load table when a new row is created.

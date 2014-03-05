@@ -122,7 +122,6 @@
             options = $.extend({
                 clientOnly: false,
                 animationsEnabled: self.options.animationsEnabled,
-                url: self.options.actions.updateAction,
                 success: function () { },
                 error: function () { }
             }, options);
@@ -140,7 +139,7 @@
 
             var $updatingRow = self.getRowByKey(key);
             if ($updatingRow == null) {
-                self._logWarn('Can not found any row by key: ' + key);
+                self._logWarn('Can not found any row by key "' + key + '" on the table. Updating row must be visible on the table.');
                 return;
             }
 
@@ -156,31 +155,59 @@
                 return;
             }
 
-            self._submitFormUsingAjax(
-                options.url,
-                $.param(options.record),
-                function (data) {
-                    if (data.Result != 'OK') {
-                        self._showError(data.Message);
-                        options.error(data);
-                        return;
-                    }
+            var completeEdit = function (data) {
+                if (data.Result != 'OK') {
+                    self._showError(data.Message);
+                    options.error(data);
+                    return;
+                }
 
-                    $.extend($updatingRow.data('record'), options.record);
-                    self._updateRecordValuesFromServerResponse($updatingRow.data('record'), data);
+                $.extend($updatingRow.data('record'), options.record);
+                self._updateRecordValuesFromServerResponse($updatingRow.data('record'), data);
 
-                    self._updateRowTexts($updatingRow);
-                    self._onRecordUpdated($updatingRow, data);
-                    if (options.animationsEnabled) {
-                        self._showUpdateAnimationForRow($updatingRow);
-                    }
+                self._updateRowTexts($updatingRow);
+                self._onRecordUpdated($updatingRow, data);
+                if (options.animationsEnabled) {
+                    self._showUpdateAnimationForRow($updatingRow);
+                }
 
-                    options.success(data);
-                },
-                function () {
-                    self._showError(self.options.messages.serverCommunicationError);
-                    options.error();
-                });
+                options.success(data);
+            };
+
+            //updateAction may be a function, check if it is
+            if (!options.url && $.isFunction(self.options.actions.updateAction)) {
+
+                //Execute the function
+                var funcResult = self.options.actions.updateAction($.param(options.record));
+
+                //Check if result is a jQuery Deferred object
+                if (self._isDeferredObject(funcResult)) {
+                    //Wait promise
+                    funcResult.done(function (data) {
+                        completeEdit(data);
+                    }).fail(function () {
+                        self._showError(self.options.messages.serverCommunicationError);
+                        options.error();
+                    });
+                } else { //assume it returned the creation result
+                    completeEdit(funcResult);
+                }
+
+            } else { //Assume it's a URL string
+
+                //Make an Ajax call to create record
+                self._submitFormUsingAjax(
+                    options.url || self.options.actions.updateAction,
+                    $.param(options.record),
+                    function (data) {
+                        completeEdit(data);
+                    },
+                    function () {
+                        self._showError(self.options.messages.serverCommunicationError);
+                        options.error();
+                    });
+
+            }
         },
 
         /************************************************************************
@@ -296,37 +323,66 @@
         *************************************************************************/
         _saveEditForm: function ($editForm, $saveButton) {
             var self = this;
-            self._submitFormUsingAjax(
-                self.options.actions.updateAction,
-                $editForm.serialize(),
-                function (data) {
-                    //Check for errors
-                    if (data.Result != 'OK') {
-                        self._showError(data.Message);
-                        self._setEnabledOfDialogButton($saveButton, true, self.options.messages.save);
-                        return;
-                    }
-
-                    var record = self._$editingRow.data('record');
-
-                    self._updateRecordValuesFromForm(record, $editForm);
-                    self._updateRecordValuesFromServerResponse(record, data);
-                    self._updateRowTexts(self._$editingRow);
-
-                    self._$editingRow.attr('data-record-key', self._getKeyValueOfRecord(record));
-
-                    self._onRecordUpdated(self._$editingRow, data);
-
-                    if (self.options.animationsEnabled) {
-                        self._showUpdateAnimationForRow(self._$editingRow);
-                    }
-
-                    self._$editDiv.dialog("close");
-                },
-                function () {
-                    self._showError(self.options.messages.serverCommunicationError);
+            
+            var completeEdit = function (data) {
+                if (data.Result != 'OK') {
+                    self._showError(data.Message);
                     self._setEnabledOfDialogButton($saveButton, true, self.options.messages.save);
-                });
+                    return;
+                }
+
+                var record = self._$editingRow.data('record');
+
+                self._updateRecordValuesFromForm(record, $editForm);
+                self._updateRecordValuesFromServerResponse(record, data);
+                self._updateRowTexts(self._$editingRow);
+
+                self._$editingRow.attr('data-record-key', self._getKeyValueOfRecord(record));
+
+                self._onRecordUpdated(self._$editingRow, data);
+
+                if (self.options.animationsEnabled) {
+                    self._showUpdateAnimationForRow(self._$editingRow);
+                }
+
+                self._$editDiv.dialog("close");
+            };
+
+
+            //updateAction may be a function, check if it is
+            if ($.isFunction(self.options.actions.updateAction)) {
+
+                //Execute the function
+                var funcResult = self.options.actions.updateAction($editForm.serialize());
+
+                //Check if result is a jQuery Deferred object
+                if (self._isDeferredObject(funcResult)) {
+                    //Wait promise
+                    funcResult.done(function (data) {
+                        completeEdit(data);
+                    }).fail(function () {
+                        self._showError(self.options.messages.serverCommunicationError);
+                        self._setEnabledOfDialogButton($saveButton, true, self.options.messages.save);
+                    });
+                } else { //assume it returned the creation result
+                    completeEdit(funcResult);
+                }
+
+            } else { //Assume it's a URL string
+
+                //Make an Ajax call to update record
+                self._submitFormUsingAjax(
+                    self.options.actions.updateAction,
+                    $editForm.serialize(),
+                    function(data) {
+                        completeEdit(data);
+                    },
+                    function() {
+                        self._showError(self.options.messages.serverCommunicationError);
+                        self._setEnabledOfDialogButton($saveButton, true, self.options.messages.save);
+                    });
+            }
+
         },
 
         /* This method ensures updating of current record with server response,

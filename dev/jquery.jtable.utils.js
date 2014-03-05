@@ -94,6 +94,12 @@
             return str;
         },
 
+        /* Checks if given object is a jQuery Deferred object.
+         */
+        _isDeferredObject: function (obj) {
+            return obj.then && obj.done && obj.fail;
+        },
+
         //Logging methods ////////////////////////////////////////////////////////
 
         _logDebug: function (text) {

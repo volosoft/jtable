@@ -402,48 +402,80 @@
         _reloadTable: function (completeCallback) {
             var self = this;
 
-            //Disable table since it's busy
-            self._showBusy(self.options.messages.loadingMessage, self.options.loadingAnimationDelay);
+            var completeReload = function(data) {
+                self._hideBusy();
 
-            //Generate URL (with query string parameters) to load records
-            var loadUrl = self._createRecordLoadUrl();
-
-            //Load data from server
-            self._onLoadingRecords();
-            self._ajax({
-                url: loadUrl,
-                data: self._lastPostData,
-                success: function (data) {
-                    self._hideBusy();
-
-                    //Show the error message if server returns error
-                    if (data.Result != 'OK') {
-                        self._showError(data.Message);
-                        return;
-                    }
-
-                    //Re-generate table rows
-                    self._removeAllRows('reloading');
-                    self._addRecordsToTable(data.Records);
-
-                    self._onRecordsLoaded(data);
-
-                    //Call complete callback
-                    if (completeCallback) {
-                        completeCallback();
-                    }
-                },
-                error: function () {
-                    self._hideBusy();
-                    self._showError(self.options.messages.serverCommunicationError);
+                //Show the error message if server returns error
+                if (data.Result != 'OK') {
+                    self._showError(data.Message);
+                    return;
                 }
-            });
+
+                //Re-generate table rows
+                self._removeAllRows('reloading');
+                self._addRecordsToTable(data.Records);
+
+                self._onRecordsLoaded(data);
+
+                //Call complete callback
+                if (completeCallback) {
+                    completeCallback();
+                }
+            };
+
+            self._showBusy(self.options.messages.loadingMessage, self.options.loadingAnimationDelay); //Disable table since it's busy
+            self._onLoadingRecords();
+
+            //listAction may be a function, check if it is
+            if ($.isFunction(self.options.actions.listAction)) {
+
+                //Execute the function
+                var funcResult = self.options.actions.listAction(self._lastPostData, self._createJtParamsForLoading());
+
+                //Check if result is a jQuery Deferred object
+                if (self._isDeferredObject(funcResult)) {
+                    funcResult.done(function(data) {
+                        completeReload(data);
+                    }).fail(function() {
+                        self._showError(self.options.messages.serverCommunicationError);
+                    }).always(function() {
+                        self._hideBusy();
+                    });
+                } else { //assume it's the data we're loading
+                    completeReload(funcResult);
+                }
+
+            } else { //assume listAction as URL string.
+
+                //Generate URL (with query string parameters) to load records
+                var loadUrl = self._createRecordLoadUrl();
+
+                //Load data from server using AJAX
+                self._ajax({
+                    url: loadUrl,
+                    data: self._lastPostData,
+                    success: function (data) {
+                        completeReload(data);
+                    },
+                    error: function () {
+                        self._hideBusy();
+                        self._showError(self.options.messages.serverCommunicationError);
+                    }
+                });
+
+            }
         },
 
         /* Creates URL to load records.
         *************************************************************************/
         _createRecordLoadUrl: function () {
             return this.options.actions.listAction;
+        },
+
+        _createJtParamsForLoading: function() {
+            return {
+                //Empty as default, paging, sorting or other extensions can override this method to add additional params to load request
+            };
         },
 
         /* TABLE MANIPULATION METHODS *******************************************/
