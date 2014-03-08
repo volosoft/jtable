@@ -30,6 +30,7 @@
             loadingAnimationDelay: 500,
             saveUserPreferences: true,
             jqueryuiTheme: false,
+            unAuthorizedRequestRedirectUrl: null,
 
             ajaxSettings: {
                 type: 'POST',
@@ -1126,14 +1127,38 @@
             });
         },
 
+        _unAuthorizedRequestHandler: function() {
+            if (this.options.unAuthorizedRequestRedirectUrl) {
+                location.href = this.options.unAuthorizedRequestRedirectUrl;
+            } else {
+                location.reload(true);
+            }
+        },
+
         /* This method is used to perform AJAX calls in jTable instead of direct
         * usage of jQuery.ajax method.
         *************************************************************************/
         _ajax: function (options) {
-            var opts = $.extend({}, this.options.ajaxSettings, options);
+            var self = this;
+
+            //Handlers for HTTP status codes
+            var opts = {
+                statusCode: {
+                    401: function () { //Unauthorized
+                        self._unAuthorizedRequestHandler();
+                    }
+                }
+            };
+
+            opts = $.extend(opts, this.options.ajaxSettings, options);
 
             //Override success
             opts.success = function (data) {
+                //Checking for Authorization error
+                if (data && data.UnAuthorizedRequest == true) {
+                    self._unAuthorizedRequestHandler();
+                }
+
                 if (options.success) {
                     options.success(data);
                 }

@@ -35,7 +35,7 @@
     "docs": "http://jtable.org/Home/Documents",
     "download": "http://jtable.org/Home/Downloads",
     "dependencies": {
-        "jquery": ">=1.6",
-		"jqueryui": ">=1.8"
+		"jquery": ">=1.9.1",
+		"jqueryui": ">=1.9.2"
     }
 }
