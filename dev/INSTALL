@@ -1,5 +1,0 @@
-#!/bin/sh
-cat jquery.jtable.build.txt | tr -d $'\r'  | sed -n -f build/build.sed | sh
-
-DEST=/home/jaroslav/www/theme/js/jquery/ui/jquery.ui.jtable.js
-cp -v ../jquery.jtable.js $DEST
