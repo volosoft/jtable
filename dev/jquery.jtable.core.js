@@ -236,7 +236,6 @@
         _createTable: function () {
             this._$table = $('<table></table>')
                 .addClass('jtable')
-                .addClass('table table-bordered')
                 .appendTo(this._$mainContainer);
 
             if (this.options.tableId) {
