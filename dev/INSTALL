@@ -1,0 +1,3 @@
+cat jquery.jtable.build.txt | tr -d $'\r'  | sed -n -f build/build.sed | sh
+
+cp -i ../jquery.jtable.js ~/www/wp-includes/js/jquery/ui/jquery.ui.jtable.js
