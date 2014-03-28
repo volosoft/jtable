@@ -77,6 +77,13 @@
                 return this._createPasswordInputForField(field, fieldName, value);
             } else if (field.type == 'checkbox') {
                 return this._createCheckboxForField(field, fieldName, value);
+            } else if (field.type == 'custom') {
+                if (typeof field.display === 'function') {
+                    var $display = field.display();
+                    return $('<div />')
+                        .addClass('jtable-input jtable-input-custom')
+                        .append($display);
+                }
             } else if (field.options) {
                 if (field.type == 'radiobutton') {
                     return this._createRadioButtonListForField(field, fieldName, value, record, formType);
