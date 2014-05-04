@@ -3,7 +3,7 @@ What is jTable
 
 http://www.jtable.org
 
-![A screenshot of jTable](https://raw.githubusercontent.com/hikalkan/jtable/master/screenshot.png)
+[![A screenshot of jTable](https://raw.githubusercontent.com/hikalkan/jtable/master/screenshot.png)](http://jtable.org/)
 
 jTable is a jQuery plugin that is used to create AJAX based CRUD tables without coding HTML or Javascript. It has several features including:
 
