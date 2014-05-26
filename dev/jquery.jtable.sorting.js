@@ -21,7 +21,8 @@
         options: {
             sorting: false,
             multiSorting: false,
-            defaultSorting: ''
+            defaultSorting: '',
+            sortingParam: 'jtSorting'
         },
 
         /************************************************************************
@@ -165,7 +166,7 @@
             this._reloadTable();
         },
 
-        /* Adds jtSorting parameter to a URL as query string.
+        /* Adds sortingParam parameter (old jtSorting) to a URL as query string.
         *************************************************************************/
         _addSortingInfoToUrl: function (url) {
             if (!this.options.sorting || this._lastSorting.length == 0) {
@@ -177,7 +178,7 @@
                 sorting.push(value.fieldName + ' ' + value.sortOrder);
             });
 
-            return (url + (url.indexOf('?') < 0 ? '?' : '&') + 'jtSorting=' + sorting.join(","));
+            return (url + (url.indexOf('?') < 0 ? '?' : '&') + this.options.sortingParam + '=' + sorting.join(","));
         },
 
         /* Overrides _createJtParamsForLoading method to add sorging parameters to jtParams object.
@@ -191,7 +192,7 @@
                     sorting.push(value.fieldName + ' ' + value.sortOrder);
                 });
 
-                jtParams.jtSorting = sorting.join(",");
+                jtParams[this.options.sortingParam] = sorting.join(",");
             }
 
             return jtParams;
