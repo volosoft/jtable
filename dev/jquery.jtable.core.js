@@ -99,7 +99,7 @@
         * CONSTRUCTOR AND INITIALIZATION METHODS                                *
         *************************************************************************/
 
-        /* Contructor.
+        /* Constructor.
         *************************************************************************/
         _create: function () {
 
@@ -138,8 +138,11 @@
             if (props.inputClass == undefined) {
                 props.inputClass = '';
             }
+            if (props.placeholder == undefined) {
+                props.placeholder = '';
+            }
 
-            //Convert dependsOn to array if it's a comma seperated lists
+            //Convert dependsOn to array if it's a comma separated lists
             if (props.dependsOn && $.type(props.dependsOn) === 'string') {
                 var dependsOnArray = props.dependsOn.split(',');
                 props.dependsOn = [];
