@@ -152,7 +152,7 @@
                 .append($input);
         },
 
-        /* Creates a checkboxfor a field.
+        /* Creates a checkbox for a field.
         *************************************************************************/
         _createCheckboxForField: function (field, fieldName, value) {
             var self = this;
@@ -179,7 +179,7 @@
 
             //Check the checkbox if it's value is checked-value
             if (self._getIsCheckBoxSelectedForFieldByValue(fieldName, value)) {
-                $checkBox.attr('checked', 'checked');
+                $checkBox.prop('checked', 'checked');
             }
 
             //This method sets checkbox's value and text according to state of the checkbox
@@ -200,9 +200,9 @@
                     .addClass('jtable-option-text-clickable')
                     .click(function () {
                         if ($checkBox.is(':checked')) {
-                            $checkBox.attr('checked', false);
+                            $checkBox.prop('checked', false);
                         } else {
-                            $checkBox.attr('checked', true);
+                            $checkBox.prop('checked', true);
                         }
 
                         refreshCheckBoxValueAndText();
