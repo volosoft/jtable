@@ -9,11 +9,11 @@ class NuDB{
 	var $primary;
 	var $master= "localhost";
 	var $master_user ="root";
-	var $master_pass="";	
+	var $master_pass="root";	
 	var $host = "localhost";
 	var $user ="root";
-	var $pass="";
-	var $db="db_name";
+	var $pass="root";
+	var $db="nucrud";
 	function __construct(){
 		$this->connect();
 	}
@@ -93,7 +93,7 @@ class NuDB{
 		$array = array();
 		$i = 1;
 		while ($row = mysql_fetch_object( $cur )) {
-				$row->id_urut= $i + $limitstart;
+				$row->record_number= $i + $limitstart;
 				$array[] = $row;
 				$i++;
 		}

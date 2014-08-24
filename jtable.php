@@ -228,7 +228,8 @@ class NuJTable{
                     "title"=>'#',
                     "width"=>'2%',
                     "edit"=>false,
-                    "create"=>false,					
+                    "create"=>false,
+					"searchable"=>false,
 					"sorting"=>false);
 		$this->fields[$this->db->primary] = array(
 					"title"=>"ID",
@@ -295,12 +296,18 @@ class NuJTable{
 		if(isset($_REQUEST['detail'])):
 			$this->datadetail();
 		endif;
-		$offset = isset($_REQUEST['jtStartIndex']) ? $_REQUEST['jtStartIndex']:0;  
+		$offset = isset($_REQUEST['jtStartIndex']) ? $_REQUEST['jtStartIndex']:0;
 		$rows = isset($_REQUEST['jtPageSize']) ? $_REQUEST['jtPageSize']:10 ;
 		$q = $_REQUEST['q'];
 		$sort = isset($_REQUEST['jtSorting']) ? $_REQUEST['jtSorting']:$this->db->primary.' desc';
 		$opt = $_REQUEST['opt'];
 		$options = $_SESSION['options'];
+		$_SESSION['offset']=$offset;
+		$_SESSION['rows']=$rows;
+		$_SESSION['sort']=$sort;
+		$_SESSION['opt']=$opt;
+		$_SESSION['q']=$q;
+
 		$join = array();
 		$where ='';
 		if($q){
@@ -637,5 +644,52 @@ var objdetail = \$.parseJSON('".json_encode($table)."');
 			$this->fieldCustom($key,$val);
 		}
 	}
+	function toexcel(){
+		$filename=$this->jtable['title'].".xls";
+		header("Content-Disposition: attachment; filename=\"$filename\""); 
+		header("Content-Type: application/vnd.ms-excel"); 
+		$offset = $_SESSION['offset']; 
+		$rows = $_SESSION['rows'];
+		$q = $_SESSION['q'];
+		$sort = $_SESSION['sort'];
+		$opt = $_SESSION['opt'];
+		$options = $_SESSION['options'];
+		$join = array();
+		$where ='';
+		if($q){
+			for($i = 0; $i < count($opt); $i++):  
+				$fld = $opt[$i];
+				if(isset($options[$opt[$i]])){
+					$option = $options[$opt[$i]];
+					$fld="t$i.".$option['field'];
+					$join[] = " INNER JOIN ".$option['table']." as t$i on ".$this->table.".".$option['id']."=t$i.".$option['relkey'];
+				}
+				$where[] = $fld." like '%".$q[$i]."%'";
+			endfor;
+			$where = " where ".implode(" And ",$where);
+		}  
+		$join = count($join)<1?"":implode("",$join);  
+		$q = "select count(*) FROM ".$this->table.$join.$where;
+		$this->db->setQuery($q);
+		$total= $this->db->loadResult();
+		$q = "SELECT * FROM ".$this->table.$join.$where." order by ".$sort;  
+		$items = $this->db->getList($q,$offset,$rows);
+		$table = "<table><thead>";
+		foreach($this->fields as $key){
+			$table.="<th>".$key['title']."</th>";
+		}
+		$table.="</thead><tbody>";
+		foreach($items as $row){
+			$table.="<tr>";
+			foreach($this->fields as $key => $val){
+				$table.="<td>".$row->$key."</td>";
+			}
+			$table.="</tr>";
+		}
+		$table.="</tbody><tfoot>";
+		$table.="<td align='right' colspan='".count($this->fields)."'>Total Records : $total</td>";
+		$table.="</tfoot></table>";
+		die($table);
+	}	
 }
 ?>

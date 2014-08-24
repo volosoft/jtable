@@ -17,15 +17,15 @@ $table->toolbarsearch=true;
 
 //set title
 $table->setUrl('example.jtable.php?');
-$table->setTitle('Invoice');
+$table->setTitle('Students');
 
 //set table from database setTable("DB Resource","Table Name","Primary key, default=id")
-$table->setTable($db,"invoice","otonumb");
+$table->setTable($db,"student");
 
 $toolbar1 =  array("icon"=>"/images/excel.png",
         		"text"=>'Export to Excel',
         		"click"=>"function () {
-            		alert('tolbar1');
+            		window.location='example.jtable.php?action=toexcel';
         		}");
 $toolbar2 =  array("icon"=>"/images/excel.png",
         		"text"=>'Export to Excel',
@@ -34,9 +34,9 @@ $toolbar2 =  array("icon"=>"/images/excel.png",
         		}");
 
 $table->addToolbar($toolbar1,$toolbar2);
-//create search option
-$opt = array("No_Invoice"=>"No.Invoice");
-$table->setOpt($opt);
+//create search option == useless if toolbarsearch enabled
+//$opt = array("name"=>"Name","address"=>"Addess");
+//$table->setOpt($opt);
 
 //trigger all request
 $table->trigger();
@@ -45,10 +45,10 @@ $table->trigger();
 <html>
 <head>
 <title>Example JTable php crud</title>
-<link rel="stylesheet" type="text/css" href="css/ui-lightness/jquery-ui-1.10.1.custom.min.css" />
+<link rel="stylesheet" type="text/css" href="jquery-ui/jquery-ui.min.css" />
 <link rel="stylesheet" type="text/css" href="lib/themes/metro/blue/jtable.min.css" />
-<script type="text/javascript" src="jquery-1.9.1.min.js"></script>
-<script type="text/javascript" src="jquery-ui-1.10.1.custom.js"></script>
+<script type="text/javascript" src="jquery-2.1.0.min.js"></script>
+<script type="text/javascript" src="jquery-ui/jquery-ui.min.js"></script>
 <script type="text/javascript" src="lib/jquery.jtable.min.js"></script>
 <script type="text/javascript" src="lib/extensions/jquery.jtable.editinline.js"></script>
 <script type="text/javascript" src="lib/extensions/jquery.jtable.toolbarsearch.js"></script>
