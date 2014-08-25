@@ -29,7 +29,7 @@ class NuJTable{
 	var $titletext = 'ucfirst';
 	var $showkey = false;
 	var $DateFormat="yy-mm-dd";
-	function getObj(){
+	static function getObj(){
 		static $instance;
 		if(!$instance):
 			$instance = new NuJTable();
@@ -298,10 +298,10 @@ class NuJTable{
 		endif;
 		$offset = isset($_REQUEST['jtStartIndex']) ? $_REQUEST['jtStartIndex']:0;
 		$rows = isset($_REQUEST['jtPageSize']) ? $_REQUEST['jtPageSize']:10 ;
-		$q = $_REQUEST['q'];
+		$q = isset($_REQUEST['q'])?$_REQUEST['q']:"";
 		$sort = isset($_REQUEST['jtSorting']) ? $_REQUEST['jtSorting']:$this->db->primary.' desc';
-		$opt = $_REQUEST['opt'];
-		$options = $_SESSION['options'];
+		$opt = isset($_REQUEST['opt'])?$_REQUEST['opt']:"";
+		$options = isset($_SESSION['options'])?$_SESSION['options']:array();
 		$_SESSION['offset']=$offset;
 		$_SESSION['rows']=$rows;
 		$_SESSION['sort']=$sort;
@@ -427,13 +427,7 @@ class NuJTable{
 		//$this->fields[$cmb]["options"] = "%%%function(data){return \'".$this->url."&action=cmb&combo=".$cmb."\';}%%%";
 	}
 	function getoption(){
-		$html="";
-		foreach($this->options as $key => $val):			
-			$html.= "
-				obj.fields.$key.options = $val;
-				";				
-			
-		endforeach;
+		
 		//return $html;
 	}
 	function justInclude(){
