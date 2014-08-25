@@ -17,7 +17,7 @@ class NuDB{
 	function __construct(){
 		$this->connect();
 	}
-	function &getObj(){
+	function getObj(){
 		static $instance;
 		if(!$instance):
 		$instance = new NuDB();
