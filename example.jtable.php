@@ -13,7 +13,7 @@ $table->editinline['img'] = 'content/';
 $table->toolbarsearch=true;
 
 // add values to dropdown
-//$table->options = array("Status"=>array(0=>"Passive",1=>"active"),"Publihed"=>array(0=>"Unpublihed",1=>"Published"));
+$table->options = array("sex"=>array(0=>"Female",1=>"Male"));
 
 //set title
 $table->setUrl('example.jtable.php?');
@@ -22,12 +22,12 @@ $table->setTitle('Students');
 //set table from database setTable("DB Resource","Table Name","Primary key, default=id")
 $table->setTable($db,"student");
 
-$toolbar1 =  array("icon"=>"/images/excel.png",
+$toolbar1 =  array("icon"=>"images/excel.png",
         		"text"=>'Export to Excel',
         		"click"=>"function () {
             		window.location='example.jtable.php?action=toexcel';
         		}");
-$toolbar2 =  array("icon"=>"/images/excel.png",
+$toolbar2 =  array("icon"=>"images/excel.png",
         		"text"=>'Export to Excel',
         		"click"=>"function () {
             		alert('tolbar2');
