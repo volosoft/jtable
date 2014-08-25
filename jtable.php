@@ -427,14 +427,14 @@ class NuJTable{
 		//$this->fields[$cmb]["options"] = "%%%function(data){return \'".$this->url."&action=cmb&combo=".$cmb."\';}%%%";
 	}
 	function getoption(){
-		foreach($this->options as $key => $val):
-			$html="";
-			if(!$this->editinline){
-			$html= "
+		$html="";
+		foreach($this->options as $key => $val):			
+			$html.= "
 				obj.fields.$key.options = $val;
 				";				
-			}
+			
 		endforeach;
+		//return $html;
 	}
 	function justInclude(){
    		$numargs = func_num_args();
@@ -567,16 +567,10 @@ var objdetail = \$.parseJSON('".json_encode($table)."');
       }
     }
     $result = array();
-    if ($isList)
-    {
-      foreach ($a as $v) $result[] = $this->json_encok($v);
-      return '[' . join(',', $result) . ']';
-    }
-    else
-    {
+    
       foreach ($a as $k => $v) $result[] = $k.':'.$this->json_encok($v);
       return '{' . join(',', $result) . '}';
-    }
+    
   }
 	function getoptions(){
 		$request =  $_REQUEST;
