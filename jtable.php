@@ -29,7 +29,7 @@ class NuJTable{
 	var $titletext = 'ucfirst';
 	var $showkey = false;
 	var $DateFormat="yy-mm-dd";
-	function &getObj(){
+	function getObj(){
 		static $instance;
 		if(!$instance):
 			$instance = new NuJTable();
