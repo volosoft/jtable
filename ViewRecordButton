@@ -1,0 +1,247 @@
+Adding View Record Functionality In JTable. Add Below to jquery.jtable.js
+And this is how you would add view button in your jtable actions    viewAction: 'ThisShouldNotBeLeftBlank'
+
+
+/************************************************************************
+* VIEW RECORD extension for jTable                                      *
+*************************************************************************/
+(function ($) {
+
+    //Reference to base object members
+    var base = {
+        _create: $.hik.jtable.prototype._create,
+        _addColumnsToHeaderRow: $.hik.jtable.prototype._addColumnsToHeaderRow,
+        _addCellsToRowUsingRecord: $.hik.jtable.prototype._addCellsToRowUsingRecord
+    };
+
+    //extension members
+    $.extend(true, $.hik.jtable.prototype, {
+
+        /************************************************************************
+        * DEFAULT OPTIONS / EVENTS                                              *
+        *************************************************************************/
+        options: {
+
+            //Events
+            recordUpdated: function (event, data) { },
+            rowUpdated: function (event, data) { },
+
+            //Localization
+            messages: {
+                viewRecord: 'View Record'
+            }
+        },
+
+        /************************************************************************
+        * PRIVATE FIELDS                                                        *
+        *************************************************************************/
+
+        _$viewDiv: null, //Reference to the viewing dialog div (jQuery object)
+        _$viewingRow: null, //Reference to currently viewing row (jQuery object)
+
+        /************************************************************************
+        * CONSTRUCTOR AND INITIALIZATION METHODS                                *
+        *************************************************************************/
+
+        /* Overrides base method to do viewing-specific constructions.
+        *************************************************************************/
+        _create: function () {
+            base._create.apply(this, arguments);
+
+            if (!this.options.actions.viewAction) {
+                return;
+            }
+
+            this._createViewDialogDiv();
+        },
+
+        /* Creates and prepares view dialog div
+        *************************************************************************/
+        _createViewDialogDiv: function () {
+            var self = this;
+
+            //Create a div for dialog and add to container element
+            self._$viewDiv = $('<div></div>')
+                .appendTo(self._$mainContainer);
+
+            //Prepare dialog
+            self._$viewDiv.dialog({
+                autoOpen: false,
+                show: self.options.dialogShowEffect,
+                hide: self.options.dialogHideEffect,
+                width: 'auto',
+                minWidth: '300',
+                modal: true,
+                title: self.options.messages.viewRecord,
+                buttons:
+                        [{  //cancel button
+                            text: self.options.messages.cancel,
+                            click: function () {
+                                self._$viewDiv.dialog('close');
+                            }
+                        }],
+                close: function () {
+                    var $viewForm = self._$viewDiv.find('form:first');
+                    //var $saveButton = self._$viewDiv.parent().find('#ViewDialogSaveButton');
+                    self._trigger("formClosed", null, { form: $viewForm, formType: 'view', row: self._$viewingRow });
+                    //self._setEnabledOfDialogButton($saveButton, true, self.options.messages.save);
+                    $viewForm.remove();
+                }
+            });
+        },
+
+
+        /************************************************************************
+        * PUBLIC METHODS                                                        *
+        *************************************************************************/
+
+        /************************************************************************
+        * OVERRIDED METHODS                                                     *
+        *************************************************************************/
+
+        /* Overrides base method to add a 'viewing column cell' to header row.
+        *************************************************************************/
+        _addColumnsToHeaderRow: function ($tr) {
+            base._addColumnsToHeaderRow.apply(this, arguments);
+            // && this.options.actions.viewAction != '' added by Mehdi. Shows view button only if viewAction has some value
+            if (this.options.actions.viewAction != undefined && this.options.actions.viewAction != '') {
+                $tr.append(this._createEmptyCommandHeader());
+            }
+        },
+
+        /* Overrides base method to add a 'view command cell' to a row.
+        *************************************************************************/
+        _addCellsToRowUsingRecord: function ($row) {
+            var self = this;
+            base._addCellsToRowUsingRecord.apply(this, arguments);
+            // && this.options.actions.viewAction != '' added by Mehdi. Shows view button only if viewAction has some value
+            if (self.options.actions.viewAction != undefined && self.options.actions.viewAction != '') {
+                var $span = $('<span></span>').html(self.options.messages.viewRecord);
+                var $button = $('<button title="' + self.options.messages.viewRecord + '"></button>')
+                    .addClass('jtable-command-button jtable-view-command-button')
+                    .append($span)
+                    .click(function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        self._showViewForm($row);
+                    });
+                $('<td></td>')
+                    .addClass('jtable-command-column')
+                    .append($button)
+                    .appendTo($row);
+            }
+        },
+
+        /************************************************************************
+        * PRIVATE METHODS                                                       *
+        *************************************************************************/
+
+        /* Shows view form for a row.
+        *************************************************************************/
+        _showViewForm: function ($tableRow) {
+            var self = this;
+            var record = $tableRow.data('record');
+
+            //Create view form
+            var $viewForm = $('<form id="jtable-view-form" class="jtable-dialog-form jtable-edit-form"></form>');
+
+            //Create input fields
+            for (var i = 0; i < self._fieldList.length; i++) {
+
+                var fieldName = self._fieldList[i];
+                var field = self.options.fields[fieldName];
+                var fieldValue = record[fieldName];
+                if (field.key == true) {
+                    if (field.edit != true) {
+                        //Create hidden field for key
+                        $viewForm.append(self._createInputForHidden(fieldName, fieldValue));
+                        continue;
+                    } else {
+                        //Create a special hidden field for key (since key is be editable)
+                        $viewForm.append(self._createInputForHidden('jtRecordKey', fieldValue));
+                    }
+                }
+
+                //Do not create element for non-editable fields
+                if (field.edit == false) {
+                    continue;
+                }
+
+                //Hidden field
+                if (field.type == 'hidden') {
+                    $viewForm.append(self._createInputForHidden(fieldName, fieldValue));
+                    continue;
+                }
+
+                //Create a container div for this input field and add to form
+                var $fieldContainer = $('<div class="jtable-input-field-container"></div>').appendTo($viewForm);
+
+                //Create a label for input
+                $fieldContainer.append(self._createInputLabelForRecordField(fieldName));
+
+                //Create input element with it's current value
+                var currentValue = self._getValueForRecordField(record, fieldName);
+                $fieldContainer.append(
+                    self._createInputForRecordField({
+                        fieldName: fieldName,
+                        value: currentValue,
+                        record: record,
+                        formType: 'edit',
+                        form: $viewForm
+                    }));
+            }
+
+            self._makeCascadeDropDowns($viewForm, record, 'edit');
+
+            $viewForm.submit(function () {
+                return false;
+            });
+
+            //Open dialog
+            self._$viewingRow = $tableRow;
+            self._$viewDiv.append($viewForm).dialog('open');
+            self._trigger("formCreated", null, { form: $viewForm, formType: 'edit', record: record, row: $tableRow });
+        },
+
+
+        /* Gets text for a field of a record according to it's type.
+        *************************************************************************/
+        _getValueForRecordField: function (record, fieldName) {
+            var field = this.options.fields[fieldName];
+            var fieldValue = record[fieldName];
+            if (field.type == 'date') {
+                return this._getDisplayTextForDateRecordField(field, fieldValue);
+            } else {
+                return fieldValue;
+            }
+        },
+
+        /* Updates cells of a table row's text values from row's record values.
+        *************************************************************************/
+        _updateRowTexts: function ($tableRow) {
+            var record = $tableRow.data('record');
+            var $columns = $tableRow.find('td');
+            for (var i = 0; i < this._columnList.length; i++) {
+                var displayItem = this._getDisplayTextForRecordField(record, this._columnList[i]);
+                if ((displayItem != "") && (displayItem == 0)) displayItem = "0";
+                $columns.eq(this._firstDataColumnOffset + i).html(displayItem || '');
+            }
+
+            this._onRowUpdated($tableRow);
+        },
+
+        /************************************************************************
+        * EVENT RAISING METHODS                                                 *
+        *************************************************************************/
+
+        _onRowUpdated: function ($row) {
+            this._trigger("rowUpdated", null, { row: $row, record: $row.data('record') });
+        },
+
+        _onRecordUpdated: function ($row, data) {
+            this._trigger("recordUpdated", null, { record: $row.data('record'), row: $row, serverResponse: data });
+        }
+
+    });
+
+})(jQuery);
