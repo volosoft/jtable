@@ -93,6 +93,9 @@
                     e.preventDefault();
                     self._showAddRecordForm();
                 });
+            } else if (self.options.addRecordButton === false) {
+                // If user doesn't want a button, do nothing..
+                
             } else {
                 //If user did not supplied a button, create a 'add record button' toolbar item.
                 self._addToolBarItem({
