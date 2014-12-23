@@ -4,7 +4,7 @@
 (function ($) {
 
     var unloadingPage;
-    
+
     $(window).on('beforeunload', function () {
         unloadingPage = true;
     });
@@ -117,7 +117,7 @@
             this._createErrorDialogDiv();
             this._addNoDataRow();
 
-            this._cookieKeyPrefix = this._generateCookieKeyPrefix();            
+            this._cookieKeyPrefix = this._generateCookieKeyPrefix();
         },
 
         /* Normalizes some options for all fields (sets default values).
@@ -281,6 +281,7 @@
         *************************************************************************/
         _createHeaderCellForField: function (fieldName, field) {
             field.width = field.width || '10%'; //default column width: 10%.
+            field.firstSort = field.firstSort 	|| 'ASC'; //default to ASC sorting columns unless firstSort: DESC
 
             var $headerTextSpan = $('<span />')
                 .addClass('jtable-column-header-text')
@@ -295,6 +296,7 @@
                 .addClass(field.listClass)
                 .css('width', field.width)
                 .data('fieldName', fieldName)
+                .data('firstSort', field.firstSort)
                 .append($headerContainerDiv);
 
             this._jqueryuiThemeAddClass($th, 'ui-state-default');
@@ -1170,7 +1172,7 @@
                     jqXHR.abort();
                     return;
                 }
-                
+
                 if (options.error) {
                     options.error(arguments);
                 }
