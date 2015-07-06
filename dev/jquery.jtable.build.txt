@@ -13,3 +13,4 @@ add jquery.jtable.editinline.js
 add jquery.jtable.dynamiccolumns.js
 add jquery.jtable.masterchild.js
 add jquery.jtable.validationEngine.js
+add jquery.jtable.numeric.js
