@@ -1,3 +1,11 @@
+What's new?
+* Mode Edit inline added with combolist, Date, Number, textarea.
+* Mode Validation, control user insert
+* Option 'required' to force user insert cells
+
+Added type 'number'.
+
+
 What is jTable
 ======
 
