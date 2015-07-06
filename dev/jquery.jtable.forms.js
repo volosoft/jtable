@@ -73,6 +73,8 @@
                 return this._createDateInputForField(field, fieldName, value);
             } else if (field.type == 'textarea') {
                 return this._createTextAreaForField(field, fieldName, value);
+            }  else if (field.type == 'number') {
+                return this._createNumberInputForField(field, fieldName, value);
             } else if (field.type == 'password') {
                 return this._createPasswordInputForField(field, fieldName, value);
             } else if (field.type == 'checkbox') {
@@ -101,13 +103,19 @@
         /* Creates a date input for a field.
         *************************************************************************/
         _createDateInputForField: function (field, fieldName, value) {
-            var $input = $('<input class="' + field.inputClass + '" id="Edit-' + fieldName + '" type="text" name="' + fieldName + '"></input>');
+            if (field.required) {
+                var $input = $('<input class="' + field.inputClass + ' validate[required,custom[date]]" id="Edit-' + fieldName + '" type="text" name="' + fieldName + '"></input>');
+            }
+            else {
+                var $input = $('<input class="' + field.inputClass + ' validate[custom[date]]" id="Edit-' + fieldName + '" type="text" name="' + fieldName + '"></input>');
+            }
+            
             if(value != undefined) {
                 $input.val(value);
             }
             
             var displayFormat = field.displayFormat || this.options.defaultDateFormat;
-            $input.datepicker({ dateFormat: displayFormat });
+            $input.datepicker({ dateFormat: displayFormat,changeMonth:true,changeYear:true });
             return $('<div />')
                 .addClass('jtable-input jtable-date-input')
                 .append($input);
@@ -116,7 +124,13 @@
         /* Creates a textarea element for a field.
         *************************************************************************/
         _createTextAreaForField: function (field, fieldName, value) {
-            var $textArea = $('<textarea class="' + field.inputClass + '" id="Edit-' + fieldName + '" name="' + fieldName + '"></textarea>');
+            if (field.required) {
+                var $textArea = $('<textarea class="' + field.inputClass + ' validate[required]" id="Edit-' + fieldName + '" name="' + fieldName + '"></textarea>');
+            }else{
+                var $textArea = $('<textarea class="' + field.inputClass + '" id="Edit-' + fieldName + '" name="' + fieldName + '"></textarea>');    
+            }
+            
+            
             if (value != undefined) {
                 $textArea.val(value);
             }
@@ -126,10 +140,34 @@
                 .append($textArea);
         },
 
+        /* Creates a standart number for a field. //#MODIFIER QR Ajout du type number + REQUIRED
+        *************************************************************************/
+        _createNumberInputForField: function (field, fieldName, value) {
+            if (field.required) {
+                var $input = $('<input class="' + field.inputClass + ' validate[required]" id="Edit-' + fieldName + '" type="number" name="' + fieldName + '"></input>');    
+            }
+            else {
+                var $input = $('<input class="' + field.inputClass + '" id="Edit-' + fieldName + '" type="number" name="' + fieldName + '"></input>');    
+            }
+            
+            if (value != undefined) {
+                $input.val(value);
+            }
+            
+            return $('<div />')
+                .addClass('jtable-input jtable-number-input')
+                .append($input).numeric(',');
+        },
+        
         /* Creates a standart textbox for a field.
         *************************************************************************/
         _createTextInputForField: function (field, fieldName, value) {
-            var $input = $('<input class="' + field.inputClass + '" id="Edit-' + fieldName + '" type="text" name="' + fieldName + '"></input>');
+            if (field.required) {
+                var $input = $('<input class="' + field.inputClass + ' validate[required]" id="Edit-' + fieldName + '" type="text" name="' + fieldName + '"></input>');
+            }else{
+                var $input = $('<input class="' + field.inputClass + '" id="Edit-' + fieldName + '" type="text" name="' + fieldName + '"></input>');
+            }
+            
             if (value != undefined) {
                 $input.val(value);
             }
@@ -142,7 +180,12 @@
         /* Creates a password input for a field.
         *************************************************************************/
         _createPasswordInputForField: function (field, fieldName, value) {
-            var $input = $('<input class="' + field.inputClass + '" id="Edit-' + fieldName + '" type="password" name="' + fieldName + '"></input>');
+            if (field.required) {
+                var $input = $('<input class="' + field.inputClass + ' validate[required]" id="Edit-' + fieldName + '" type="password" name="' + fieldName + '"></input>');
+            }else{
+                var $input = $('<input class="' + field.inputClass + '" id="Edit-' + fieldName + '" type="password" name="' + fieldName + '"></input>');
+            }
+            
             if (value != undefined) {
                 $input.val(value);
             }
