@@ -9,7 +9,7 @@ Added type 'number'.
 
 More information
 ======
-https://raw.githubusercontent.com/QuentinRillet/jtable/master/doc/Documentation.md
+https://github.com/QuentinRillet/jtable/blob/master/doc/Documentation.md
 
 What is jTable
 ======
@@ -46,3 +46,12 @@ lib folder contains files necessary to use jTable.
 dev folder contains parts of library helpful for development of jTable.
 
 See http://www.jtable.org for documentation, demos, themes and more...
+
+Thanks
+======
+
+*@hikalkan
+*@nubuntu
+*@posabsolute 
+*@SamWM
+
