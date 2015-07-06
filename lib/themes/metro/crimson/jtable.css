@@ -240,9 +240,12 @@ form.jtable-dialog-form div.jtable-input-label {
   padding: 2px 3px;
   font-size: 1.1em;
   color: #666;
+  display:inline-block; 
+  width:160px;
 }
 form.jtable-dialog-form div.jtable-input {
   padding: 2px;
+  display:inline-block; 
 }
 form.jtable-dialog-form div.jtable-date-input {
   /* No additional style */
