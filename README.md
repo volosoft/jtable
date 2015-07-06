@@ -50,8 +50,8 @@ See http://www.jtable.org for documentation, demos, themes and more...
 Thanks
 ======
 
-*@hikalkan
-*@nubuntu
-*@posabsolute 
-*@SamWM
+* @hikalkan
+* @nubuntu
+* @posabsolute 
+* @SamWM
 
