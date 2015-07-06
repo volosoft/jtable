@@ -9,5 +9,6 @@ add jquery.jtable.deletion.js
 add jquery.jtable.selecting.js
 add jquery.jtable.paging.js
 add jquery.jtable.sorting.js
+add jquery.jtable.editinline.js
 add jquery.jtable.dynamiccolumns.js
 add jquery.jtable.masterchild.js
