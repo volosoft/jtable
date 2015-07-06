@@ -7,6 +7,9 @@ What's new?
 
 Added type 'number'.
 
+More information
+======
+https://raw.githubusercontent.com/QuentinRillet/jtable/master/doc/Documentation.md
 
 What is jTable
 ======
