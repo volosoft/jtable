@@ -25,6 +25,11 @@
             //Localization
             messages: {
                 editRecord: 'Edit Record'
+            },
+            
+            validationOptions : {
+                promptPosition : "bottomRight",
+                autoPositionUpdate : true
             }
         },
 
@@ -316,6 +321,7 @@
             //Open dialog
             self._$editingRow = $tableRow;
             self._$editDiv.append($editForm).dialog('open');
+            $('#jtable-edit-form').validationEngine('attach',{promptPosition: self.options.validationOptions.promptPosition,autoPositionUpdate :self.options.validationOptions.autoPositionUpdate});
             self._trigger("formCreated", null, { form: $editForm, formType: 'edit', record: record, row: $tableRow });
         },
 

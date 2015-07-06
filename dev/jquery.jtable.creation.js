@@ -22,6 +22,11 @@
             //Localization
             messages: {
                 addNewRecord: 'Add new record'
+            },
+            
+            validationOptions : {
+                promptPosition : "bottomRight",
+                autoPositionUpdate : true
             }
         },
 
@@ -273,6 +278,7 @@
 
             //Open the form
             self._$addRecordDiv.append($addRecordForm).dialog('open');
+            $('#jtable-create-form').validationEngine('attach',{ promptPosition: self.options.validationOptions.promptPosition ,autoPositionUpdate :self.options.validationOptions.autoPositionUpdate});
             self._trigger("formCreated", null, { form: $addRecordForm, formType: 'create' });
         },
 

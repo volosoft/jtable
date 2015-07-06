@@ -22,8 +22,7 @@
 		_createCellForRecordField: function (record, fieldName) {
 			var $column = base._createCellForRecordField.apply(this, arguments);
 			var field = this.options.fields[fieldName];
-
-			if(this.options.editinline.enable && this.options.fields[fieldName].edit != false){
+			if(this.options.editinline.enable && this.options.fields[fieldName].edit != false && this.options.actions.updateAction != undefined){
 				return $('<td></td>')
                 .addClass(this.options.fields[fieldName].listClass)
                 .append((this._getDisplayTextEditInline(record, fieldName)));
