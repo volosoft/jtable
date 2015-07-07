@@ -19,6 +19,6 @@ Documentation
 		<td>* Option validation:</td>
 		<td>[![Activation required](https://raw.githubusercontent.com/QuentinRillet/jtable/master/doc/inputClass.PNG)](http://quentinrillet.fr/)</td>
 	</tr>
-</table
+</table>
 
 more about ValidationEngine : <a href="https://github.com/posabsolute/jQuery-Validation-Engine">posabsolute/jQuery-Validation-Engine</a>
