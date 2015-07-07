@@ -50,8 +50,9 @@ See http://www.jtable.org for documentation, demos, themes and more...
 Thanks
 ======
 
-* @hikalkan
-* @nubuntu
-* @posabsolute 
-* @SamWM
+* <a href="https://github.com/hikalkan">@hikalkan</a>
+* <a href="https://github.com/nubuntu">@nubuntu</a>
+* <a href="https://github.com/posabsolute">@posabsolute</a>
+* <a href="https://github.com/SamWM">@SamWM</a>
+
 
