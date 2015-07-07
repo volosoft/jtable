@@ -19,7 +19,10 @@ more about ValidationEngine : <a href="https://github.com/posabsolute/jQuery-Val
 	</tr>
 	<tr>
 		<td>**Option validation:**</td>
-		<td>[![Activation required](https://raw.githubusercontent.com/QuentinRillet/jtable/master/doc/inputClass.PNG)](http://quentinrillet.fr/)</td>
+		<td>[![Activation option](https://raw.githubusercontent.com/QuentinRillet/jtable/master/doc/inputClass.PNG)](http://quentinrillet.fr/)</td>
 	</tr>
-
+	<tr>
+		<td>**Don't forget** to configure path to content for editinline</td>
+		<td>[![Edit inline content](https://raw.githubusercontent.com/QuentinRillet/jtable/master/doc/imgpath.PNG)](http://quentinrillet.fr/)</td>
+	</tr>
 
