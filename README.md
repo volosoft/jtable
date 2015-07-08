@@ -4,6 +4,7 @@ What's new?
 * Mode Edit inline added with combolist, Date, Number, textarea.
 * Mode Validation, control user insert
 * Option 'required' to force user insert cells
+* Option 'addMask' for example '99h99' for field time
 
 Added type 'number'.
 
