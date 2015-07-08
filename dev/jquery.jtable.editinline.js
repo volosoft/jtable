@@ -96,7 +96,8 @@
 					valtext = options[i].DisplayText;
 				}
             }
-			var defaulttext = (valtext) ? valtext :'Null';  
+			
+			var defaulttext = (valtext) ? valtext :'Null';
 			var $txt = $('<span>' + defaulttext + '</span>');
 			$txt.dblclick(function(){
 				if($(this).children().length < 1){
