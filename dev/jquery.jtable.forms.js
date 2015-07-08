@@ -167,7 +167,9 @@
             }else{
                 var $input = $('<input class="' + field.inputClass + '" id="Edit-' + fieldName + '" type="text" name="' + fieldName + '"></input>');
             }
-            
+            if(field.addMask)
+                $input.mask(field.addMask);
+
             if (value != undefined) {
                 $input.val(value);
             }

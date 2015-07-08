@@ -136,8 +136,9 @@
 						$inputhtml.addClass('form-control');
 						$inputhtml.css('background-repeat','no-repeat');
 						$inputhtml.css('background-position','right center');
+						$inputhtml.addClass(field.inputClass);
 						$(this).html($inputhtml);
-						$(this).mask("99-99-9999");
+						(displayFormat.toLowerCase() == 'dd-mm-yy' )?$(this).mask("99-99-9999"):$(this).mask("9999-99-99");
 						if (field.required) {
 							$(this).attr('title',self.options.messages.required);
 							$(this).append('<b><i>'+self.options.messages.required+'</i></b>');
@@ -201,6 +202,10 @@
 						var $inputhtml = $('<textarea>' + $(this).html() + '</textarea>');
 						$inputhtml.css('background-repeat','no-repeat');
 						$inputhtml.css('background-position','right center');
+						$inputhtml.addClass(field.inputClass);
+						if (field.addMask) {
+							$inputhtml.mask(field.addMask);
+						}
 						$(this).html($inputhtml);
 						if (field.required) {
 							$(this).append('<b><i>'+self.options.messages.required+'</i></b>');
@@ -239,6 +244,10 @@
 						var $inputhtml = $('<input type="text" value="' + $(this).html() + '"/>');
 						$inputhtml.css('background-repeat','no-repeat');
 						$inputhtml.css('background-position','right center');
+						$inputhtml.addClass(field.inputClass);
+						if (field.addMask) {
+							$inputhtml.mask(field.addMask);
+						}
 						$(this).html($inputhtml);
 						if (field.required) {
 							$(this).append('<b><i>'+self.options.messages.required+'</i></b>');

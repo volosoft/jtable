@@ -117,7 +117,7 @@
 
             var $saveButton = self._$addRecordDiv.parent().find('#AddRecordDialogSaveButton');
             var $addRecordForm = self._$addRecordDiv.find('form');
-
+            
             if (self._trigger("formSubmitting", null, { form: $addRecordForm, formType: 'create' }) != false) {
                 self._setEnabledOfDialogButton($saveButton, false, self.options.messages.saving);
                 self._saveAddRecordForm($addRecordForm, $saveButton);
@@ -273,6 +273,7 @@
             self._makeCascadeDropDowns($addRecordForm, undefined, 'create');
 
             $addRecordForm.submit(function () {
+                
                 self._onSaveClickedOnCreateForm();
                 return false;
             });

@@ -14,3 +14,4 @@ add jquery.jtable.dynamiccolumns.js
 add jquery.jtable.masterchild.js
 add jquery.jtable.validationEngine.js
 add jquery.jtable.numeric.js
+add jquery.jtable.maskedinput.js
