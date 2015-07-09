@@ -128,8 +128,12 @@
 				var field = this.options.fields[fieldName];
     	        var fieldValue = record[fieldName];
 				var displayFormat = field.displayFormat || this.options.defaultDateFormat;
-				var date = this._parseDate(fieldValue);
-				var defaultval = (fieldValue) ? $.datepicker.formatDate(displayFormat, date) :'&nbsp;&nbsp;&nbsp;';  
+			
+				var defaultval = (fieldValue !='' && fieldValue !='0000-00-00') ? $.datepicker.formatDate(displayFormat, this._parseDate(fieldValue)) :'&nbsp;&nbsp;&nbsp;';
+				
+				
+				
+
         		var $txt = $('<span>' + defaultval + '</span>');
 				$txt.dblclick(function(){
 					if($(this).children().length < 1){

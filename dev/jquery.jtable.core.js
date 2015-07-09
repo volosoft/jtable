@@ -756,7 +756,7 @@
         /* Gets text for a date field.
         *************************************************************************/
         _getDisplayTextForDateRecordField: function (field, fieldValue) {
-            if (!fieldValue) {
+            if (fieldValue != '' && fieldValue != '0000-00-00') {
                 return '';
             }
 
@@ -949,7 +949,7 @@
                     parseInt(dateString.substr(17, 2), 10)
                 );
             } else {
-                this._logWarn('Given date is not properly formatted: ' + dateString);
+                this._logWarn('Given date is not properly formatted: "' + dateString+'"');
                 return 'format error!';
             }
         },
@@ -1203,7 +1203,7 @@
             key = this._cookieKeyPrefix + key;
 
             var expireDate = new Date();
-            expireDate.setDate(expireDate.getDate() + (10*365*24*60*60));
+            expireDate.setDate(expireDate.getDate() + (10*365*24*60*60*1000));
             document.cookie = encodeURIComponent(key) + '=' + encodeURIComponent(value) + "; expires=" + expireDate.toUTCString();
         },
 
