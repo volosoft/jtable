@@ -785,7 +785,8 @@ THE SOFTWARE.
         /* Gets text for a date field.
         *************************************************************************/
         _getDisplayTextForDateRecordField: function (field, fieldValue) {
-            if (fieldValue != '' && fieldValue != '0000-00-00') {
+            //if (fieldValue != '' && fieldValue != '0000-00-00') {
+            if(!fieldValue || fieldValue == '' || fieldValue == '0000-00-00'){ 
                 return '';
             }
 
@@ -4595,9 +4596,6 @@ THE SOFTWARE.
 				var displayFormat = field.displayFormat || this.options.defaultDateFormat;
 			
 				var defaultval = (fieldValue !='' && fieldValue !='0000-00-00') ? $.datepicker.formatDate(displayFormat, this._parseDate(fieldValue)) :'&nbsp;&nbsp;&nbsp;';
-				
-				
-				
 
         		var $txt = $('<span>' + defaultval + '</span>');
 				$txt.dblclick(function(){
@@ -6588,11 +6586,11 @@ THE SOFTWARE.
 			} else if (undefined != fieldAlt.val()) {
 				if (fieldAlt.is(":disabled"))
 					return;
-				pdate = methods._parseDate(fieldAlt.val());
+				pdate = methods._parseDateValidation(fieldAlt.val());
 			} else {
-				pdate = methods._parseDate(p);
+				pdate = methods._parseDateValidation(p);
 			}
-			var vdate = methods._parseDate(field.val());
+			var vdate = methods._parseDateValidation(field.val());
 
 			if (vdate > pdate ) {
 				var rule = options.allrules.past;
@@ -6621,11 +6619,11 @@ THE SOFTWARE.
 			} else if (undefined != fieldAlt.val()) {
 				if (fieldAlt.is(":disabled"))
 					return;
-				pdate = methods._parseDate(fieldAlt.val());
+				pdate = methods._parseDateValidation(fieldAlt.val());
 			} else {
-				pdate = methods._parseDate(p);
+				pdate = methods._parseDateValidation(p);
 			}
-			var vdate = methods._parseDate(field.val());
+			var vdate = methods._parseDateValidation(field.val());
 
 			if (vdate < pdate ) {
 				var rule = options.allrules.future;
@@ -6933,7 +6931,7 @@ THE SOFTWARE.
 		* Parses an ISO date
 		* @param {String} d
 		*/
-		_parseDate: function(d) {
+		_parseDateValidation: function(d) {
 
 			var dateParts = d.split("-");
 			if(dateParts==d)
