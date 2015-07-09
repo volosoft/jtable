@@ -115,13 +115,14 @@
             var $saveButton = self._$editDiv.parent().find('#EditDialogSaveButton');
             var $editForm = self._$editDiv.find('form');
             
-            return $editForm.validationEngine('validate');
-
-            if (self._trigger("formSubmitting", null, { form: $editForm, formType: 'edit', row: self._$editingRow }) != false) {
+             
+            
+            if (self._trigger("formSubmitting", null, { form: $editForm, formType: 'edit', row: self._$editingRow }) != false && $editForm.validationEngine('validate')) {
                 self._setEnabledOfDialogButton($saveButton, false, self.options.messages.saving);
                 self._saveEditForm($editForm, $saveButton);
             }
         },
+        
 
         /************************************************************************
         * PUBLIC METHODS                                                        *
