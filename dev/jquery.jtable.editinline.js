@@ -132,9 +132,6 @@
 				var displayFormat = field.displayFormat || this.options.defaultDateFormat;
 			
 				var defaultval = (fieldValue !='' && fieldValue !='0000-00-00') ? $.datepicker.formatDate(displayFormat, this._parseDate(fieldValue)) :'&nbsp;&nbsp;&nbsp;';
-				
-				
-				
 
         		var $txt = $('<span>' + defaultval + '</span>');
 				$txt.dblclick(function(){

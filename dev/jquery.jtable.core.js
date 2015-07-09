@@ -756,7 +756,7 @@
         /* Gets text for a date field.
         *************************************************************************/
         _getDisplayTextForDateRecordField: function (field, fieldValue) {
-            if (fieldValue != '' && fieldValue != '0000-00-00') {
+            if(!fieldValue || fieldValue == '' || fieldValue == '0000-00-00'){ 
                 return '';
             }
 

@@ -1145,11 +1145,11 @@
 			} else if (undefined != fieldAlt.val()) {
 				if (fieldAlt.is(":disabled"))
 					return;
-				pdate = methods._parseDate(fieldAlt.val());
+				pdate = methods._parseDateValidation(fieldAlt.val());
 			} else {
-				pdate = methods._parseDate(p);
+				pdate = methods._parseDateValidation(p);
 			}
-			var vdate = methods._parseDate(field.val());
+			var vdate = methods._parseDateValidation(field.val());
 
 			if (vdate > pdate ) {
 				var rule = options.allrules.past;
@@ -1178,11 +1178,11 @@
 			} else if (undefined != fieldAlt.val()) {
 				if (fieldAlt.is(":disabled"))
 					return;
-				pdate = methods._parseDate(fieldAlt.val());
+				pdate = methods._parseDateValidation(fieldAlt.val());
 			} else {
-				pdate = methods._parseDate(p);
+				pdate = methods._parseDateValidation(p);
 			}
-			var vdate = methods._parseDate(field.val());
+			var vdate = methods._parseDateValidation(field.val());
 
 			if (vdate < pdate ) {
 				var rule = options.allrules.future;
@@ -1490,7 +1490,7 @@
 		* Parses an ISO date
 		* @param {String} d
 		*/
-		_parseDate: function(d) {
+		_parseDateValidation: function(d) {
 
 			var dateParts = d.split("-");
 			if(dateParts==d)
