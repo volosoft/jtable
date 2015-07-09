@@ -91,6 +91,10 @@
                 close: function () {
                     var $editForm = self._$editDiv.find('form:first');
                     var $saveButton = self._$editDiv.parent().find('#EditDialogSaveButton');
+                    
+                    $editForm.validationEngine('hide');
+                    $editForm.validationEngine('detach');
+                    
                     self._trigger("formClosed", null, { form: $editForm, formType: 'edit', row: self._$editingRow });
                     self._setEnabledOfDialogButton($saveButton, true, self.options.messages.save);
                     $editForm.remove();
@@ -110,6 +114,8 @@
 
             var $saveButton = self._$editDiv.parent().find('#EditDialogSaveButton');
             var $editForm = self._$editDiv.find('form');
+            
+            return $editForm.validationEngine('validate');
 
             if (self._trigger("formSubmitting", null, { form: $editForm, formType: 'edit', row: self._$editingRow }) != false) {
                 self._setEnabledOfDialogButton($saveButton, false, self.options.messages.saving);

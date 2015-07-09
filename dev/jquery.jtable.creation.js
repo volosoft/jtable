@@ -87,6 +87,9 @@
                 close: function () {
                     var $addRecordForm = self._$addRecordDiv.find('form').first();
                     var $saveButton = self._$addRecordDiv.parent().find('#AddRecordDialogSaveButton');
+                    
+                    $addRecordForm.validationEngine('hide');
+                    $addRecordForm.validationEngine('detach');
                     self._trigger("formClosed", null, { form: $addRecordForm, formType: 'create' });
                     self._setEnabledOfDialogButton($saveButton, true, self.options.messages.save);
                     $addRecordForm.remove();
@@ -118,6 +121,8 @@
             var $saveButton = self._$addRecordDiv.parent().find('#AddRecordDialogSaveButton');
             var $addRecordForm = self._$addRecordDiv.find('form');
             
+            return $addRecordForm.validationEngine('validate');
+        
             if (self._trigger("formSubmitting", null, { form: $addRecordForm, formType: 'create' }) != false) {
                 self._setEnabledOfDialogButton($saveButton, false, self.options.messages.saving);
                 self._saveAddRecordForm($addRecordForm, $saveButton);
