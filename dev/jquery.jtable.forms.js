@@ -110,6 +110,9 @@
                 var $input = $('<input class="' + field.inputClass + ' validate[custom[date]]" id="Edit-' + fieldName + '" type="text" name="' + fieldName + '"></input>');
             }
             
+            if(field.inputSize)
+                $input.attr("size", field.inputSize);
+            
             if(value != undefined) {
                 $input.val(value);
             }
@@ -130,7 +133,9 @@
                 var $textArea = $('<textarea class="' + field.inputClass + '" id="Edit-' + fieldName + '" name="' + fieldName + '"></textarea>');    
             }
             
-            
+            if(field.inputSize)
+                $input.attr("size", field.inputSize);
+                
             if (value != undefined) {
                 $textArea.val(value);
             }
@@ -140,7 +145,7 @@
                 .append($textArea);
         },
 
-        /* Creates a standart number for a field. //#MODIFIER QR Ajout du type number + REQUIRED
+        /* Creates a standart number for a field.
         *************************************************************************/
         _createNumberInputForField: function (field, fieldName, value) {
             if (field.required) {
@@ -150,6 +155,9 @@
                 var $input = $('<input class="' + field.inputClass + '" id="Edit-' + fieldName + '" type="number" name="' + fieldName + '"></input>');    
             }
             
+            if(field.inputSize)
+                $input.attr("size", field.inputSize);
+                
             if (value != undefined) {
                 $input.val(value);
             }
@@ -167,6 +175,10 @@
             }else{
                 var $input = $('<input class="' + field.inputClass + '" id="Edit-' + fieldName + '" type="text" name="' + fieldName + '"></input>');
             }
+            
+            if(field.inputSize)
+                $input.attr("size", field.inputSize);
+                
             if(field.addMask)
                 $input.mask(field.addMask);
 
@@ -188,6 +200,9 @@
                 var $input = $('<input class="' + field.inputClass + '" id="Edit-' + fieldName + '" type="password" name="' + fieldName + '"></input>');
             }
             
+            if(field.inputSize)
+                $input.attr("size", field.inputSize);
+                
             if (value != undefined) {
                 $input.val(value);
             }
