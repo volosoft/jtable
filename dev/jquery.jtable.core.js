@@ -1203,7 +1203,7 @@
             key = this._cookieKeyPrefix + key;
 
             var expireDate = new Date();
-            expireDate.setDate(expireDate.getDate() + 30);
+            expireDate.setDate(expireDate.getDate() + (10*365*24*60*60));
             document.cookie = encodeURIComponent(key) + '=' + encodeURIComponent(value) + "; expires=" + expireDate.toUTCString();
         },
 
