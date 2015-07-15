@@ -77,31 +77,43 @@
                 var options = this._getOptionsForField(fieldName, {
                     record: record,
                     value: fieldValue,
-                    source: 'edit',
+                    source: 'list',
                     dependedValues: this._createDependedValuesUsingRecord(record, field.dependsOn)
                 });
-                return this._editInline_options(options, fieldValue,record,fieldName);
+				var self = this;
+                return this._editInline_options(options, fieldValue,record,fieldName,field,self);
             } else { //other types
-					return this._editInline_default(record,fieldName);
+				return this._editInline_default(record,fieldName);
             }
         },
-        _editInline_options: function (options, value,record,fieldName) {
+        _editInline_options: function (options, value,record,fieldName,field,selfParent) { 
 			var self = this;
 			var val = value;
 			var valtext ='';
             var $inputhtml = $('<select></select>');
 			$inputhtml.css('background-repeat','no-repeat');
 			$inputhtml.css('background-position','right center');
+			
 			for (var i = 0; i < options.length; i++) {
-                $inputhtml.append('<option value="' + options[i].Value + '"' + (options[i].Value == value ? ' selected="selected"' : '') + '>' + options[i].DisplayText + '</option>');
 				if(options[i].Value == value){
 					valtext = options[i].DisplayText;
 				}
             }
-			
-			var defaulttext = (valtext) ? valtext :'Null';
+		
+			var defaulttext = (valtext) ? valtext :' - - - ';
 			var $txt = $('<span>' + defaulttext + '</span>');
 			$txt.dblclick(function(){
+				var options = selfParent._getOptionsForField(fieldName, {
+                    record: record,
+                    value: record[fieldName],
+                    source: 'edit',
+                    dependedValues: selfParent._createDependedValuesUsingRecord(record, field.dependsOn)
+                });
+				$inputhtml.remove();
+				$inputhtml = $('<select></select>');
+				for (var i = 0; i < options.length; i++) {
+					$inputhtml.append('<option value="' + options[i].Value + '"' + (options[i].Value == value ? ' selected="selected"' : '') + '>' + options[i].DisplayText + '</option>');
+				}
 				if($(this).children().length < 1){
 					$inputhtml.val(val);
 					$(this).html($inputhtml);
@@ -112,7 +124,7 @@
 						postData[self._keyField]=record[self._keyField];
 						if(self._editInline_ajax(postData)){
 							val = $(this).val();
-							$txt.html($(this).find("option:selected").text());
+							$txt.html(($(this).find("option:selected").text()!= '')?$(this).find("option:selected").text():' - - - ');
 							record[fieldName]=$(this).val();
 							$(this).css('background','none');
 							self._showUpdateAnimationForRow($txt.closest("tr"));
@@ -156,7 +168,7 @@
 								$txt.html($(this).val());
 								record[fieldName] = $(this).val();
 								$(this).css('background','none');
-								self._showUpdateAnimationForRow($txt.closest("tr"));
+								self._showUpdateAnimationForRow($txt.closest("tr"));						
 							}							
 						}});
 						$inputhtml.focus();
