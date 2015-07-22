@@ -13,6 +13,12 @@ More information
 ======
 https://github.com/QuentinRillet/jtable/blob/master/doc/Documentation.md
 
+@Todos
+======
+* Create type upload
+* Create type multiselect 
+* Freeze header by default
+
 What is jTable
 ======
 
