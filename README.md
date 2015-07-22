@@ -5,6 +5,7 @@ What's new?
 * Mode Validation, control user insert
 * Option 'required' to force user insert cells
 * Option 'addMask' for example '99h99' for field time
+* Option 'inputSize' 
 
 Added type 'number'.
 
