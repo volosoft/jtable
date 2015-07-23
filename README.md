@@ -7,7 +7,9 @@ What's new?
 * Option 'addMask' for example '99h99' for field time
 * Option 'inputSize' 
 
+
 Added type 'number'.
+Added type 'multiselect' NOT WORK WITH EDIT INLINE
 
 More information
 ======
