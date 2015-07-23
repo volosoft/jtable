@@ -457,7 +457,7 @@
                     var fieldName = $thisDropdown.attr('name');
 
                     if(fieldName.substr(-2) == '[]'){ //For multi select
-                        fieldName = fieldName.substr(0,-2);
+                        fieldName = fieldName.slice(0,-2);
                     }
                     if (!fieldName) {
                         return;
