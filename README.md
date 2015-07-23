@@ -8,8 +8,8 @@ What's new?
 * Option 'inputSize' 
 
 
-Added type 'number'.
-Added type 'multiselect' NOT WORK WITH EDIT INLINE
+* Added type 'number'.
+* Added type 'multiselect' NOT WORK WITH EDIT INLINE
 
 More information
 ======
