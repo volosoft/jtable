@@ -54,8 +54,9 @@
 				}
 			}
             this._onRowUpdated($tableRow);
-        },		
-		_getDisplayTextEditInline:function (record, fieldName) {
+        },
+
+        _getDisplayTextEditInline:function (record, fieldName) {
 			var field = this.options.fields[fieldName];
             var fieldValue = record[fieldName];
 			
@@ -82,6 +83,8 @@
                 });
 				var self = this;
                 return this._editInline_options(options, fieldValue,record,fieldName,field,self);
+            /*} else if (field.type == 'link') {
+                return this._editInline_link(record, fieldName);*/
             } else { //other types
 				return this._editInline_default(record,fieldName);
             }
@@ -329,6 +332,67 @@
 				return $txt;	
 
 		},
+        _editInline_link:function(record,fieldName){
+            var self = this;
+            var field = this.options.fields[fieldName];
+            var fieldValue = record[fieldName];
+            var defaultval = (fieldValue) ? fieldValue :'&nbsp;&nbsp;&nbsp;&nbsp;';
+            if(fieldValue.substring(7) == 'http://' || fieldValue.substring(8) == 'https://'){
+                var $txt = $('<div style=\'width:auto\'><a href="' + defaultval + '">'+defaultval+'</a></div>');
+            }else{
+                var $txt = $('<div style=\'width:auto\'><a href="http://' + defaultval + '">'+defaultval+'</a></div>');
+            }
+
+            $txt.children().click(function(event){
+                if($(this).html() == '&nbsp;&nbsp;&nbsp;&nbsp;') {
+                    event.preventDefault();
+                }else{
+                    window.open($txt.children().href(),'_blank');
+                }
+            });
+
+            $txt.children().on("contextmenu",this, function(e){
+                if($(this).children().length < 1){
+                    var $inputhtml = $('<input type="text" value="' + $(this).html() + '"/>');
+                    $inputhtml.css('background-repeat','no-repeat');
+                    $inputhtml.css('background-position','right center');
+                    $inputhtml.addClass(field.inputClass);
+                    if (field.addMask) {
+                        $inputhtml.mask(field.addMask);
+                    }
+
+                    $(this).html($inputhtml);
+
+                    if (field.required) {
+                        $(this).parent().append('<b><i>'+self.options.messages.required+'</i></b>');
+                    }
+                    $inputhtml.bind('change blur focusout',function(){
+                        if ($(this).val().trim() == '' && field.required) {
+                            $(this).attr('title',self.options.messages.required);
+                        }else{
+                            $(this).css('background-image','url("' + self.options.editinline.img + 'loading.gif")');
+                            var postData = {};
+                            postData[fieldName]=$(this).val().trim();
+                            postData[self._keyField] = record[self._keyField];
+                            if(self._editInline_ajax(postData)){
+                                $txt.children().html($(this).val().trim()+'&nbsp;&nbsp;&nbsp;&nbsp;');
+                                if($(this).val().trim().substring(7) == 'http://' || $(this).val().trim().substring(8) == 'https://'){
+                                    $txt.children().attr("href",$(this).val().trim());
+                                }else{
+                                    $txt.children().attr("href",'http://'+$(this).val().trim());
+                                }
+                                record[fieldName]=$(this).val().trim();
+                                $(this).css('background','none');
+                                self._showUpdateAnimationForRow($txt.closest("tr"));
+                            }
+                        }
+                    });
+                    $inputhtml.focus();
+                }
+                return false;
+            });
+            return $txt;
+        },
 		_editInline_ajax:function(postData){
             var self = this;
 			var res = true;
@@ -339,7 +403,6 @@
 					if (data.Result != 'OK') {
                         return res =false;
                     }
-
                     self._trigger("recordUpdated", null, {});
                 },
                 error: function () {

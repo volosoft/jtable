@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
 * FORMS extension for jTable (base for edit/create forms)               *
 *************************************************************************/
 (function ($) {
@@ -82,6 +82,8 @@
             } else if (field.options) {
                 if (field.type == 'radiobutton') {
                     return this._createRadioButtonListForField(field, fieldName, value, record, formType);
+                } else if (field.type == 'multiselect') {
+                    return this._createDropDownListMultiForField(field, fieldName, value, record, formType, form);
                 } else {
                     return this._createDropDownListForField(field, fieldName, value, record, formType, form);
                 }
@@ -272,6 +274,31 @@
             return $containerDiv;
         },
 
+        /* Creates a multiselecter a field.
+         *************************************************************************/
+        _createDropDownListMultiForField: function (field, fieldName, value, record, source, form) {
+            //Create a container div
+            var $containerDiv = $('<div />')
+                .addClass('jtable-input jtable-dropdown-input');
+
+            //Create select element
+            var $select = $('<select multiple class="' + field.inputClass + '" id="Edit-' + fieldName + '" name="' + fieldName + '"></select>')
+                .appendTo($containerDiv);
+
+            //add options
+            var options = this._getOptionsForField(fieldName, {
+                record: record,
+                source: source,
+                form: form,
+                dependedValues: this._createDependedValuesUsingForm(form, field.dependsOn)
+            });
+
+            this._fillDropDownListWithOptions($select, options, value);
+
+            $select.multiSelect();
+
+            return $containerDiv;
+        },
         /* Creates a drop down list (combobox) input element for a field.
         *************************************************************************/
         _createDropDownListForField: function (field, fieldName, value, record, source, form) {
@@ -433,7 +460,7 @@
                     }
 
                     var field = self.options.fields[fieldName];
-                    
+
                     //check if this combobox depends on others
                     if (!field.dependsOn) {
                         return;

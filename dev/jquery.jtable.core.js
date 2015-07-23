@@ -721,7 +721,15 @@
                     dependedValues: this._createDependedValuesUsingRecord(record, field.dependsOn)
                 });
                 return this._findOptionByValue(options, fieldValue).DisplayText;
-            } else { //other types
+            } else if (field.type == 'upload') {
+                return "<a href='"+fieldValue+"'>"+fieldValue+"</a>";
+            } else if (field.type == 'link') {
+                if(fieldValue.substring(7) == 'http://' || fieldValue.substring(8) == 'https://'){
+                    return "<a href='"+fieldValue+"'>"+fieldValue+"</a>";
+                }
+                return "<a href='http://"+fieldValue+"'>"+fieldValue+"</a>";
+            }
+            else { //other types
                 return fieldValue;
             }
         },
