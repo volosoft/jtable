@@ -282,7 +282,7 @@
                 .addClass('jtable-input jtable-dropdown-input');
 
             //Create select element
-            var $select = $('<select multiple class="' + field.inputClass + '" id="Edit-' + fieldName + '" name="' + fieldName + '"></select>')
+            var $select = $('<select multiple class="' + field.inputClass + '" id="Edit-' + fieldName + '" name="' + fieldName + '[]"></select>')
                 .appendTo($containerDiv);
 
             //add options
@@ -455,6 +455,10 @@
 
                     //get field name
                     var fieldName = $thisDropdown.attr('name');
+
+                    if(fieldName.substr(-2) == '[]'){ //For multi select
+                        fieldName = fieldName.substr(0,-2);
+                    }
                     if (!fieldName) {
                         return;
                     }
