@@ -16,9 +16,10 @@ https://github.com/QuentinRillet/jtable/blob/master/doc/Documentation.md
 
 @Todos
 ======
-* Create type upload
-* Create type multiselect 
-* Freeze header by default
+* Create type 'upload'.
+* Create type 'multiselect' working with edit inline.
+* Create type 'geolocate' who allow show a map.
+* Freeze header by default.
 
 What is jTable
 ======
