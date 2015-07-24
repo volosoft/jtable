@@ -20,6 +20,7 @@ https://github.com/QuentinRillet/jtable/blob/master/doc/Documentation.md
 * Create type 'multiselect' working with edit inline.
 * Create type 'geolocate' who allow show a map.
 * Freeze header by default.
+* Type password right click to reveal
 
 What is jTable
 ======

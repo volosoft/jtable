@@ -66,15 +66,15 @@
 			
             if (field.type == 'date') {
 					return this._editInline_date(record,fieldName);
-			} else if (field.type == 'checkbox') {
-                return this._editInline_checkbox(record, fieldName);
-            } else if (field.type == 'textarea') {
+			} else if (field.type == 'textarea') {
                 return this._editInline_textarea(record, fieldName);
             } else if (field.type == 'number') {
                 return this._editInline_number(record, fieldName);
-            }else if (field.type == 'password') {
-                return this._createPasswordInputForField(field, fieldName, value);
-            }else if (field.options) { //combobox or radio button list since there are options.
+            } else if (field.type == 'password') {
+                return this._editInline_password(record, fieldName);
+            } else if (field.type == 'checkbox') {
+                return this._editInline_checkbox(record, fieldName);
+            } else if (field.options) { //combobox or radio button list since there are options.
                 var options = this._getOptionsForField(fieldName, {
                     record: record,
                     value: fieldValue,
@@ -332,6 +332,47 @@
 				return $txt;	
 
 		},
+        _editInline_password:function(record, fieldName){
+            var self = this;
+            var field = this.options.fields[fieldName];
+            var fieldValue = record[fieldName];
+            var defaultval = (fieldValue) ? fieldValue :'&nbsp;&nbsp;&nbsp;&nbsp;';
+            var $txt = $('<div style=\'width:auto\'>' + defaultval + '</div>');
+            $txt.dblclick(function(){
+                if($(this).children().length < 1){
+                    var $inputhtml = $('<input type="password" value="' + $(this).html() + '"/>');
+                    $inputhtml.css('background-repeat','no-repeat');
+                    $inputhtml.css('background-position','right center');
+                    $inputhtml.addClass(field.inputClass);
+                    if (field.addMask) {
+                        $inputhtml.mask(field.addMask);
+                    }
+                    $(this).html($inputhtml);
+                    if (field.required) {
+                        $(this).append('<b><i>'+self.options.messages.required+'</i></b>');
+                    }
+                    $inputhtml.bind('change blur focusout',function(){
+                        if ($(this).val().trim() == '' && field.required) {
+                            $(this).attr('title',self.options.messages.required);
+                        }else{
+                            $(this).css('background-image','url("' + self.options.editinline.img + 'loading.gif")');
+                            var postData = {};
+                            postData[fieldName]=$(this).val().trim();
+                            postData[self._keyField] = record[self._keyField];
+                            if(self._editInline_ajax(postData)){
+                                $txt.html($(this).val().trim()+'&nbsp;&nbsp;&nbsp;&nbsp;');
+                                record[fieldName]=$(this).val().trim();
+                                $(this).css('background','none');
+                                self._showUpdateAnimationForRow($txt.closest("tr"));
+                            }
+                        }
+
+                    });
+                    $inputhtml.focus();
+                }
+            });
+            return $txt;
+        },
         _editInline_link:function(record,fieldName){
             var self = this;
             var field = this.options.fields[fieldName];

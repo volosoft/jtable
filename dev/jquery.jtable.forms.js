@@ -26,6 +26,8 @@
         *************************************************************************/
         _createInputLabelForRecordField: function (fieldName) {
             //TODO: May create label tag instead of a div.
+            //return $('<label>').attr('for',fieldName).addClass('jtable-input-label').append(this.options.fields[fieldName].inputTitle || this.options.fields[fieldName].title);
+
             return $('<div />')
                 .addClass('jtable-input-label')
                 .html(this.options.fields[fieldName].inputTitle || this.options.fields[fieldName].title);
@@ -66,6 +68,7 @@
                 return $('<div />')
                     .addClass('jtable-input jtable-custom-input')
                     .append($input);
+
             }
 
             //Create input according to field type
@@ -73,12 +76,12 @@
                 return this._createDateInputForField(field, fieldName, value);
             } else if (field.type == 'textarea') {
                 return this._createTextAreaForField(field, fieldName, value);
-            }  else if (field.type == 'number') {
-                return this._createNumberInputForField(field, fieldName, value);
             } else if (field.type == 'password') {
                 return this._createPasswordInputForField(field, fieldName, value);
             } else if (field.type == 'checkbox') {
                 return this._createCheckboxForField(field, fieldName, value);
+            } else if (field.upload) {
+                return this._createUploadForField(field, fieldName, value);
             } else if (field.options) {
                 if (field.type == 'radiobutton') {
                     return this._createRadioButtonListForField(field, fieldName, value, record, formType);
@@ -87,6 +90,8 @@
                 } else {
                     return this._createDropDownListForField(field, fieldName, value, record, formType, form);
                 }
+            } else if (field.type == 'number') {
+                return this._createNumberInputForField(field, fieldName, value);
             } else {
                 return this._createTextInputForField(field, fieldName, value);
             }
@@ -274,6 +279,74 @@
             return $containerDiv;
         },
 
+        /* Creates a uploader for a field.
+         *************************************************************************/
+        _createUploadForField: function (field, fieldName, value){
+
+            if(field.upload.maxFileSize){ var maxFileSize = field.upload.maxFileSize; }else { var maxFileSize = 100000000; }
+            if(field.upload.directory){var directory = field.upload.directory}else{ var directory = './'}
+            if(field.upload.typeDocument){ var typeDocument = field.upload.typeDocument+'-'}else{ var typeDocument = ''}
+            if(!field.upload.url){
+                this._logError('Url for upload is not set!');return '';
+            }
+
+            var $div = $('<div>');
+            var $form = $('<form>');
+            $form.attr('target','iframeTarget');
+            $form.attr('class','formUploadFile');
+            $form.attr('action',field.upload.url);
+            $form.attr('method','post');
+            $form.attr('enctype','multipart/form-data');
+
+            /*
+            Create field of form upload
+             */
+            var $i_file = $('<input type="file" name="FILE"/>');
+            var $i_name = $('<input type="hidden" name="'+fieldName+'" id="'+fieldName+'" />');
+            var $i_size = $('<input type="hidden" name="MAX_FILE_SIZE" value="'+maxFileSize+'" />');
+            var $i_directory = $('<input type="hidden" name="DIRECTORY" value="'+directory+'" />');
+            var $i_typeDocument = $('<input type="hidden" name="TYPEDOC" value="'+typeDocument+'" />');
+
+            $form.append($i_file);
+            $form.append($i_size);
+            $form.append($i_directory);
+            $form.append($i_typeDocument);
+
+            if(value){
+
+            }
+            /*
+            'Thread'
+             */
+            var $iframe = $('<iframe>');
+            $iframe.attr('class','upload-iframe');
+            $iframe.attr('src','#');
+            $iframe.attr('name','iframeTarget');
+            $iframe.css('display','none');
+
+            $div.append($i_name);
+            $div.append($form);
+            $div.append($iframe);
+
+            $i_file.change(function(){
+                $i_name.val('/'+$i_directory.val()+$i_typeDocument.val()+$(this).val().substring(12));
+                console.log(this.form.submit());
+                /**
+                 * TODO Finir une fois le fichier telecharger pour le supprimer
+                 */
+                $div.append($i_directory.val()+$i_typeDocument.val()+$i_name.val()+' télécharger!');
+
+                this.form.remove();
+            });
+
+            if (value != undefined) {
+                //$i_file.val(value);
+            }
+
+            return $('<div />')
+                .addClass('jtable-input jtable-text-input')
+                .append($div);
+        },
         /* Creates a multiselecter a field.
          *************************************************************************/
         _createDropDownListMultiForField: function (field, fieldName, value, record, source, form) {
@@ -526,11 +599,11 @@
                         } catch (e) {
                             //TODO: Handle incorrect/different date formats
                             this._logWarn('Date format is incorrect for field ' + fieldName + ': ' + dateVal);
-                            record[fieldName] = undefined;
+                            record[fieldName] = '';
                         }
                     } else {
                         this._logDebug('Date is empty for ' + fieldName);
-                        record[fieldName] = undefined; //TODO: undefined, null or empty string?
+                        record[fieldName] = ''; //TODO: undefined, null or empty string?
                     }
                 } else if (field.options && field.type == 'radiobutton') {
                     var $checkedElement = $inputElement.filter(':checked');
