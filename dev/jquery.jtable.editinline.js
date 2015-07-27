@@ -39,13 +39,8 @@
             var $columns = $tableRow.find('td');
 			if(this.options.editinline.enable){
 				for (var i = 0; i < this._columnList.length; i++) {
-					if(this.options.fields[this._columnList[i]].type=='date'){
-						var displayItem = this._getDisplayTextForRecordField(record, this._columnList[i]);
-						$columns.eq(this._firstDataColumnOffset + i).html(displayItem || '');				
-					}else{
-						var displayItem = this._getDisplayTextEditInline(record, this._columnList[i]);
-						$columns.eq(this._firstDataColumnOffset + i).html(displayItem || '');
-					}
+                    var displayItem = this._getDisplayTextEditInline(record, this._columnList[i]);
+                    $columns.eq(this._firstDataColumnOffset + i).html(displayItem || '');
 				}
 			}else{
 				for (var i = 0; i < this._columnList.length; i++) {
