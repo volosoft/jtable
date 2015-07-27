@@ -37,7 +37,7 @@
 		_updateRowTexts: function ($tableRow) {
             var record = $tableRow.data('record');
             var $columns = $tableRow.find('td');
-			if(this.options.editinline){
+			if(this.options.editinline.enable){
 				for (var i = 0; i < this._columnList.length; i++) {
 					if(this.options.fields[this._columnList[i]].type=='date'){
 						var displayItem = this._getDisplayTextForRecordField(record, this._columnList[i]);
@@ -50,6 +50,7 @@
 			}else{
 				for (var i = 0; i < this._columnList.length; i++) {
 					var displayItem = this._getDisplayTextForRecordField(record, this._columnList[i]);
+                    if ((displayItem != "") && (displayItem == 0)) displayItem = "0";
 					$columns.eq(this._firstDataColumnOffset + i).html(displayItem || '');
 				}
 			}

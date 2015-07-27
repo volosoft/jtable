@@ -6,6 +6,18 @@
     $.extend(true, $.hik.jtable.prototype, {
 
         /************************************************************************
+         * DEFAULT OPTIONS / EVENTS                                              *
+         *************************************************************************/
+        options: {
+
+            messages: {
+                addFile : 'Choose file',
+                delFile : 'Delete file',
+                warningFile: 'Warning, the file is auto upload even if you don\'t save!'
+            }
+        },
+
+        /************************************************************************
         * PRIVATE METHODS                                                       *
         *************************************************************************/
 
@@ -294,27 +306,46 @@
             var $form = $('<form>');
             $form.attr('target','iframeTarget');
             $form.attr('class','formUploadFile');
-            $form.attr('action',field.upload.url);
+            $form.attr('action',field.upload.url+'?action=upload');
             $form.attr('method','post');
             $form.attr('enctype','multipart/form-data');
 
             /*
             Create field of form upload
              */
-            var $i_file = $('<input type="file" name="FILE"/>');
-            var $i_name = $('<input type="hidden" name="'+fieldName+'" id="'+fieldName+'" />');
-            var $i_size = $('<input type="hidden" name="MAX_FILE_SIZE" value="'+maxFileSize+'" />');
-            var $i_directory = $('<input type="hidden" name="DIRECTORY" value="'+directory+'" />');
-            var $i_typeDocument = $('<input type="hidden" name="TYPEDOC" value="'+typeDocument+'" />');
+            var $i_file = $('<input type="file" name="FILE"/>').css('display','none');
+
+            var $i_button = $('<input type="button" id="btn_addFile" />');//Declenche le chargement du fichier
+            $i_button.attr('value',this.options.messages.addFile).button();
+
+            var $i_button_delete = $('<input type="button" id="btn_delFile"/>');
+            $i_button_delete.attr('value',this.options.messages.delFile).button();
+
+            var $i_name = $('<input type="hidden"/>');//Champ de la jtable, doit contenir le nom complet + chemin
+            $i_name.attr('name',fieldName).attr('id',fieldName);
+            $i_name.attr('value',value);
+
+            var $i_display = $('<input type="text" readonly disabled="disabled">'); //Champ visible par l'utilisateur (Uniquement le nom du fichier)
+            $i_display.attr('value',value.slice(value.lastIndexOf('/') + 1));
+
+            var $i_size = $('<input type="hidden" name="MAX_FILE_SIZE"/>');//Taille max du fichier
+            $i_size.attr('value',maxFileSize);
+
+            var $i_directory = $('<input type="hidden" name="DIRECTORY" value="'+directory+'" />');//Dossier de destination, doit prendre en compte la racine du site
+            var $i_typeDocument = $('<input type="hidden" name="TYPEDOC" value="'+typeDocument+'" />');//Definit un type de document
 
             $form.append($i_file);
-            $form.append($i_size);
-            $form.append($i_directory);
-            $form.append($i_typeDocument);
+            $form.append($i_display);
+            $form.append($i_button);
+            $form.append($i_button_delete);
 
-            if(value){
+            $i_button.click(function(){
+                $form.append($i_size);
+                $form.append($i_directory);
+                $form.append($i_typeDocument);
+                $i_file.click();
+            });
 
-            }
             /*
             'Thread'
              */
@@ -323,25 +354,35 @@
             $iframe.attr('src','#');
             $iframe.attr('name','iframeTarget');
             $iframe.css('display','none');
-
+            $div.append('<h4>'+this.options.messages.warningFile+'</h4>');
             $div.append($i_name);
             $div.append($form);
             $div.append($iframe);
 
             $i_file.change(function(){
                 $i_name.val('/'+$i_directory.val()+$i_typeDocument.val()+$(this).val().substring(12));
-                console.log(this.form.submit());
-                /**
-                 * TODO Finir une fois le fichier telecharger pour le supprimer
-                 */
-                $div.append($i_directory.val()+$i_typeDocument.val()+$i_name.val()+' télécharger!');
+                $i_display.val($(this).val().substring(12));
 
-                this.form.remove();
+                this.form.submit();
+                $i_size.remove();
+                $i_directory.remove();
+                $i_typeDocument.remove();
             });
 
-            if (value != undefined) {
-                //$i_file.val(value);
-            }
+            /**
+             * TODO Supprime sans avertissement
+             */
+            $i_button_delete.click(function(){
+                $.ajax({
+                    type: "POST",
+                    url: field.upload.url+'?action=delete',
+                    data: {
+                        filename : $i_name.val()
+                    }
+                });
+                $i_name.val('');
+                $i_display.val('');
+            });
 
             return $('<div />')
                 .addClass('jtable-input jtable-text-input')
