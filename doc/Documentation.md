@@ -33,4 +33,13 @@ more about ValidationEngine : <a href="https://github.com/posabsolute/jQuery-Val
 	    <td>Exemple password, right click for reveal</td>
 	    <td>[![Edit inline content](https://raw.githubusercontent.com/QuentinRillet/jtable/master/doc/password.PNG)](http://quentinrillet.fr/)</td>
 	</tr>
+	<tr>
+	    <td> 
+	        freezeHeader: true,
+	        In general Options
+	    </td>
+	    <td>
+	        [![Edit inline content](https://raw.githubusercontent.com/QuentinRillet/jtable/master/doc/freeze.PNG)](http://quentinrillet.fr/)
+        </td>
+	</tr>
 

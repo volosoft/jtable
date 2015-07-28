@@ -32,6 +32,7 @@
             saveUserPreferences: true,
             jqueryuiTheme: false,
             unAuthorizedRequestRedirectUrl: null,
+            freezeHeader: false,
 
             ajaxSettings: {
                 type: 'POST',
@@ -247,6 +248,12 @@
 
             this._createTableHead();
             this._createTableBody();
+
+            var $table = $(this._$table);
+            if(this.options.freezeHeader){
+                $table.freezeHeader();
+            }
+
         },
 
         /* Creates header (all column headers) of the table.
