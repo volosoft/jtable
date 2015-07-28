@@ -3,10 +3,10 @@ What's new?
 
 * Mode Edit inline added with combolist, Date, Number, textarea.
 * Mode Validation, control user insert
+* Mode freezeHeader, default false.
 * Option 'required' to force user insert cells
 * Option 'addMask' for example '99h99' for field time
-* Option 'inputSize' 
-
+* Option 'inputSize'
 * Added type 'number'.
 * Added type 'multiselect' NOT WORK WITH EDIT INLINE
 * Type password right click to reveal in table
@@ -20,7 +20,7 @@ https://github.com/QuentinRillet/jtable/blob/master/doc/Documentation.md
 * Create type 'upload'.
 * Create type 'multiselect' working with edit inline.
 * Create type 'geolocate' who allow show a map.
-* Freeze header by default.
+
 
 What is jTable
 ======
