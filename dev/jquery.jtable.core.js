@@ -723,11 +723,6 @@
                 });
                 return this._findOptionByValue(options, fieldValue).DisplayText;
             } else if (field.upload) {
-
-                /**
-                 * TODO OnError if file not found
-                 * @type {Array.<T>|string|Blob|*}
-                 */
                 var showFieldValue = fieldValue.slice(fieldValue.lastIndexOf('/') + 1);
                 return "<a target='_blank' href='"+fieldValue+"'>"+showFieldValue+"</a>";
             } else if (field.type == 'link') {
@@ -735,6 +730,8 @@
                     return "<a href='"+fieldValue+"'>"+fieldValue+"</a>";
                 }
                 return "<a href='http://"+fieldValue+"'>"+fieldValue+"</a>";
+            } else if (field.type == 'password'){
+                return this._getDisplayTextPassword(field,fieldValue);
             }
             else { //other types
                 return fieldValue;
@@ -778,6 +775,22 @@
             var displayFormat = field.displayFormat || this.options.defaultDateFormat;
             var date = this._parseDate(fieldValue);
             return $.datepicker.formatDate(displayFormat, date);
+        },
+
+        /* Get password for field
+        ************************************************************************/
+        _getDisplayTextPassword: function (field,fieldValue){
+            var $i_inputPassword = $('<input type="password" readonly/>');
+            $i_inputPassword.attr('value',fieldValue);
+            $i_inputPassword.on("contextmenu",this,function(){
+                event.preventDefault();
+                if(this.type == 'password'){
+                    $(this).attr('type','text');
+                }else{
+                    $(this).attr('type','password');
+                }
+            });
+            return $i_inputPassword;
         },
 
         /* Gets options for a field according to user preferences.

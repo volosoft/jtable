@@ -90,6 +90,7 @@
                     
                     $addRecordForm.validationEngine('hide');
                     $addRecordForm.validationEngine('detach');
+
                     self._trigger("formClosed", null, { form: $addRecordForm, formType: 'create' });
                     self._setEnabledOfDialogButton($saveButton, true, self.options.messages.save);
                     $addRecordForm.remove();
@@ -122,6 +123,7 @@
             var $addRecordForm = self._$addRecordDiv.find('form');
 
             if (self._trigger("formSubmitting", null, { form: $addRecordForm, formType: 'create' }) != false && $addRecordForm.validationEngine('validate')) {
+                alert();
                 self._setEnabledOfDialogButton($saveButton, false, self.options.messages.saving);
                 self._saveAddRecordForm($addRecordForm, $saveButton);
             }

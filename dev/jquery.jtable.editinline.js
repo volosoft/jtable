@@ -81,6 +81,9 @@
                 return this._editInline_options(options, fieldValue,record,fieldName,field,self);
             /*} else if (field.type == 'link') {
                 return this._editInline_link(record, fieldName);*/
+            } else if(field.upload){
+                var showFieldValue = fieldValue.slice(fieldValue.lastIndexOf('/') + 1);
+                return "<a target='_blank' href='"+fieldValue+"'>"+showFieldValue+"</a>";
             } else { //other types
 				return this._editInline_default(record,fieldName);
             }
@@ -333,7 +336,8 @@
             var field = this.options.fields[fieldName];
             var fieldValue = record[fieldName];
             var defaultval = (fieldValue) ? fieldValue :'&nbsp;&nbsp;&nbsp;&nbsp;';
-            var $txt = $('<div style=\'width:auto\'>' + defaultval + '</div>');
+            //var $txt = $('<div style=\'width:auto\'>' + defaultval + '</div>');
+            var $txt = $('<div style=\'width:auto\' name="cache"> * * * * * </div>');
             $txt.dblclick(function(){
                 if($(this).children().length < 1){
                     var $inputhtml = $('<input type="password" value="' + $(this).html() + '"/>');
@@ -365,6 +369,16 @@
 
                     });
                     $inputhtml.focus();
+                }
+            });
+            $txt.bind('contextmenu',this,function(){
+                event.preventDefault();
+                if($(this).attr('name') == 'cache'){
+                    $(this).html(defaultval);
+                    $(this).attr('name','uncache');
+                }else{
+                    $(this).html(' * * * * * ');
+                    $(this).attr('name','cache');
                 }
             });
             return $txt;

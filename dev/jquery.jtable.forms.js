@@ -13,7 +13,7 @@
             messages: {
                 addFile : 'Choose file',
                 delFile : 'Delete file',
-                warningFile: 'Warning, the file is auto upload even if you don\'t save!'
+                warningFile: 'Warning, the file is auto upload even if you don\'t save!<br> And if you change the upload file, the older file is deleted'
             }
         },
 
@@ -305,6 +305,7 @@
             var $div = $('<div>');
             var $form = $('<form>');
             $form.attr('target','iframeTarget');
+            $form.attr('name','formUpload');
             $form.attr('class','formUploadFile');
             $form.attr('action',field.upload.url+'?action=upload');
             $form.attr('method','post');
@@ -325,14 +326,22 @@
             $i_name.attr('name',fieldName).attr('id',fieldName);
             $i_name.attr('value',value);
 
+            //=============================================
+            var $i_name_old = $('<input type="hidden"/>');
+            $i_name_old.attr('name','OLD_FILE');
+            $i_name_old.attr('value',value);
+            //=============================================
+
             var $i_display = $('<input type="text" readonly disabled="disabled">'); //Champ visible par l'utilisateur (Uniquement le nom du fichier)
             $i_display.attr('value',value.slice(value.lastIndexOf('/') + 1));
 
             var $i_size = $('<input type="hidden" name="MAX_FILE_SIZE"/>');//Taille max du fichier
             $i_size.attr('value',maxFileSize);
 
+
             var $i_directory = $('<input type="hidden" name="DIRECTORY" value="'+directory+'" />');//Dossier de destination, doit prendre en compte la racine du site
             var $i_typeDocument = $('<input type="hidden" name="TYPEDOC" value="'+typeDocument+'" />');//Definit un type de document
+
 
             $form.append($i_file);
             $form.append($i_display);
@@ -360,6 +369,15 @@
             $div.append($iframe);
 
             $i_file.change(function(){
+                if($i_name.val() != ''){// delete the old file
+                    $.ajax({
+                        type: "POST",
+                        url: field.upload.url+'?action=delete',
+                        data: {
+                            filename : $i_name.val()
+                        }
+                    });
+                }
                 $i_name.val('/'+$i_directory.val()+$i_typeDocument.val()+$(this).val().substring(12));
                 $i_display.val($(this).val().substring(12));
 
@@ -368,7 +386,6 @@
                 $i_directory.remove();
                 $i_typeDocument.remove();
             });
-
             /**
              * TODO Supprime sans avertissement
              */

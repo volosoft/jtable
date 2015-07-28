@@ -9,6 +9,7 @@ What's new?
 
 * Added type 'number'.
 * Added type 'multiselect' NOT WORK WITH EDIT INLINE
+* Type password right click to reveal in table
 
 More information
 ======
@@ -20,7 +21,6 @@ https://github.com/QuentinRillet/jtable/blob/master/doc/Documentation.md
 * Create type 'multiselect' working with edit inline.
 * Create type 'geolocate' who allow show a map.
 * Freeze header by default.
-* Type password right click to reveal
 
 What is jTable
 ======

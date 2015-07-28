@@ -29,4 +29,8 @@ more about ValidationEngine : <a href="https://github.com/posabsolute/jQuery-Val
 	    <td>Upload</td>
 	    <td>[![Edit inline content](https://raw.githubusercontent.com/QuentinRillet/jtable/master/doc/upload.PNG)](http://quentinrillet.fr/)</td>
 	</tr>
+	<tr>
+	    <td>Exemple password, right click for reveal</td>
+	    <td>[![Edit inline content](https://raw.githubusercontent.com/QuentinRillet/jtable/master/doc/password.PNG)](http://quentinrillet.fr/)</td>
+	</tr>
 
