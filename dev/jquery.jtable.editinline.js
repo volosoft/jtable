@@ -22,7 +22,7 @@
 		_createCellForRecordField: function (record, fieldName) {
 			var $column = base._createCellForRecordField.apply(this, arguments);
 			var field = this.options.fields[fieldName];
-			if(this.options.editinline.enable && this.options.fields[fieldName].edit != false && this.options.actions.updateAction != undefined){
+			if(this.options.editinline.enable == true && this.options.fields[fieldName].edit != false && this.options.actions.updateAction != undefined){
 				return $('<td></td>')
                 .addClass(this.options.fields[fieldName].listClass)
                 .append((this._getDisplayTextEditInline(record, fieldName)));
@@ -37,7 +37,7 @@
 		_updateRowTexts: function ($tableRow) {
             var record = $tableRow.data('record');
             var $columns = $tableRow.find('td');
-			if(this.options.editinline.enable){
+			if(this.options.editinline.enable == true){
 				for (var i = 0; i < this._columnList.length; i++) {
                     var displayItem = this._getDisplayTextEditInline(record, this._columnList[i]);
                     $columns.eq(this._firstDataColumnOffset + i).html(displayItem || '');
@@ -84,6 +84,8 @@
             } else if(field.upload){
                 var showFieldValue = fieldValue.slice(fieldValue.lastIndexOf('/') + 1);
                 return "<a target='_blank' href='"+fieldValue+"'>"+showFieldValue+"</a>";
+            } else if(field.geocomplete){
+                return this._editInline_geoComplete(record, fieldName);
             } else { //other types
 				return this._editInline_default(record,fieldName);
             }
@@ -113,6 +115,7 @@
                 });
 				$inputhtml.remove();
 				$inputhtml = $('<select></select>');
+                self._bootstrapThemeAddClass($inputhtml,'form-control');
 				for (var i = 0; i < options.length; i++) {
 					$inputhtml.append('<option value="' + options[i].Value + '"' + (options[i].Value == value ? ' selected="selected"' : '') + '>' + options[i].DisplayText + '</option>');
 				}
@@ -151,7 +154,7 @@
 				$txt.dblclick(function(){
 					if($(this).children().length < 1){
 						var $inputhtml = $('<input type="text" value="' + $(this).html().trim() + '" />');
-						$inputhtml.addClass('form-control');
+                        self._bootstrapThemeAddClass($inputhtml,'form-control');
 						$inputhtml.css('background-repeat','no-repeat');
 						$inputhtml.css('background-position','right center');
 						$inputhtml.addClass(field.inputClass);
@@ -218,6 +221,7 @@
 				$txt.dblclick(function(){
 					if($(this).children().length < 1){
 						var $inputhtml = $('<textarea>' + $(this).html() + '</textarea>');
+                        self._bootstrapThemeAddClass($inputhtml,'form-control');
 						$inputhtml.css('background-repeat','no-repeat');
 						$inputhtml.css('background-position','right center');
 						$inputhtml.addClass(field.inputClass);
@@ -260,6 +264,7 @@
 				$txt.dblclick(function(){
 					if($(this).children().length < 1){
 						var $inputhtml = $('<input type="text" value="' + $(this).html() + '"/>');
+                        self._bootstrapThemeAddClass($inputhtml,'form-control');
 						$inputhtml.css('background-repeat','no-repeat');
 						$inputhtml.css('background-position','right center');
 						$inputhtml.addClass(field.inputClass);
@@ -292,7 +297,84 @@
 				});						
 				return $txt;	
 		},
-		_editInline_number:function(record,fieldName){
+        _editInline_geoComplete:function (record, fieldName){
+            var self = this;
+            var field = this.options.fields[fieldName];
+            var fieldValue = record[fieldName];
+            var defaultval = (fieldValue) ? fieldValue :'&nbsp;&nbsp;&nbsp;&nbsp;';
+            var $txt = $('<div style=\'width:auto\'>' + defaultval + '</div>');
+            $txt.dblclick(function(){
+                if($(this).children().length < 1){
+                    var $inputhtml = $('<input type="text" value="' + $(this).html() + '"/>');
+                    self._bootstrapThemeAddClass($inputhtml,'form-control');
+                    $inputhtml.css('background-repeat','no-repeat');
+                    $inputhtml.css('background-position','right center');
+                    $inputhtml.addClass(field.inputClass);
+
+
+
+                    var $div = $('<div>');
+                    $div.attr('id','myMap');
+                    $div.css({height : 400, width : 400})
+
+                    if (field.addMask) {
+                        $inputhtml.mask(field.addMask);
+                    }
+                    $(this).html($inputhtml);
+                    $(this).append($div);
+                    $inputhtml.geocomplete({
+                        'map':'#myMap',
+                        'find':'Paris, France',
+                        markerOptions: {
+                            draggable: true
+                        },
+                        location: $(this).html()
+                    });
+                    if (field.required) {
+                        $(this).append('<b><i>'+self.options.messages.required+'</i></b>');
+                    }
+                    /*$inputhtml.bind('blur',function(){
+                        if ($(this).val().trim() == '' && field.required) {
+                            $(this).attr('title',self.options.messages.required);
+                        }else{
+                            $(this).css('background-image','url("' + self.options.editinline.img + 'loading.gif")');
+                            var postData = {};
+                            postData[fieldName]=$(this).val().trim();
+                            postData[self._keyField] = record[self._keyField];
+                            if(self._editInline_ajax(postData)){
+                                $txt.html($(this).val().trim()+'&nbsp;&nbsp;&nbsp;&nbsp;');
+                                record[fieldName]=$(this).val().trim();
+                                $(this).css('background','none');
+                                self._showUpdateAnimationForRow($txt.closest("tr"));
+                            }
+                        }
+
+                    });*/
+                    $inputhtml.on('keypress',function(e){
+                        if(e.which == 13) {
+                            if ($(this).val().trim() == '' && field.required) {
+                                $(this).attr('title', self.options.messages.required);
+                            } else {
+                                $(this).css('background-image', 'url("' + self.options.editinline.img + 'loading.gif")');
+                                var postData = {};
+                                postData[fieldName] = $(this).val().trim();
+                                postData[self._keyField] = record[self._keyField];
+                                if (self._editInline_ajax(postData)) {
+                                    $txt.html($(this).val().trim() + '&nbsp;&nbsp;&nbsp;&nbsp;');
+                                    record[fieldName] = $(this).val().trim();
+                                    $(this).css('background', 'none');
+                                    self._showUpdateAnimationForRow($txt.closest("tr"));
+                                }
+                            }
+                        }
+                    });
+
+                    $inputhtml.focus();
+                }
+            });
+            return $txt;
+        },
+        _editInline_number:function(record,fieldName){
 	            var self = this;
 				var field = this.options.fields[fieldName];
     	        var fieldValue = record[fieldName];
@@ -301,6 +383,7 @@
 				$txt.dblclick(function(){
 					if($(this).children().length < 1){
 						var $inputhtml = $('<input type="number" value="' + $(this).html() + '"/>');
+                        self._bootstrapThemeAddClass($inputhtml,'form-control');
 						$inputhtml.css('background-repeat','no-repeat');
 						$inputhtml.css('background-position','right center');
 						$(this).html($inputhtml);
@@ -326,10 +409,8 @@
 						});
 						$inputhtml.focus();
 					}
-				});	
-										
-				return $txt;	
-
+				});
+				return $txt;
 		},
         _editInline_password:function(record, fieldName){
             var self = this;
@@ -341,6 +422,7 @@
             $txt.dblclick(function(){
                 if($(this).children().length < 1){
                     var $inputhtml = $('<input type="password" value="' + $(this).html() + '"/>');
+                    self._bootstrapThemeAddClass($inputhtml,'form-control');
                     $inputhtml.css('background-repeat','no-repeat');
                     $inputhtml.css('background-position','right center');
                     $inputhtml.addClass(field.inputClass);
@@ -405,6 +487,7 @@
             $txt.children().on("contextmenu",this, function(e){
                 if($(this).children().length < 1){
                     var $inputhtml = $('<input type="text" value="' + $(this).html() + '"/>');
+                    self._bootstrapThemeAddClass($inputhtml,'form-control');
                     $inputhtml.css('background-repeat','no-repeat');
                     $inputhtml.css('background-position','right center');
                     $inputhtml.addClass(field.inputClass);

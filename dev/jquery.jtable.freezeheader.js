@@ -24,7 +24,7 @@
                     obj.closeDivScroll = '</div>';
                 }
 
-                obj.header = obj.grid.find('thead');
+                obj.header = obj.grid.find('thead tr:first');
 
                 if (params && params.height !== undefined) {
                     if ($('#hdScroll' + obj.id).length == 0) {
@@ -57,6 +57,7 @@
 
                             if (($(document).scrollTop() > obj.header.offset().top)) {
                                 obj.container.css("position", "absolute");
+                                //MODIF
                                 obj.container.css("top", (obj.grid.find("tr:last").offset().top - obj.header.height()) + "px");
                             }
                             else {
@@ -77,6 +78,7 @@
                 return (obj.header.offset().top <= obj.scroller.offset().top);
             }
             else {
+                //==modif
                 return ($(document).scrollTop() > obj.header.offset().top && $(document).scrollTop() < (obj.grid.height() - obj.header.height() - obj.grid.find("tr:last").height()) + obj.header.offset().top);
             }
         }

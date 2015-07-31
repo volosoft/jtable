@@ -18,9 +18,7 @@
         * DEFAULT OPTIONS / EVENTS                                              *
         *************************************************************************/
         options: {
-            i:0,
-
-            //Options
+             //Options
             actions: {},
             fields: {},
             animationsEnabled: true,
@@ -33,6 +31,7 @@
             jqueryuiTheme: false,
             unAuthorizedRequestRedirectUrl: null,
             freezeHeader: false,
+            bootstrapTheme:false,
 
             ajaxSettings: {
                 type: 'POST',
@@ -1133,6 +1132,24 @@
         *************************************************************************/
         _jqueryuiThemeAddClass: function ($elm, className, hoverClassName) {
             if (!this.options.jqueryuiTheme) {
+                return;
+            }
+
+            $elm.addClass(className);
+
+            if (hoverClassName) {
+                $elm.hover(function () {
+                    $elm.addClass(hoverClassName);
+                }, function () {
+                    $elm.removeClass(hoverClassName);
+                });
+            }
+        },
+
+        /* Adds jQueryUI class to an item.
+         *************************************************************************/
+        _bootstrapThemeAddClass: function ($elm, className, hoverClassName) {
+            if (!this.options.bootstrapTheme) {
                 return;
             }
 

@@ -103,7 +103,9 @@
                     return this._createDropDownListForField(field, fieldName, value, record, formType, form);
                 }
             } else if (field.type == 'number') {
-                return this._createNumberInputForField(field, fieldName, value);
+                return this._createTextInputForField(field, fieldName, value).attr('type','number').numeric(',');
+            } else if(field.geocomplete){
+                return this._createGeoInputForField(field, fieldName, value);
             } else {
                 return this._createTextInputForField(field, fieldName, value);
             }
@@ -138,6 +140,9 @@
             
             var displayFormat = field.displayFormat || this.options.defaultDateFormat;
             $input.datepicker({ dateFormat: displayFormat,changeMonth:true,changeYear:true });
+
+            this._bootstrapThemeAddClass($input,'form-control');
+
             return $('<div />')
                 .addClass('jtable-input jtable-date-input')
                 .append($input);
@@ -146,65 +151,53 @@
         /* Creates a textarea element for a field.
         *************************************************************************/
         _createTextAreaForField: function (field, fieldName, value) {
-            if (field.required) {
-                var $textArea = $('<textarea class="' + field.inputClass + ' validate[required]" id="Edit-' + fieldName + '" name="' + fieldName + '"></textarea>');
-            }else{
-                var $textArea = $('<textarea class="' + field.inputClass + '" id="Edit-' + fieldName + '" name="' + fieldName + '"></textarea>');    
-            }
-            
+
+            var $textArea = $('<textarea>');
+            $textArea.addClass(field.inputClass);
+            $textArea.attr('id','Edit-'+fieldName);
+            $textArea.attr('name',fieldName);
+
+            if (field.required)
+                 $textArea.addClass('validate[required]');
+
             if(field.inputSize)
-                $input.attr("size", field.inputSize);
+                $textArea.attr("size", field.inputSize);
                 
-            if (value != undefined) {
+            if (value != undefined)
                 $textArea.val(value);
-            }
-            
+
+            this._bootstrapThemeAddClass($input,'form-control');
+
+
             return $('<div />')
                 .addClass('jtable-input jtable-textarea-input')
                 .append($textArea);
         },
 
-        /* Creates a standart number for a field.
-        *************************************************************************/
-        _createNumberInputForField: function (field, fieldName, value) {
-            if (field.required) {
-                var $input = $('<input class="' + field.inputClass + ' validate[required]" id="Edit-' + fieldName + '" type="number" name="' + fieldName + '"></input>');    
-            }
-            else {
-                var $input = $('<input class="' + field.inputClass + '" id="Edit-' + fieldName + '" type="number" name="' + fieldName + '"></input>');    
-            }
-            
-            if(field.inputSize)
-                $input.attr("size", field.inputSize);
-                
-            if (value != undefined) {
-                $input.val(value);
-            }
-            
-            return $('<div />')
-                .addClass('jtable-input jtable-number-input')
-                .append($input).numeric(',');
-        },
-        
         /* Creates a standart textbox for a field.
         *************************************************************************/
         _createTextInputForField: function (field, fieldName, value) {
-            if (field.required) {
-                var $input = $('<input class="' + field.inputClass + ' validate[required]" id="Edit-' + fieldName + '" type="text" name="' + fieldName + '"></input>');
-            }else{
-                var $input = $('<input class="' + field.inputClass + '" id="Edit-' + fieldName + '" type="text" name="' + fieldName + '"></input>');
-            }
-            
+            var $input = $('<input  type="text">');
+            $input.addClass(field.inputClass);
+            $input.attr('id','Edit-'+fieldName);
+            $input.attr('name', fieldName);
+
+            if (field.required)
+                $input.addClass('validate[required]');
+
             if(field.inputSize)
                 $input.attr("size", field.inputSize);
-                
+
             if(field.addMask)
                 $input.mask(field.addMask);
 
-            if (value != undefined) {
+            if (value != undefined)
                 $input.val(value);
-            }
-            
+
+            this._bootstrapThemeAddClass($input,'form-control');
+
+            //return $input;
+
             return $('<div />')
                 .addClass('jtable-input jtable-text-input')
                 .append($input);
@@ -225,7 +218,9 @@
             if (value != undefined) {
                 $input.val(value);
             }
-            
+
+            this._bootstrapThemeAddClass($input,'form-control');
+
             return $('<div />')
                 .addClass('jtable-input jtable-password-input')
                 .append($input);
@@ -248,6 +243,7 @@
             //Create checkbox and check if needed
             var $checkBox = $('<input class="' + field.inputClass + '" id="Edit-' + fieldName + '" type="checkbox" name="' + fieldName + '" />')
                 .appendTo($containerDiv);
+
             if (value != undefined) {
                 $checkBox.val(value);
             }
@@ -298,6 +294,7 @@
             if(field.upload.maxFileSize){ var maxFileSize = field.upload.maxFileSize; }else { var maxFileSize = 100000000; }
             if(field.upload.directory){var directory = field.upload.directory}else{ var directory = './'}
             if(field.upload.typeDocument){ var typeDocument = field.upload.typeDocument+'-'}else{ var typeDocument = ''}
+
             if(!field.upload.url){
                 this._logError('Url for upload is not set!');return '';
             }
@@ -322,18 +319,23 @@
             var $i_button_delete = $('<input type="button" id="btn_delFile"/>');
             $i_button_delete.attr('value',this.options.messages.delFile).button();
 
+
             var $i_name = $('<input type="hidden"/>');//Champ de la jtable, doit contenir le nom complet + chemin
             $i_name.attr('name',fieldName).attr('id',fieldName);
-            $i_name.attr('value',value);
 
             //=============================================
             var $i_name_old = $('<input type="hidden"/>');
             $i_name_old.attr('name','OLD_FILE');
-            $i_name_old.attr('value',value);
+
             //=============================================
 
             var $i_display = $('<input type="text" readonly disabled="disabled">'); //Champ visible par l'utilisateur (Uniquement le nom du fichier)
-            $i_display.attr('value',value.slice(value.lastIndexOf('/') + 1));
+
+            if(value != undefined) {
+                $i_name.attr('value',value);
+                $i_name_old.attr('value',value);
+                $i_display.attr('value',value.slice(value.lastIndexOf('/') + 1));
+            }
 
             var $i_size = $('<input type="hidden" name="MAX_FILE_SIZE"/>');//Taille max du fichier
             $i_size.attr('value',maxFileSize);
@@ -405,6 +407,35 @@
                 .addClass('jtable-input jtable-text-input')
                 .append($div);
         },
+
+        /* Creates a geocomplete for a field.
+        *************************************************************************/
+        _createGeoInputForField: function(field, fieldName, value){
+            var $input = $('<input  type="text">');
+            $input.addClass(field.inputClass);
+            $input.attr('id','Edit-'+fieldName);
+            $input.attr('name', fieldName);
+
+            if (field.required)
+                $input.addClass('validate[required]');
+
+            if(field.inputSize)
+                $input.attr("size", field.inputSize);
+
+            if(field.addMask)
+                $input.mask(field.addMask);
+
+            if (value != undefined)
+                $input.val(value);
+
+            this._bootstrapThemeAddClass($input,'form-control');
+
+            $input.geocomplete();
+
+            return $('<div />')
+                .addClass('jtable-input jtable-text-input')
+                .append($input);
+        },
         /* Creates a multiselecter a field.
          *************************************************************************/
         _createDropDownListMultiForField: function (field, fieldName, value, record, source, form) {
@@ -415,6 +446,8 @@
             //Create select element
             var $select = $('<select multiple class="' + field.inputClass + '" id="Edit-' + fieldName + '" name="' + fieldName + '[]"></select>')
                 .appendTo($containerDiv);
+
+            this._bootstrapThemeAddClass($select,'form-control');
 
             //add options
             var options = this._getOptionsForField(fieldName, {
@@ -430,6 +463,7 @@
 
             return $containerDiv;
         },
+
         /* Creates a drop down list (combobox) input element for a field.
         *************************************************************************/
         _createDropDownListForField: function (field, fieldName, value, record, source, form) {
@@ -441,6 +475,8 @@
             //Create select element
             var $select = $('<select class="' + field.inputClass + '" id="Edit-' + fieldName + '" name="' + fieldName + '"></select>')
                 .appendTo($containerDiv);
+
+            this._bootstrapThemeAddClass($select,'form-control');
 
             //add options
             var options = this._getOptionsForField(fieldName, {

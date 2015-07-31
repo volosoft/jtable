@@ -10,16 +10,23 @@ What's new?
 * Added type 'number'.
 * Added type 'multiselect' NOT WORK WITH EDIT INLINE
 * Type password right click to reveal in table
+* Option Geocomplete but not allows map for the moment
+* Bootstrap integration 'bootstrapTheme' 
+* Search integrate in thead 
 
+
+You can use jtable generator here : https://github.com/QuentinRillet/jTable_generator.git
 More information
 ======
 https://github.com/QuentinRillet/jtable/blob/master/doc/Documentation.md
+
+
 
 @Todos
 ======
 * Create type 'upload'.
 * Create type 'multiselect' working with edit inline.
-* Create type 'geolocate' who allow show a map.
+* Terminate geocomplete map in form 
 
 
 What is jTable
