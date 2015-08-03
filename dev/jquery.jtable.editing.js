@@ -343,7 +343,6 @@
                     return;
                 }
 
-                //console.log($editForm[1]);
                 var record = self._$editingRow.data('record');
 
                 self._updateRecordValuesFromForm(record, $editForm);
@@ -360,7 +359,6 @@
 
                 self._$editDiv.dialog("close");
             };
-
 
             //updateAction may be a function, check if it is
             if ($.isFunction(self.options.actions.updateAction)) {
@@ -386,7 +384,8 @@
                 //Make an Ajax call to update record
                 self._submitFormUsingAjax(
                     self.options.actions.updateAction,
-                    $editForm.serialize(),
+                    //$editForm.serialize(),
+                    $editForm.serializeWithChkBox(),
                     function(data) {
                         completeEdit(data);
                     },

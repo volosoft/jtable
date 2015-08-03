@@ -96,6 +96,7 @@
 
         _cache: null, //General purpose cache dictionary (object)
 
+        _lastRecord : null, //Object contain last record for generate export.
         /************************************************************************
         * CONSTRUCTOR AND INITIALIZATION METHODS                                *
         *************************************************************************/
@@ -367,6 +368,7 @@
         load: function (postData, completeCallback) {
             this._lastPostData = postData;
             this._reloadTable(completeCallback);
+
         },
 
         /* Refreshes (re-loads) table data with last postData.
@@ -383,7 +385,6 @@
                     return this._$tableRows[i];
                 }
             }
-
             return null;
         },
 
@@ -423,6 +424,7 @@
                 //Re-generate table rows
                 self._removeAllRows('reloading');
                 self._addRecordsToTable(data.Records);
+
 
                 self._onRecordsLoaded(data);
 

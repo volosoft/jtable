@@ -123,7 +123,6 @@
             var $addRecordForm = self._$addRecordDiv.find('form');
 
             if (self._trigger("formSubmitting", null, { form: $addRecordForm, formType: 'create' }) != false && $addRecordForm.validationEngine('validate')) {
-                alert();
                 self._setEnabledOfDialogButton($saveButton, false, self.options.messages.saving);
                 self._saveAddRecordForm($addRecordForm, $saveButton);
             }

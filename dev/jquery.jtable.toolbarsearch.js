@@ -13,16 +13,15 @@
          /* Adds tr element to given thead element
          *************************************************************************/
         _addRowToTableHead: function ($thead) {
-            var $tr = $('<tr></tr>')
-                .appendTo($thead);
+            base._addRowToTableHead.apply(this,arguments);
 
-            this._addColumnsToHeaderRow($tr);
             if(this.options.toolbarsearch.enable){
                 var $tr = $('<tr></tr>')
                     .appendTo($thead);
                 this._toolbarsearch_addColumnsToHeaderRow($tr);
             }
         },
+
         /* Adds column header cells to given tr element.
          *************************************************************************/
         _toolbarsearch_addColumnsToHeaderRow: function ($tr) {

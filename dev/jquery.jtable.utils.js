@@ -156,4 +156,18 @@
         };
     }
 
+    $.fn.serializeWithChkBox = function() {
+        // perform a serialize form the non-checkbox fields
+
+        var values = $(this).find('select')
+            .add(  $(this).find('input[type!=checkbox]')).add($(this).find('textarea'))
+            .serialize();
+        // add values for checked and unchecked checkboxes fields
+        $(this).find('input[type=checkbox]').each(function() {
+            var chkVal = $(this).is(':checked') ? $(this).val() : "0";
+            values += "&" + $(this).attr('name') + "=" + chkVal;
+        });
+        return values;
+    }
+
 })(jQuery);

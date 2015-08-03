@@ -44,7 +44,7 @@ $.fn.numeric = function(config, callback)
 	// set decimal point
 	var decimal = (config.decimal === false) ? "" : config.decimal || ".";
 	// allow negatives
-	var negative = (config.negative === true) ? true : false;
+	var negative = (config.negative === true);
     // set decimal places
 	var decimalPlaces = (typeof config.decimalPlaces == "undefined") ? -1 : config.decimalPlaces;
 	// callback function
@@ -134,14 +134,7 @@ $.fn.numeric.keypress = function(e)
 		// if key pressed is the decimal and it is not already in the field
 		if(decimal && key == decimal.charCodeAt(0))
 		{
-			if($.inArray(decimal, value.split('')) == -1)
-			{
-				allow = true;
-			}
-			else
-			{
-				allow = false;
-			}
+			allow = $.inArray(decimal, value.split('')) == -1;
 		}
 	}
 	else

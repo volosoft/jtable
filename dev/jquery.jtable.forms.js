@@ -166,7 +166,7 @@
             if (value != undefined)
                 $textArea.val(value);
 
-            this._bootstrapThemeAddClass($input,'form-control');
+            this._bootstrapThemeAddClass($textArea,'form-control');
 
 
             return $('<div />')
@@ -735,6 +735,7 @@
                     .text(buttonText);
             }
         }
+
 
     });
 
