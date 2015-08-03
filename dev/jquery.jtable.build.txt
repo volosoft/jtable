@@ -3,9 +3,9 @@ add jquery.jtable.header.txt
 add jquery.jtable.freezeheader.js
 add jquery.jtable.core.js
 add jquery.jtable.creation.js
-add jquery.jtable.deletion.js
 add jquery.jtable.editing.js
 add jquery.jtable.editinline.js
+add jquery.jtable.deletion.js
 add jquery.jtable.toolbarsearch.js
 add jquery.jtable.dynamiccolumns.js
 add jquery.jtable.multi-select.js
