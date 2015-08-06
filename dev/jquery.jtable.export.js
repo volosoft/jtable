@@ -11,10 +11,9 @@
     $.extend(true, $.hik.jtable.prototype, {
         options:{
             exportExcel: true, // active or desactive export excel
-            exportPdf: true, // active or desactive export excel
+            exportPrint: true, // active or desactive export print
             messages:{
                 exportExcel: 'Export to Excel',
-                exportPdf: 'Export to PDF',
                 print:'Print'
             }
         },
@@ -29,7 +28,7 @@
                 this._exportExcel();
             }
 
-            if(this.options.exportPdf){
+            if(this.options.exportPrint){
                 this._exportPrint();
             }
         },
@@ -116,22 +115,16 @@
                     $(divToPrint).find('thead tr').css({'background-color':'blue','color':'white'});
                     $(divToPrint).find('tr').css({'border':'1px solid black'});
                     $(divToPrint).find('td').css({'border':'1px solid black','vertical-align': 'middle','padding': '5px'});
-                    console.log(divToPrint);
 
                     newWin.document.write(divToPrint.outerHTML);
                     newWin.print();
                     newWin.close();
 
                     $(divToPrint).remove();
-
-                    //window.open('data:application/vnd.ms-excel,' + encodeURIComponent(tableClone[0].outerHTML));
                 }
             };
             this._addToolBarItem(exportPdf);
         }
-
-
-
     });
 
 

@@ -13,6 +13,8 @@ What's new?
 * Option Geocomplete but not allows map for the moment
 * Bootstrap integration 'bootstrapTheme' 
 * Search integrate in thead 
+* Option exportPrint
+* Option exportExcel
 
 
 You can use jtable generator here : https://github.com/QuentinRillet/jTable_generator.git
