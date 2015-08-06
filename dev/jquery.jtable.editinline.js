@@ -167,10 +167,13 @@
                     source: 'edit',
                     dependedValues: selfParent._createDependedValuesUsingRecord(record, field.dependsOn)
                 });
+
                 $inputhtml.remove();
                 $inputhtml = $('<select multiple></select>');
                 $inputhtml.attr('name',fieldName+'[]');
+
                 self._bootstrapThemeAddClass($inputhtml,'form-control');
+
                 for (var i = 0; i < options.length; i++) {
                     $inputhtml.append('<option value="' + options[i].Value + '"' + (options[i].Value == value ? ' selected="selected"' : '') + '>' + options[i].DisplayText + '</option>');
                 }
@@ -360,13 +363,12 @@
             var $txt = $('<div style=\'width:auto\'>' + defaultval + '</div>');
             $txt.dblclick(function(){
                 if($(this).children().length < 1){
-                    var $inputhtml = $('<input type="text" value="' + $(this).html() + '"/>');
+                    var location = $(this).html();
+                    var $inputhtml = $('<input type="text" value="' + location + '"/>');
                     self._bootstrapThemeAddClass($inputhtml,'form-control');
                     $inputhtml.css('background-repeat','no-repeat');
                     $inputhtml.css('background-position','right center');
                     $inputhtml.addClass(field.inputClass);
-
-
 
                     var $div = $('<div>');
                     $div.attr('id','myMap');
@@ -381,30 +383,14 @@
                         'map':'#myMap',
                         'find':'Paris, France',
                         markerOptions: {
-                            draggable: true
+                            draggable: false
                         },
-                        location: $(this).html()
+                        location: location
                     });
                     if (field.required) {
                         $(this).append('<b><i>'+self.options.messages.required+'</i></b>');
                     }
-                    /*$inputhtml.bind('blur',function(){
-                        if ($(this).val().trim() == '' && field.required) {
-                            $(this).attr('title',self.options.messages.required);
-                        }else{
-                            $(this).css('background-image','url("' + self.options.editinline.img + 'loading.gif")');
-                            var postData = {};
-                            postData[fieldName]=$(this).val().trim();
-                            postData[self._keyField] = record[self._keyField];
-                            if(self._editInline_ajax(postData)){
-                                $txt.html($(this).val().trim()+'&nbsp;&nbsp;&nbsp;&nbsp;');
-                                record[fieldName]=$(this).val().trim();
-                                $(this).css('background','none');
-                                self._showUpdateAnimationForRow($txt.closest("tr"));
-                            }
-                        }
 
-                    });*/
                     $inputhtml.on('keypress',function(e){
                         if(e.which == 13) {
                             if ($(this).val().trim() == '' && field.required) {
