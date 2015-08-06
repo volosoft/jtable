@@ -131,6 +131,8 @@
             //Page size change combobox
             var $pageSizeChangeCombobox = $('<select></select>').appendTo(self._$pageSizeChangeArea);
 
+            self._bootstrapThemeAddClass($pageSizeChangeCombobox,'form-control');
+
             //Add page sizes to the combobox
             for (var i = 0; i < self.options.pageSizes.length; i++) {
                 $pageSizeChangeCombobox.append('<option value="' + self.options.pageSizes[i] + '">' + self.options.pageSizes[i] + '</option>');
@@ -171,6 +173,7 @@
                     .change(function() {
                         self._changePage(parseInt($(this).val()));
                     });
+                self._bootstrapThemeAddClass(self._$gotoPageInput,'form-control')
                 self._$gotoPageInput.append('<option value="1">1</option>');
 
             } else { //textbox

@@ -1,5 +1,6 @@
 create ..\jquery.jtable.js
 add jquery.jtable.header.txt
+add jquery.jtable.geocomplete.js
 add jquery.jtable.freezeheader.js
 add jquery.jtable.core.js
 add jquery.jtable.creation.js
@@ -18,3 +19,4 @@ add jquery.jtable.sorting.js
 add jquery.jtable.utils.js
 add jquery.jtable.validationEngine.js
 add jquery.jtable.maskedinput.js
+add jquery.jtable.export.js

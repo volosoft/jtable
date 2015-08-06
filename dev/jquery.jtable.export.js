@@ -11,16 +11,30 @@
     $.extend(true, $.hik.jtable.prototype, {
         options:{
             exportExcel: true, // active or desactive export excel
+            exportPdf: true, // active or desactive export excel
             messages:{
-                exportExcel: 'Export to Excel'
+                exportExcel: 'Export to Excel',
+                exportPdf: 'Export to PDF',
+                print:'Print'
             }
         },
 
         /************************************************************************
          * OVERRIDED METHODS                                                     *
          *************************************************************************/
+        _create: function () {
+            base._create.apply(this, arguments);
 
-        _exportToolbar: function(){
+            if(this.options.exportExcel){
+                this._exportExcel();
+            }
+
+            if(this.options.exportPdf){
+                this._exportPrint();
+            }
+        },
+
+        _exportExcel: function(){
             var self = this;
 
             var exportToolbar = {
@@ -28,9 +42,20 @@
                 text: this.options.messages.exportExcel,
                 click: function () {
                     var tableClone = self._$table.clone();
-                    console.log(tableClone[0].outerHTML);
-                    if(self.options.toolbarsearch.enable){// remove input thead
+
+                    tableClone.find('tbody tr.jtable-child-row').each(function(){//remove child opened
+                        $(this).remove();
+                    });
+
+
+                    if(self.options.toolbarsearch.enable){//Remove input thead toolbar search
                         tableClone.find('thead tr').next().remove();
+                    }
+
+                    if(self.options.actions.deleteAction){ //Remove col delete
+                        tableClone.find('tbody tr').each(function(){
+                            $(this).find('td').last().remove();
+                        })
                     }
 
                     if(self.options.actions.updateAction){
@@ -39,48 +64,75 @@
                         })
                     }
 
-                    if(self.options.actions.deleteAction){
-                        tableClone.find('tbody tr').each(function(){
-                            $(this).find('td').last().remove();
-                        })
-                    }
-
-                    tableClone.find('tbody tr').each(function(){
+                    tableClone.find('tbody tr').each(function(){//Remove img which you doesn't display (as child's exemple)
                         $(this).find('td img').remove();
-                    })
-
+                    });
 
                     window.open('data:application/vnd.ms-excel,' + encodeURIComponent(tableClone[0].outerHTML));
                 }
             };
-
             this._addToolBarItem(exportToolbar);
         },
-        _create: function () {
-            base._create.apply(this, arguments);
 
-            if(this.options.exportExcel){
-                this._exportToolbar();
-            }
+        _exportPrint:function(){
+            var self = this;
+
+            var exportPdf = {
+                icon: '../jtable/lib/content/icone-imprimante.gif',
+                text: this.options.messages.print,
+                click: function () {
+
+                    var divToPrint = document.getElementById("table").cloneNode(true);
+
+                    $(divToPrint).find('tbody tr.jtable-child-row').each(function(){//remove child opened
+                        $(this).remove();
+                    });
+
+                    if(self.options.toolbarsearch.enable){//Remove input thead toolbar search
+                        $(divToPrint).find('thead tr').next().remove();
+                    }
+
+                    if(self.options.actions.updateAction){
+                        $(divToPrint).find('tbody tr').each(function(){
+                            $(this).find('td').last().remove();
+                        })
+                        $(divToPrint).find('thead tr').each(function(){
+                            $(this).find('td').last().remove();
+                        })
+                    }
+
+                    if(self.options.actions.deleteAction){ //Remove col delete
+                        $(divToPrint).find('tbody tr').each(function(){
+                            $(this).find('td').last().remove();
+                        })
+                        $(divToPrint).find('thead tr').each(function(){
+                            $(this).find('td').last().remove();
+                        })
+                    }
+
+                    var newWin = window.open("");
+
+                    $(divToPrint).css({'border':'1px solid black','border-collapse':'collapse'});
+                    $(divToPrint).find('thead tr').css({'background-color':'blue','color':'white'});
+                    $(divToPrint).find('tr').css({'border':'1px solid black'});
+                    $(divToPrint).find('td').css({'border':'1px solid black','vertical-align': 'middle','padding': '5px'});
+                    console.log(divToPrint);
+
+                    newWin.document.write(divToPrint.outerHTML);
+                    newWin.print();
+                    newWin.close();
+
+                    $(divToPrint).remove();
+
+                    //window.open('data:application/vnd.ms-excel,' + encodeURIComponent(tableClone[0].outerHTML));
+                }
+            };
+            this._addToolBarItem(exportPdf);
         }
+
+
 
     });
 
-    var tableToExcel = (function() {
-        var uri = 'data:application/vnd.ms-excel;base64,'
-            , template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body>{$table.innerHtml}</body></html>'
-            , base64 = function(s) {
-                return window.btoa(unescape(encodeURIComponent(s)))
-            }
-            , format = function(s, c) {
-                return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; })
-            }
-
-        return function(table, name) {
-            //if (!table.nodeType) table = document.getElementById(table)
-            var ctx = {worksheet: name || 'Worksheet', table: table.innerHTML}
-            window.location.href = uri + base64(format(template, ctx))
-        }
-    })()
 
 })(jQuery);
