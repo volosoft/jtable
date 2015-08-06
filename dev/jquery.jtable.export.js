@@ -80,8 +80,8 @@
                 icon: '../jtable/lib/content/icone-imprimante.gif',
                 text: this.options.messages.print,
                 click: function () {
-
-                    var divToPrint = document.getElementById("table").cloneNode(true);
+                    
+                    var divToPrint = self._$table[0].cloneNode(true);
 
                     $(divToPrint).find('tbody tr.jtable-child-row').each(function(){//remove child opened
                         $(this).remove();
