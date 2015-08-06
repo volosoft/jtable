@@ -8,7 +8,7 @@ What's new?
 * Option 'addMask' for example '99h99' for field time
 * Option 'inputSize'
 * Added type 'number'.
-* Added type 'multiselect' NOT WORK WITH EDIT INLINE
+* Added type 'multiselect'
 * Type password right click to reveal in table
 * Option Geocomplete but not allows map for the moment
 * Bootstrap integration 'bootstrapTheme' 
@@ -27,7 +27,6 @@ https://github.com/QuentinRillet/jtable/blob/master/doc/Documentation.md
 @Todos
 ======
 * Create type 'upload'.
-* Create type 'multiselect' working with edit inline.
 * Terminate geocomplete map in form 
 
 

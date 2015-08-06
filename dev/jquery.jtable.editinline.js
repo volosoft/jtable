@@ -78,7 +78,11 @@
                     dependedValues: this._createDependedValuesUsingRecord(record, field.dependsOn)
                 });
 				var self = this;
-                return this._editInline_options(options, fieldValue,record,fieldName,field,self);
+                if(field.type == 'multiselect'){
+                    return this._editInline_optionsMulti(options, fieldValue,record,fieldName,field,self);
+                }else{
+                    return this._editInline_options(options, fieldValue,record,fieldName,field,self);
+                }
             /*} else if (field.type == 'link') {
                 return this._editInline_link(record, fieldName);*/
             } else if(field.upload){
@@ -136,13 +140,64 @@
 						}
 					});
 					$inputhtml.focus();
-					
 				}
-			
 			});
 			return $txt;
-        },		
-		_editInline_date:function(record,fieldName){
+        },
+        _editInline_optionsMulti:function (options, value,record,fieldName,field,selfParent){
+            var self = this;
+            var val = value;
+            var valtext ='';
+            var $inputhtml = $('<select></select>');
+            $inputhtml.css('background-repeat','no-repeat');
+            $inputhtml.css('background-position','right center');
+
+            for (var i = 0; i < options.length; i++) {
+                if(options[i].Value == value){
+                    valtext = options[i].DisplayText;
+                }
+            }
+
+            var defaulttext = (valtext) ? valtext :' - - - ';
+            var $txt = $('<span>' + defaulttext + '</span>');
+            $txt.dblclick(function(){
+                var options = selfParent._getOptionsForField(fieldName, {
+                    record: record,
+                    value: record[fieldName],
+                    source: 'edit',
+                    dependedValues: selfParent._createDependedValuesUsingRecord(record, field.dependsOn)
+                });
+                $inputhtml.remove();
+                $inputhtml = $('<select multiple></select>');
+                $inputhtml.attr('name',fieldName+'[]');
+                self._bootstrapThemeAddClass($inputhtml,'form-control');
+                for (var i = 0; i < options.length; i++) {
+                    $inputhtml.append('<option value="' + options[i].Value + '"' + (options[i].Value == value ? ' selected="selected"' : '') + '>' + options[i].DisplayText + '</option>');
+                }
+
+                if($(this).children().length < 1){
+                    $inputhtml.val(val);
+                    $(this).html($inputhtml);
+                    $inputhtml.bind('change blur focusout',function(){
+                        $(this).css('background-image','url("' + self.options.editinline.img + 'loading.gif")');
+                        var postData = {};
+                        postData[fieldName]=$(this).val();
+                        postData[self._keyField]=record[self._keyField];
+                        if(self._editInline_ajax(postData)){
+                            val = $(this).val();
+                            $txt.html(($(this).find("option:selected").text()!= '')?$(this).find("option:selected").text():' - - - ');
+                            record[fieldName]=$(this).val();
+                            $(this).css('background','none');
+                            self._showUpdateAnimationForRow($txt.closest("tr"));
+                        }
+                    });
+                    $inputhtml.focus();
+                }
+
+            });
+            return $txt;
+        },
+        _editInline_date:function(record,fieldName){
 	            var self = this;
 				var field = this.options.fields[fieldName];
     	        var fieldValue = record[fieldName];
