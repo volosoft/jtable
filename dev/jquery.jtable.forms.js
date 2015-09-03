@@ -178,7 +178,7 @@
         /* Creates a standart textbox for a field.
         *************************************************************************/
         _createTextInputForField: function (field, fieldName, value) {
-            var $input = $('<input  type="text" '+field.inputAttr+' >');
+            var $input = $('<input  type="text" '+field.inputAttr+' style="'+field.inputCss+'">');
             $input.addClass(field.inputClass);
             $input.attr('id','Edit-'+fieldName);
             $input.attr('name', fieldName);

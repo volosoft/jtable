@@ -321,7 +321,7 @@
 				var $txt = $('<div style=\'width:auto\'>' + defaultval + '</div>');
 				$txt.dblclick(function(){
 					if($(this).children().length < 1){
-						var $inputhtml = $('<input type="text" value="' + $(this).html() + '"/>');
+						var $inputhtml = $('<input type="text" '+field.inputAttr +' style="'+field.inputCss+'" value="' + $(this).html() + '"/>');
                         self._bootstrapThemeAddClass($inputhtml,'form-control');
 						$inputhtml.css('background-repeat','no-repeat');
 						$inputhtml.css('background-position','right center');
