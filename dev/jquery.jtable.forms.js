@@ -125,10 +125,10 @@
         *************************************************************************/
         _createDateInputForField: function (field, fieldName, value) {
             if (field.required) {
-                var $input = $('<input class="' + field.inputClass + ' validate[required,custom[date]]" id="Edit-' + fieldName + '" type="text" name="' + fieldName + '"></input>');
+                var $input = $('<input class="' + field.inputClass + '  validate[required,custom[date]]" '+field.inputAttr+' style="'+field.inputCss+'" id="Edit-' + fieldName + '" type="text" name="' + fieldName + '"></input>');
             }
             else {
-                var $input = $('<input class="' + field.inputClass + ' validate[custom[date]]" id="Edit-' + fieldName + '" type="text" name="' + fieldName + '"></input>');
+                var $input = $('<input class="' + field.inputClass + ' validate[custom[date]]" '+field.inputAttr+' style="'+field.inputCss+'" id="Edit-' + fieldName + '" type="text" name="' + fieldName + '"></input>');
             }
             
             if(field.inputSize)
@@ -153,7 +153,7 @@
         *************************************************************************/
         _createTextAreaForField: function (field, fieldName, value) {
 
-            var $textArea = $('<textarea>');
+            var $textArea = $('<textarea '+field.inputAttr+' >');
             $textArea.addClass(field.inputClass);
             $textArea.attr('id','Edit-'+fieldName);
             $textArea.attr('name',fieldName);
