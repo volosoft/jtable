@@ -133,7 +133,6 @@
 
             console.log('jTable ERROR: ' + text);
         }
-
     });
 
     /* Fix for array.indexOf method in IE7.

@@ -307,6 +307,7 @@
 
                 //Create input element with it's current value
                 var currentValue = self._getValueForRecordField(record, fieldName);
+                var currentValue = self._getValueForRecordField(record, fieldName);
                 $fieldContainer.append(
                     self._createInputForRecordField({
                         fieldName: fieldName,

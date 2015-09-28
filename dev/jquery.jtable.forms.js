@@ -130,7 +130,7 @@
             else {
                 var $input = $('<input class="' + field.inputClass + ' validate[custom[date]]" '+field.inputAttr+' style="'+field.inputCss+'" id="Edit-' + fieldName + '" type="text" name="' + fieldName + '"></input>');
             }
-            
+
             if(field.inputSize)
                 $input.attr("size", field.inputSize);
                 

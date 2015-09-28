@@ -10,8 +10,8 @@
     //extension members
     $.extend(true, $.hik.jtable.prototype, {
         options:{
-            exportExcel: true, // active or desactive export excel
-            exportPrint: true, // active or desactive export print
+            exportExcel: false, // active or desactive export excel
+            exportPrint: false, // active or desactive export print
             messages:{
                 exportExcel: 'Export to Excel',
                 print:'Print'

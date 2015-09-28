@@ -209,6 +209,17 @@
 				var defaultval = (fieldValue !='' && fieldValue !='0000-00-00') ? $.datepicker.formatDate(displayFormat, this._parseDate(fieldValue)) :'&nbsp;&nbsp;&nbsp;';
 
         		var $txt = $('<span>' + defaultval + '</span>');
+                var jourFRtoEN = function (jour){
+                    if (jour=="" || jour==null || jour == undefined){
+                        return "";
+                    }
+                    else{
+                        var annee= jour.substr(6,4);
+                        var mois=  jour.substr(3,2);
+                        jour=  jour.substr(0,2);
+                        return( annee + "-" + mois + "-" +jour);
+                    }
+                };
 				$txt.dblclick(function(){
 					if($(this).children().length < 1){
 						var $inputhtml = $('<input type="text" value="' + $(this).html().trim() + '" />');
@@ -229,13 +240,13 @@
 							postData[self._keyField] = record[self._keyField];
 							if(self._editInline_ajax(postData)){
 								$txt.html($(this).val());
-								record[fieldName] = $(this).val();
+                                (displayFormat.toLowerCase() == 'dd-mm-yy' )?record[fieldName] = jourFRtoEN($(this).val()):record[fieldName] = $(this).val();
+								//record[fieldName] = $(this).val();
 								$(this).css('background','none');
 								self._showUpdateAnimationForRow($txt.closest("tr"));						
 							}							
 						}});
 						$inputhtml.focus();
-							
 					}
 				});	
 										
