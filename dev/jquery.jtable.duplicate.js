@@ -1,231 +1,246 @@
 /************************************************************************
-* DUPLICATE RECORD extension for jTable                                    *
+* DUPLICATE extension for jTable                                         *
 *************************************************************************/
 (function ($) {
-    
+
     //Reference to base object members
     var base = {
         _create: $.hik.jtable.prototype._create,
         _addColumnsToHeaderRow: $.hik.jtable.prototype._addColumnsToHeaderRow,
         _addCellsToRowUsingRecord: $.hik.jtable.prototype._addCellsToRowUsingRecord
     };
-    
+
     //extension members
     $.extend(true, $.hik.jtable.prototype, {
+
         /************************************************************************
         * DEFAULT OPTIONS / EVENTS                                              *
         *************************************************************************/
         options: {
 
+            //Options
+            duplicateConfirmation: true,
+
             //Events
             recordDuplicated: function (event, data) { },
-            rowDuplicated: function (event, data) { },
 
             //Localization
             messages: {
-                duplicateRecord: 'Duplicate Record'
-            },
-            
-            validationOptions : {
-                promptPosition : "bottomRight",
-                autoPositionUpdate : true
+                duplicateConfirmation: 'This record will be duplicated. Are you sure?',
+                duplicateText: 'Duplicate',
+                deleting: 'Duplicating',
+                canNotDuplicatedRecords: 'Can not duplicate {0} of {1} records!',
+                duplicateProggress: 'Duplicating {0} of {1} records, processing...'
             }
         },
-        
-        
+
         /************************************************************************
         * PRIVATE FIELDS                                                        *
         *************************************************************************/
 
-        _$duplicateDiv: null, //Reference to the duplicating dialog div (jQuery object)
-        _$duplicatingRow: null, //Reference to currently duplicating row (jQuery object)
+        _$duplicateRecordDiv: null, //Reference to the adding new record dialog div (jQuery object)
+        _$deletingRow: null, //Reference to currently deleting row (jQuery object)
 
         /************************************************************************
-        * CONSTRUCTOR AND INITIALIZATION METHODS                                *
+        * CONSTRUCTOR                                                           *
         *************************************************************************/
 
-        /* Overrides base method to do duplicating-specific constructions.
+        /* Overrides base method to do deletion-specific constructions.
         *************************************************************************/
         _create: function () {
             base._create.apply(this, arguments);
-            
-            if (!this.options.actions.duplicateAction) {
-                return;
-            }
-            
             this._createDuplicateDialogDiv();
         },
 
-        /* Creates and prepares duplicate dialog div
+        /* Creates and prepares duplicate record confirmation dialog div.
         *************************************************************************/
         _createDuplicateDialogDiv: function () {
             var self = this;
 
-            //Create a div for dialog and add to container element
-            self._$duplicateDiv = $('<div></div>')
-                .appendTo(self._$mainContainer);
+            //Check if duplicateAction is supplied
+            if (!self.options.actions.duplicateAction) {
+                return;
+            }
+
+            //Create div element for duplicate confirmation dialog
+            self._$duplicateRecordDiv = $('<div><p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span><span class="jtable-duplicate-confirm-message"></span></p></div>').appendTo(self._$mainContainer);
 
             //Prepare dialog
-            self._$duplicateDiv.dialog({
+            self._$duplicateRecordDiv.dialog({
                 appendTo: self._$mainContainer,
                 autoOpen: false,
                 show: self.options.dialogShowEffect,
                 hide: self.options.dialogHideEffect,
-                width: 'auto',
-                minWidth: '300',
                 modal: true,
-                title: self.options.messages.duplicateRecord,
+                title: self.options.messages.areYouSure,
                 buttons:
                         [{  //cancel button
                             text: self.options.messages.cancel,
                             click: function () {
-                                self._$duplicateDiv.dialog('close');
+                                self._$duplicateRecordDiv.dialog("close");
                             }
-                        }, { //save button
-                            id: 'DuplicateDialogSaveButton',
-                            text: self.options.messages.save,
+                        }, {//duplicate button
+                            id: 'DuplicateDialogButton',
+                            text: self.options.messages.duplicateText,
                             click: function () {
-                                self._onSaveClickedOnDuplicateForm();
+
+                                //row maybe removed by another source, if so, do nothing
+                                if (self._$deletingRow.hasClass('jtable-row-removed')) {
+                                    self._$duplicateRecordDiv.dialog('close');
+                                    return;
+                                }
+
+                                var $duplicateButton = self._$duplicateRecordDiv.parent().find('#DuplicateDialogButton');
+                                self._setEnabledOfDialogButton($duplicateButton, false, self.options.messages.deleting);
+                                self._duplicateRecordFromServer(
+                                    self._$deletingRow,
+                                    function () {
+                                        self._removeRowsFromTableWithAnimation(self._$deletingRow);
+                                        self._$duplicateRecordDiv.dialog('close');
+                                    },
+                                    function (message) { //error
+                                        self._showError(message);
+                                        self._setEnabledOfDialogButton($duplicateButton, true, self.options.messages.duplicateText);
+                                    }
+                                );
                             }
                         }],
                 close: function () {
-                    var $duplicateForm = self._$duplicateDiv.find('form:first');
-                    var $saveButton = self._$duplicateDiv.parent().find('#DuplicateDialogSaveButton');
-                    
-                    $duplicateForm.validationEngine('hide');
-                    $duplicateForm.validationEngine('detach');
-                    
-                    self._trigger("formClosed", null, { form: $duplicateForm, formType: 'duplicate', row: self._$duplicatingRow });
-                    self._setEnabledOfDialogButton($saveButton, true, self.options.messages.save);
-                    $duplicateForm.remove();
+                    var $duplicateButton = self._$duplicateRecordDiv.parent().find('#DuplicateDialogButton');
+                    self._setEnabledOfDialogButton($duplicateButton, true, self.options.messages.duplicateText);
                 }
             });
         },
-
-        /* Saves duplicating form to server.
-        *************************************************************************/
-        _onSaveClickedOnDuplicateForm: function () {
-            var self = this;
-            //row maybe removed by another source, if so, do nothing
-            if (self._$duplicatingRow.hasClass('jtable-row-removed')) {
-                self._$duplicateDiv.dialog('close');
-                return;
-            }
-
-            var $saveButton = self._$duplicateDiv.parent().find('#DuplicateDialogSaveButton');
-            var $duplicateForm = self._$duplicateDiv.find('form');
-
-            if (self._trigger("formSubmitting", null, { form: $duplicateForm, formType: 'duplicate', row: self._$duplicatingRow }) != false && $duplicateForm.validationEngine('validate')) {
-                self._setEnabledOfDialogButton($saveButton, false, self.options.messages.saving);
-                self._saveduplicateForm($duplicateForm, $saveButton);
-            }
-        },
-        
 
         /************************************************************************
         * PUBLIC METHODS                                                        *
         *************************************************************************/
 
-        /* Updates a record on the table (optionally on the server also)
+        /* This method is used to duplicate one or more rows from server and the table.
+        *************************************************************************/
+        duplicateRows: function ($rows) {
+            var self = this;
+
+            if ($rows.length <= 0) {
+                self._logWarn('No rows specified to jTable duplicateRows method.');
+                return;
+            }
+
+            if (self._isBusy()) {
+                self._logWarn('Can not duplicate rows since jTable is busy!');
+                return;
+            }
+
+            //Duplicating just one row
+            if ($rows.length == 1) {
+                self._duplicateRecordFromServer(
+                    $rows,
+                    function () { //success
+                        self._removeRowsFromTableWithAnimation($rows);
+                    },
+                    function (message) { //error
+                        self._showError(message);
+                    }
+                );
+
+                return;
+            }
+
+            //Duplicating multiple rows
+            self._showBusy(self._formatString(self.options.messages.duplicateProggress, 0, $rows.length));
+
+            //This method checks if deleting of all records is completed
+            var completedCount = 0;
+            var isCompleted = function () {
+                return (completedCount >= $rows.length);
+            };
+
+            //This method is called when deleting of all records completed
+            var completed = function () {
+                var $duplicatedRows = $rows.filter('.jtable-row-ready-to-remove');
+                if ($duplicatedRows.length < $rows.length) {
+                    self._showError(self._formatString(self.options.messages.canNotDuplicatedRecords, $rows.length - $duplicatedRows.length, $rows.length));
+                }
+
+                if ($duplicatedRows.length > 0) {
+                    self._removeRowsFromTableWithAnimation($duplicatedRows);
+                }
+
+                self._hideBusy();
+            };
+
+            //Duplicate all rows
+            var duplicatedCount = 0;
+            $rows.each(function () {
+                var $row = $(this);
+                self._duplicateRecordFromServer(
+                    $row,
+                    function () { //success
+                        ++duplicatedCount; ++completedCount;
+                        $row.addClass('jtable-row-ready-to-remove');
+                        self._showBusy(self._formatString(self.options.messages.duplicateProggress, duplicatedCount, $rows.length));
+                        if (isCompleted()) {
+                            completed();
+                        }
+                    },
+                    function () { //error
+                        ++completedCount;
+                        if (isCompleted()) {
+                            completed();
+                        }
+                    }
+                );
+            });
+        },
+
+        /* Duplicates a record from the table (optionally from the server also).
         *************************************************************************/
         duplicateRecord: function (options) {
             var self = this;
             options = $.extend({
                 clientOnly: false,
                 animationsEnabled: self.options.animationsEnabled,
+                url: self.options.actions.duplicateAction,
                 success: function () { },
                 error: function () { }
             }, options);
 
-            if (!options.record) {
-                self._logWarn('options parameter in duplicateRecord method must contain a record property.');
+            if (options.key == undefined) {
+                self._logWarn('options parameter in duplicateRecord method must contain a key property.');
                 return;
             }
 
-            var key = self._getKeyValueOfRecord(options.record);
-            if (key == undefined || key == null) {
-                self._logWarn('options parameter in duplicateRecord method must contain a record that contains the key field property.');
-                return;
-            }
-
-            var $updatingRow = self.getRowByKey(key);
-            if ($updatingRow == null) {
-                self._logWarn('Can not found any row by key "' + key + '" on the table. Updating row must be visible on the table.');
+            var $deletingRow = self.getRowByKey(options.key);
+            if ($deletingRow == null) {
+                self._logWarn('Can not found any row by key: ' + options.key);
                 return;
             }
 
             if (options.clientOnly) {
-                $.extend($updatingRow.data('record'), options.record);
-                self._duplicateRowTexts($updatingRow);
-                self._onRecordDuplicated($updatingRow, null);
-                if (options.animationsEnabled) {
-                    self._showDuplicateAnimationForRow($updatingRow);
-                }
-
+                self._removeRowsFromTableWithAnimation($deletingRow, options.animationsEnabled);
                 options.success();
                 return;
             }
 
-            var completeduplicate = function (data) {
-                if (data.Result != 'OK') {
-                    self._showError(data.Message);
-                    options.error(data);
-                    return;
-                }
-
-                $.extend($updatingRow.data('record'), options.record);
-                self._duplicateRecordValuesFromServerResponse($updatingRow.data('record'), data);
-
-                self._duplicateRowTexts($updatingRow);
-                self._onRecordDuplicated($updatingRow, data);
-                if (options.animationsEnabled) {
-                    self._showDuplicateAnimationForRow($updatingRow);
-                }
-
-                options.success(data);
-            };
-
-            //duplicateAction may be a function, check if it is
-            if (!options.url && $.isFunction(self.options.actions.duplicateAction)) {
-
-                //Execute the function
-                var funcResult = self.options.actions.duplicateAction($.param(options.record));
-
-                //Check if result is a jQuery Deferred object
-                if (self._isDeferredObject(funcResult)) {
-                    //Wait promise
-                    funcResult.done(function (data) {
-                        completeduplicate(data);
-                    }).fail(function () {
-                        self._showError(self.options.messages.serverCommunicationError);
-                        options.error();
-                    });
-                } else { //assume it returned the creation result
-                    completeduplicate(funcResult);
-                }
-
-            } else { //Assume it's a URL string
-
-                //Make an Ajax call to create record
-                self._submitFormUsingAjax(
-                    options.url || self.options.actions.duplicateAction,
-                    $.param(options.record),
-                    function (data) {
-                        completeduplicate(data);
+            self._duplicateRecordFromServer(
+                    $deletingRow,
+                    function (data) { //success
+                        self._removeRowsFromTableWithAnimation($deletingRow, options.animationsEnabled);
+                        options.success(data);
                     },
-                    function () {
-                        self._showError(self.options.messages.serverCommunicationError);
-                        options.error();
-                    });
-
-            }
+                    function (message) { //error
+                        self._showError(message);
+                        options.error(message);
+                    },
+                    options.url
+                );
         },
 
         /************************************************************************
         * OVERRIDED METHODS                                                     *
         *************************************************************************/
 
-        /* Overrides base method to add a 'duplicating column cell' to header row.
+        /* Overrides base method to add a 'deletion column cell' to header row.
         *************************************************************************/
         _addColumnsToHeaderRow: function ($tr) {
             base._addColumnsToHeaderRow.apply(this, arguments);
@@ -237,18 +252,18 @@
         /* Overrides base method to add a 'duplicate command cell' to a row.
         *************************************************************************/
         _addCellsToRowUsingRecord: function ($row) {
-            var self = this;
             base._addCellsToRowUsingRecord.apply(this, arguments);
 
+            var self = this;
             if (self.options.actions.duplicateAction != undefined) {
-                var $span = $('<span></span>').html(self.options.messages.duplicateRecord);
-                var $button = $('<button title="' + self.options.messages.duplicateRecord + '"></button>')
-                    .addClass('jtable-command-button jtable-edit-command-button')
+                var $span = $('<span></span>').html(self.options.messages.duplicateText);
+                var $button = $('<button title="' + self.options.messages.duplicateText + '"></button>')
+                    .addClass('jtable-command-button jtable-delete-command-button')
                     .append($span)
                     .click(function (e) {
                         e.preventDefault();
                         e.stopPropagation();
-                        self._showduplicateForm($row);
+                        self._duplicateButtonClickedForRow($row);
                     });
                 $('<td></td>')
                     .addClass('jtable-command-column')
@@ -261,211 +276,158 @@
         * PRIVATE METHODS                                                       *
         *************************************************************************/
 
-        /* Shows duplicate form for a row.
+        /* This method is called when user clicks duplicate button on a row.
         *************************************************************************/
-        _showduplicateForm: function ($tableRow) {
+        _duplicateButtonClickedForRow: function ($row) {
             var self = this;
-            var record = $tableRow.data('record');
 
-            //Create duplicate form
-            var $duplicateForm = $('<form id="jtable-duplicate-form" class="jtable-dialog-form jtable-duplicate-form"></form>');
+            var duplicateConfirm;
+            var duplicateConfirmMessage = self.options.messages.duplicateConfirmation;
 
-            //Create input fields
-            for (var i = 0; i < self._fieldList.length; i++) {
+            //If options.duplicateConfirmation is function then call it
+            if ($.isFunction(self.options.duplicateConfirmation)) {
+                var data = { row: $row, record: $row.data('record'), duplicateConfirm: true, duplicateConfirmMessage: duplicateConfirmMessage, cancel: false, cancelMessage: null };
+                self.options.duplicateConfirmation(data);
 
-                var fieldName = self._fieldList[i];
-                var field = self.options.fields[fieldName];
-                var fieldValue = record[fieldName];
+                //If duplicate progress is cancelled
+                if (data.cancel) {
 
-                if (field.key == true) {
-                    if (field.duplicate != true) {
-                        //Create hidden field for key
-                        $duplicateForm.append(self._createInputForHidden(fieldName, fieldValue));
-                        continue;
-                    } else {
-                        //Create a special hidden field for key (since key is be duplicatable)
-                        $duplicateForm.append(self._createInputForHidden('jtRecordKey', fieldValue));
+                    //If a canlellation reason is specified
+                    if (data.cancelMessage) {
+                        self._showError(data.cancelMessage); //TODO: show warning/stop message instead of error (also show warning/error ui icon)!
                     }
-                }
 
-                //Do not create element for non-duplicatable fields
-                if (field.duplicate == false) {
-                    continue;
-                }
-
-                //Hidden field
-                if (field.type == 'hidden') {
-                    $duplicateForm.append(self._createInputForHidden(fieldName, fieldValue));
-                    continue;
-                }
-
-                //Create a container div for this input field and add to form
-                var $fieldContainer = $('<div class="jtable-input-field-container"></div>').appendTo($duplicateForm);
-
-                //Create a label for input
-                $fieldContainer.append(self._createInputLabelForRecordField(fieldName));
-
-                //Create input element with it's current value
-                var currentValue = self._getValueForRecordField(record, fieldName);
-                var currentValue = self._getValueForRecordField(record, fieldName);
-                $fieldContainer.append(
-                    self._createInputForRecordField({
-                        fieldName: fieldName,
-                        value: currentValue,
-                        record: record,
-                        formType: 'duplicate',
-                        form: $duplicateForm
-                    }));
-            }
-            
-            self._makeCascadeDropDowns($duplicateForm, record, 'duplicate');
-
-            $duplicateForm.submit(function () {
-                self._onSaveClickedOnduplicateForm();
-                return false;
-            });
-
-            //Open dialog
-            self._$duplicatingRow = $tableRow;
-            self._$duplicateDiv.append($duplicateForm).dialog('open');
-            
-            console.log($duplicateForm);
-            console.log(self._$duplicateDiv);
-            
-            $('#jtable-duplicate-form').validationEngine('attach',{promptPosition: self.options.validationOptions.promptPosition,autoPositionDuplicate :self.options.validationOptions.autoPositionDuplicate});
-            self._trigger("formCreated", null, { form: $duplicateForm, formType: 'duplicate', record: record, row: $tableRow });
-            
-            self._$duplicateDiv.parent().find('#DuplicateDialogSaveButton').click();
-        },
-
-        /* Saves duplicateing form to the server and duplicates the record on the table.
-        *************************************************************************/
-        _saveduplicateForm: function ($duplicateForm, $saveButton) {
-            var self = this;
-            
-            var completeduplicate = function (data) {
-                if (data.Result != 'OK') {
-                    self._showError(data.Message);
-                    self._setEnabledOfDialogButton($saveButton, true, self.options.messages.save);
                     return;
                 }
 
-                var record = self._$duplicatingRow.data('record');
+                duplicateConfirmMessage = data.duplicateConfirmMessage;
+                duplicateConfirm = data.duplicateConfirm;
+            } else {
+                duplicateConfirm = self.options.duplicateConfirmation;
+            }
 
-                self._duplicateRecordValuesFromForm(record, $duplicateForm);
-                self._duplicateRecordValuesFromServerResponse(record, data);
-                self._duplicateRowTexts(self._$duplicatingRow);
+            if (duplicateConfirm != false) {
+                //Confirmation
+                self._$duplicateRecordDiv.find('.jtable-duplicate-confirm-message').html(duplicateConfirmMessage);
+                self._showDuplicateDialog($row);
+            } else {
+                //No confirmation
+                self._duplicateRecordFromServer(
+                    $row,
+                    function () { //success
+                        self._removeRowsFromTableWithAnimation($row);
+                    },
+                    function (message) { //error
+                        self._showError(message);
+                    }
+                );
+            }
+        },
 
-                self._$duplicatingRow.attr('data-record-key', self._getKeyValueOfRecord(record));
+        /* Shows duplicate comfirmation dialog.
+        *************************************************************************/
+        _showDuplicateDialog: function ($row) {
+            this._$deletingRow = $row;
+            this._$duplicateRecordDiv.dialog('open');
+        },
 
-                self._onRecordDuplicated(self._$duplicatingRow, data);
+        /* Performs an ajax call to server to duplicate record
+        *  and removes row of the record from table if ajax call success.
+        *************************************************************************/
+        _duplicateRecordFromServer: function ($row, success, error, url) {
+            var self = this;
 
-                if (self.options.animationsEnabled) {
-                    self._showDuplicateAnimationForRow(self._$duplicatingRow);
+            var completeDuplicate = function(data) {
+                if (data.Result != 'OK') {
+                    $row.data('deleting', false);
+                    if (error) {
+                        error(data.Message);
+                    }
+
+                    return;
                 }
 
-                self._$duplicateDiv.dialog("close");
+                self._trigger("recordDuplicated", null, { record: $row.data('record'), row: $row, serverResponse: data });
+
+                if (success) {
+                    success(data);
+                }
             };
 
+            //Check if it is already being duplicated right now
+            if ($row.data('deleting') == true) {
+                return;
+            }
+
+            $row.data('deleting', true);
+
+            var postData = {};
+            postData[self._keyField] = self._getKeyValueOfRecord($row.data('record'));
+            
             //duplicateAction may be a function, check if it is
-            if ($.isFunction(self.options.actions.duplicateAction)) {
+            if (!url && $.isFunction(self.options.actions.duplicateAction)) {
 
                 //Execute the function
-                var funcResult = self.options.actions.duplicateAction($duplicateForm.serialize());
+                var funcResult = self.options.actions.duplicateAction(postData);
 
                 //Check if result is a jQuery Deferred object
                 if (self._isDeferredObject(funcResult)) {
                     //Wait promise
                     funcResult.done(function (data) {
-                        completeduplicate(data);
+                        completeDuplicate(data);
                     }).fail(function () {
-                        self._showError(self.options.messages.serverCommunicationError);
-                        self._setEnabledOfDialogButton($saveButton, true, self.options.messages.save);
+                        $row.data('deleting', false);
+                        if (error) {
+                            error(self.options.messages.serverCommunicationError);
+                        }
                     });
-                } else { //assume it returned the creation result
-                    completeduplicate(funcResult);
+                } else { //assume it returned the deletion result
+                    completeDuplicate(funcResult);
                 }
 
             } else { //Assume it's a URL string
-
-                //Make an Ajax call to duplicate record
-                self._submitFormUsingAjax(
-                    self.options.actions.duplicateAction,
-                    //$duplicateForm.serialize(),
-                    $duplicateForm.serializeWithChkBox(),
-                    function(data) {
-                        completeduplicate(data);
+                //Make ajax call to duplicate the record from server
+                this._ajax({
+                    url: (url || self.options.actions.duplicateAction),
+                    data: postData,
+                    success: function (data) {
+                        completeDuplicate(data);
                     },
-                    function() {
-                        self._showError(self.options.messages.serverCommunicationError);
-                        self._setEnabledOfDialogButton($saveButton, true, self.options.messages.save);
-                    });
-            }
+                    error: function () {
+                        $row.data('deleting', false);
+                        if (error) {
+                            error(self.options.messages.serverCommunicationError);
+                        }
+                    }
+                });
 
+            }
         },
 
-        /* This method ensures updating of current record with server response,
-        * if server sends a Record object as response to duplicateAction.
+        /* Removes a row from table after a 'deleting' animation.
         *************************************************************************/
-        _duplicateRecordValuesFromServerResponse: function (record, serverResponse) {
-            if (!serverResponse || !serverResponse.Record) {
-                return;
+        _removeRowsFromTableWithAnimation: function ($rows, animationsEnabled) {
+            var self = this;
+
+            if (animationsEnabled == undefined) {
+                animationsEnabled = self.options.animationsEnabled;
             }
 
-            $.extend(true, record, serverResponse.Record);
-        },
+            if (animationsEnabled) {
+                var className = 'jtable-row-deleting';
+                if (this.options.jqueryuiTheme) {
+                    className = className + ' ui-state-disabled';
+                }
 
-        /* Gets text for a field of a record according to it's type.
-        *************************************************************************/
-        _getValueForRecordField: function (record, fieldName) {
-            var field = this.options.fields[fieldName];
-            var fieldValue = record[fieldName];
-            if (field.type == 'date') {
-                return this._getDisplayTextForDateRecordField(field, fieldValue);
+                //Stop current animation (if does exists) and begin 'deleting' animation.
+                $rows.stop(true, true).addClass(className, 'slow', '').promise().done(function () {
+                    self._removeRowsFromTable($rows, 'duplicated');
+                });
             } else {
-                return fieldValue;
+                self._removeRowsFromTable($rows, 'duplicated');
             }
-        },
-
-        /* Duplicates cells of a table row's text values from row's record values.
-        *************************************************************************/
-        _duplicateRowTexts: function ($tableRow) {
-            var record = $tableRow.data('record');
-            var $columns = $tableRow.find('td');
-            for (var i = 0; i < this._columnList.length; i++) {
-                var displayItem = this._getDisplayTextForRecordField(record, this._columnList[i]);
-                if ((displayItem != "") && (displayItem == 0)) displayItem = "0";
-                $columns.eq(this._firstDataColumnOffset + i).html(displayItem || '');
-            }
-
-            this._onRowUpdated($tableRow);
-        },
-
-        /* Shows 'duplicated' animation for a table row.
-        *************************************************************************/
-        _showUpdateAnimationForRow: function ($tableRow) {
-            var className = 'jtable-row-duplicated';
-            if (this.options.jqueryuiTheme) {
-                className = className + ' ui-state-highlight';
-            }
-
-            $tableRow.stop(true, true).addClass(className, 'slow', '', function () {
-                $tableRow.removeClass(className, 5000);
-            });
-        },
-
-        /************************************************************************
-        * EVENT RAISING METHODS                                                 *
-        *************************************************************************/
-
-        _onRowUpdated: function ($row) {
-            this._trigger("rowUpdated", null, { row: $row, record: $row.data('record') });
-        },
-
-        _onRecordUpdated: function ($row, data) {
-            this._trigger("recordUpdated", null, { record: $row.data('record'), row: $row, serverResponse: data });
         }
-        
-        
+
     });
+
 })(jQuery);
