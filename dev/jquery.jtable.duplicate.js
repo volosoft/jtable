@@ -258,7 +258,7 @@
             if (self.options.actions.duplicateAction != undefined) {
                 var $span = $('<span></span>').html(self.options.messages.duplicateText);
                 var $button = $('<button title="' + self.options.messages.duplicateText + '"></button>')
-                    .addClass('jtable-command-button jtable-delete-command-button')
+                    .addClass('jtable-command-button jtable-duplicate-command-button')
                     .append($span)
                     .click(function (e) {
                         e.preventDefault();

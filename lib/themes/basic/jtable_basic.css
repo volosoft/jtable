@@ -278,6 +278,11 @@ div.jtable-main-container table.jtable tbody > tr > td .jtable-delete-command-bu
   width: 16px;
   height: 16px;
 }
+div.jtable-main-container table.jtable tbody > tr > td .jtable-duplicate-command-button {
+    background: url('duplicate.png') no-repeat;
+    width: 16px;
+    height: 16px;
+}
 div.jtable-busy-message {
   color: #000;
   background-color: #ddd;
