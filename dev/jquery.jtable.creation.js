@@ -61,6 +61,7 @@
             self._$addRecordDiv = $('<div />')
                 .appendTo(self._$mainContainer);
 
+
             //Prepare dialog
             self._$addRecordDiv.dialog({
                 appendTo: self._$mainContainer,
@@ -281,6 +282,10 @@
                 self._onSaveClickedOnCreateForm();
                 return false;
             });
+
+            if(self.options.formHeight != '0'){
+                $addRecordForm.css("height",self.options.formHeight)
+            }
 
             //Open the form
             self._$addRecordDiv.append($addRecordForm).dialog('open');

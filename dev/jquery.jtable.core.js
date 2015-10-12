@@ -32,6 +32,8 @@
             unAuthorizedRequestRedirectUrl: null,
             freezeHeader: false,
             bootstrapTheme:false,
+            formInline: '0',
+            formHeight: '0',
 
             ajaxSettings: {
                 type: 'POST',

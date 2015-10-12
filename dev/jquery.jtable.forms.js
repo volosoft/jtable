@@ -40,9 +40,16 @@
             //TODO: May create label tag instead of a div.
             //return $('<label>').attr('for',fieldName).addClass('jtable-input-label').append(this.options.fields[fieldName].inputTitle || this.options.fields[fieldName].title);
 
-            return $('<div />')
+             var $divLabel = $('<div />')
                 .addClass('jtable-input-label')
                 .html(this.options.fields[fieldName].inputTitle || this.options.fields[fieldName].title);
+
+            if(this.options.formInline != '0'){
+                return $divLabel.css('display','inline-block').css('width',this.options.formInline);
+            }else{
+                return $divLabel;
+            }
+
         },
 
         /* Creates an input element according to field type.
@@ -82,33 +89,40 @@
                     .append($input);
 
             }
-
+            var $createdInput;
             //Create input according to field type
             if (field.type == 'date') {
-                return this._createDateInputForField(field, fieldName, value);
+                $createdInput = this._createDateInputForField(field, fieldName, value);
             } else if (field.type == 'textarea') {
-                return this._createTextAreaForField(field, fieldName, value);
+                $createdInput = this._createTextAreaForField(field, fieldName, value);
             } else if (field.type == 'password') {
-                return this._createPasswordInputForField(field, fieldName, value);
+                $createdInput = this._createPasswordInputForField(field, fieldName, value);
             } else if (field.type == 'checkbox') {
-                return this._createCheckboxForField(field, fieldName, value);
+                $createdInput = this._createCheckboxForField(field, fieldName, value);
             } else if (field.upload) {
-                return this._createUploadForField(field, fieldName, value);
+                $createdInput = this._createUploadForField(field, fieldName, value);
             } else if (field.options) {
                 if (field.type == 'radiobutton') {
-                    return this._createRadioButtonListForField(field, fieldName, value, record, formType);
+                    $createdInput = this._createRadioButtonListForField(field, fieldName, value, record, formType);
                 } else if (field.type == 'multiselect') {
-                    return this._createDropDownListMultiForField(field, fieldName, value, record, formType, form);
+                    $createdInput = this._createDropDownListMultiForField(field, fieldName, value, record, formType, form);
                 } else {
-                    return this._createDropDownListForField(field, fieldName, value, record, formType, form);
+                    $createdInput = this._createDropDownListForField(field, fieldName, value, record, formType, form);
                 }
             } else if (field.type == 'number') {
-                return this._createTextInputForField(field, fieldName, value).attr('type','number').numeric(',');
+                $createdInput = this._createTextInputForField(field, fieldName, value).attr('type','number').numeric(',');
             } else if(field.geocomplete){
-                return this._createGeoInputForField(field, fieldName, value);
+                $createdInput = this._createGeoInputForField(field, fieldName, value);
             } else {
-                return this._createTextInputForField(field, fieldName, value);
+                $createdInput = this._createTextInputForField(field, fieldName, value);
             }
+
+            if(this.options.formInline !='0'){
+                return $createdInput.css('display','inline-block');
+            }else{
+                return $createdInput;
+            }
+
         },
 
         //Creates a hidden input element with given name and value.

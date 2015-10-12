@@ -307,7 +307,6 @@
 
                 //Create input element with it's current value
                 var currentValue = self._getValueForRecordField(record, fieldName);
-                var currentValue = self._getValueForRecordField(record, fieldName);
                 $fieldContainer.append(
                     self._createInputForRecordField({
                         fieldName: fieldName,
@@ -324,6 +323,10 @@
                 self._onSaveClickedOnEditForm();
                 return false;
             });
+
+            if(self.options.formHeight != '0'){
+                $editForm.css("height",self.options.formHeight)
+            }
 
             //Open dialog
             self._$editingRow = $tableRow;
