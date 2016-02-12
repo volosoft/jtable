@@ -18,7 +18,7 @@
     "sorting"
   ],
   "license": "MIT",
-  "homepage": "http://www.jtable.orghttp://www.jtable.org",
+  "homepage": "http://www.jtable.org",
   "ignore": [
     "**/.*",
     "node_modules",
