@@ -415,7 +415,7 @@
             var $columns = $tableRow.find('td');
             for (var i = 0; i < this._columnList.length; i++) {
                 var displayItem = this._getDisplayTextForRecordField(record, this._columnList[i]);
-                if ((displayItem != "") && (displayItem == 0)) displayItem = "0";
+                if ((displayItem === 0)) displayItem = "0";
                 $columns.eq(this._firstDataColumnOffset + i).html(displayItem || '');
             }
 
