@@ -138,6 +138,9 @@
             if (props.inputClass == undefined) {
                 props.inputClass = '';
             }
+            if (props.placeholder == undefined) {
+                props.placeholder = '';
+            }
 
             //Convert dependsOn to array if it's a comma seperated lists
             if (props.dependsOn && $.type(props.dependsOn) === 'string') {
