@@ -1,5 +1,5 @@
 {
-  "name": "QuentinRillet/jtable",
+  "name": "jtable",
   "main": [
     "lib/jquery.jtable.min.js"
   ],
