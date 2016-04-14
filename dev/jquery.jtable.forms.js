@@ -129,7 +129,7 @@
         /* Creates a standart textbox for a field.
         *************************************************************************/
         _createTextInputForField: function (field, fieldName, value) {
-            var $input = $('<input class="' + field.inputClass + '" id="Edit-' + fieldName + '" type="text" name="' + fieldName + '"></input>');
+            var $input = $('<input class="' + field.inputClass + '" placeholder="' + field.placeholder + '" id="Edit-' + fieldName + '" type="text" name="' + fieldName + '"></input>');
             if (value != undefined) {
                 $input.val(value);
             }
@@ -142,7 +142,7 @@
         /* Creates a password input for a field.
         *************************************************************************/
         _createPasswordInputForField: function (field, fieldName, value) {
-            var $input = $('<input class="' + field.inputClass + '" id="Edit-' + fieldName + '" type="password" name="' + fieldName + '"></input>');
+            var $input = $('<input class="' + field.inputClass + '" placeholder="' + field.placeholder + '" id="Edit-' + fieldName + '" type="password" name="' + fieldName + '"></input>');
             if (value != undefined) {
                 $input.val(value);
             }
