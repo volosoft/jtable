@@ -71,6 +71,7 @@
                 autoOpen: false,
                 show: self.options.dialogShowEffect,
                 hide: self.options.dialogHideEffect,
+				height: self.options.dialogHeight,
                 width: 'auto',
                 minWidth: '300',
                 modal: true,

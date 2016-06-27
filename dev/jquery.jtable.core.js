@@ -25,6 +25,7 @@
             defaultDateFormat: 'yy-mm-dd',
             dialogShowEffect: 'fade',
             dialogHideEffect: 'fade',
+			dialogHeight: 'auto',
             showCloseButton: false,
             loadingAnimationDelay: 500,
             saveUserPreferences: true,

@@ -69,6 +69,7 @@
                 show: self.options.dialogShowEffect,
                 hide: self.options.dialogHideEffect,
                 width: 'auto',
+				height: self.options.dialogHeight,
                 minWidth: '300',
                 modal: true,
                 title: self.options.messages.addNewRecord,
