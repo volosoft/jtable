@@ -8,7 +8,8 @@
         _initializeFields: $.hik.jtable.prototype._initializeFields,
         _normalizeFieldOptions: $.hik.jtable.prototype._normalizeFieldOptions,
         _createHeaderCellForField: $.hik.jtable.prototype._createHeaderCellForField,
-        _createRecordLoadUrl: $.hik.jtable.prototype._createRecordLoadUrl
+        _createRecordLoadUrl: $.hik.jtable.prototype._createRecordLoadUrl,
+        _createJtParamsForLoading: $.hik.jtable.prototype._createJtParamsForLoading
     };
 
     //extension members
@@ -84,7 +85,7 @@
                     if (fieldProps.sorting) {
                         var colOffset = orderValue.indexOf(fieldName);
                         if (colOffset > -1) {
-                            if (orderValue.toUpperCase().indexOf('DESC', colOffset) > -1) {
+                            if (orderValue.toUpperCase().indexOf(' DESC', colOffset) > -1) {
                                 self._lastSorting.push({
                                     fieldName: fieldName,
                                     sortOrder: 'DESC'
@@ -177,6 +178,23 @@
             });
 
             return (url + (url.indexOf('?') < 0 ? '?' : '&') + 'jtSorting=' + sorting.join(","));
+        },
+
+        /* Overrides _createJtParamsForLoading method to add sorging parameters to jtParams object.
+        *************************************************************************/
+        _createJtParamsForLoading: function () {
+            var jtParams = base._createJtParamsForLoading.apply(this, arguments);
+
+            if (this.options.sorting && this._lastSorting.length) {
+                var sorting = [];
+                $.each(this._lastSorting, function (idx, value) {
+                    sorting.push(value.fieldName + ' ' + value.sortOrder);
+                });
+
+                jtParams.jtSorting = sorting.join(",");
+            }
+
+            return jtParams;
         }
 
     });

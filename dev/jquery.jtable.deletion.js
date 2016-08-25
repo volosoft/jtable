@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
 * DELETION extension for jTable                                         *
 *************************************************************************/
 (function ($) {
@@ -57,6 +57,11 @@
         _createDeleteDialogDiv: function () {
             var self = this;
 
+            //Check if deleteAction is supplied
+            if (!self.options.actions.deleteAction) {
+                return;
+            }
+
             //Create div element for delete confirmation dialog
             self._$deleteRecordDiv = $('<div><p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span><span class="jtable-delete-confirm-message"></span></p></div>').appendTo(self._$mainContainer);
 
@@ -77,14 +82,14 @@
                             id: 'DeleteDialogButton',
                             text: self.options.messages.deleteText,
                             click: function () {
-                                
+
                                 //row maybe removed by another source, if so, do nothing
                                 if (self._$deletingRow.hasClass('jtable-row-removed')) {
                                     self._$deleteRecordDiv.dialog('close');
                                     return;
                                 }
 
-                                var $deleteButton = $('#DeleteDialogButton');
+                                var $deleteButton = self._$deleteRecordDiv.parent().find('#DeleteDialogButton');
                                 self._setEnabledOfDialogButton($deleteButton, false, self.options.messages.deleting);
                                 self._deleteRecordFromServer(
                                     self._$deletingRow,
@@ -100,7 +105,7 @@
                             }
                         }],
                 close: function () {
-                    var $deleteButton = $('#DeleteDialogButton');
+                    var $deleteButton = self._$deleteRecordDiv.parent().find('#DeleteDialogButton');
                     self._setEnabledOfDialogButton($deleteButton, true, self.options.messages.deleteText);
                 }
             });
@@ -119,7 +124,7 @@
                 self._logWarn('No rows specified to jTable deleteRows method.');
                 return;
             }
-            
+
             if (self._isBusy()) {
                 self._logWarn('Can not delete rows since jTable is busy!');
                 return;
@@ -326,10 +331,27 @@
         },
 
         /* Performs an ajax call to server to delete record
-        *  and removesd row of record from table if ajax call success.
+        *  and removes row of the record from table if ajax call success.
         *************************************************************************/
         _deleteRecordFromServer: function ($row, success, error, url) {
             var self = this;
+
+            var completeDelete = function(data) {
+                if (data.Result != 'OK') {
+                    $row.data('deleting', false);
+                    if (error) {
+                        error(data.Message);
+                    }
+
+                    return;
+                }
+
+                self._trigger("recordDeleted", null, { record: $row.data('record'), row: $row, serverResponse: data });
+
+                if (success) {
+                    success(data);
+                }
+            };
 
             //Check if it is already being deleted right now
             if ($row.data('deleting') == true) {
@@ -340,34 +362,45 @@
 
             var postData = {};
             postData[self._keyField] = self._getKeyValueOfRecord($row.data('record'));
+            
+            //deleteAction may be a function, check if it is
+            if (!url && $.isFunction(self.options.actions.deleteAction)) {
 
-            this._ajax({
-                url: (url || self.options.actions.deleteAction),
-                data: postData,
-                success: function (data) { 
-                    
-                    if (data.Result != 'OK') {
+                //Execute the function
+                var funcResult = self.options.actions.deleteAction(postData);
+
+                //Check if result is a jQuery Deferred object
+                if (self._isDeferredObject(funcResult)) {
+                    //Wait promise
+                    funcResult.done(function (data) {
+                        completeDelete(data);
+                    }).fail(function () {
                         $row.data('deleting', false);
                         if (error) {
-                            error(data.Message);
+                            error(self.options.messages.serverCommunicationError);
                         }
-
-                        return;
-                    }
-
-                    self._trigger("recordDeleted", null, { record: $row.data('record'), row: $row, serverResponse: data });
-
-                    if (success) {
-                        success(data);
-                    }
-                },
-                error: function () {
-                    $row.data('deleting', false);
-                    if (error) {
-                        error(self.options.messages.serverCommunicationError);
-                    }
+                    });
+                } else { //assume it returned the deletion result
+                    completeDelete(funcResult);
                 }
-            });
+
+            } else { //Assume it's a URL string
+                //Make ajax call to delete the record from server
+                this._ajax({
+                    url: (url || self.options.actions.deleteAction),
+                    data: postData,
+                    success: function (data) {
+                        completeDelete(data);
+                    },
+                    error: function () {
+                        $row.data('deleting', false);
+                        if (error) {
+                            error(self.options.messages.serverCommunicationError);
+                        }
+                    }
+                });
+
+            }
         },
 
         /* Removes a row from table after a 'deleting' animation.
@@ -384,7 +417,7 @@
                 if (this.options.jqueryuiTheme) {
                     className = className + ' ui-state-disabled';
                 }
-                
+
                 //Stop current animation (if does exists) and begin 'deleting' animation.
                 $rows.stop(true, true).addClass(className, 'slow', '').promise().done(function () {
                     self._removeRowsFromTable($rows, 'deleted');

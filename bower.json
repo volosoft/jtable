@@ -1,0 +1,35 @@
+{
+  "name": "jtable",
+  "main": [
+    "lib/jquery.jtable.min.js"
+  ],
+  "version": "2.4.0",
+  "authors": [
+    "Halil ibrahim Kalkan <halil@jtable.org>"
+  ],
+  "description": "A JQuery plugin to create AJAX based CRUD tables (grids). It supports paging, sorting, selecting, master/child tables, show/hide/resize columns, localization, themes and more.A JQuery plugin to create AJAX based CRUD tables (grids). It supports paging, sorting, selecting, master/child tables, show/hide/resize columns, localization, themes and more.",
+  "keywords": [
+    "ajax",
+    "table",
+    "grid",
+    "crud",
+    "jtable",
+    "paging",
+    "sorting"
+  ],
+  "license": "MIT",
+  "homepage": "http://www.jtable.org",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "./components",
+    "dev",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": ">=1.9.1",
+    "jqueryui": ">=1.9.2"
+  }
+}

@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
 * CREATE RECORD extension for jTable                                    *
 *************************************************************************/
 (function ($) {
@@ -39,6 +39,11 @@
         *************************************************************************/
         _create: function () {
             base._create.apply(this, arguments);
+
+            if (!this.options.actions.createAction) {
+                return;
+            }
+
             this._createAddRecordDialogDiv();
         },
 
@@ -46,11 +51,6 @@
         *************************************************************************/
         _createAddRecordDialogDiv: function () {
             var self = this;
-
-            //Check if createAction is supplied
-            if (!self.options.actions.createAction) {
-                return;
-            }
 
             //Create a div for dialog and add to container element
             self._$addRecordDiv = $('<div />')
@@ -75,18 +75,12 @@
                             id: 'AddRecordDialogSaveButton',
                             text: self.options.messages.save,
                             click: function () {
-                                var $saveButton = $('#AddRecordDialogSaveButton');
-                                var $addRecordForm = self._$addRecordDiv.find('form');
-
-                                if (self._trigger("formSubmitting", null, { form: $addRecordForm, formType: 'create' }) != false) {
-                                    self._setEnabledOfDialogButton($saveButton, false, self.options.messages.saving);
-                                    self._saveAddRecordForm($addRecordForm, $saveButton);
-                                }
+                                self._onSaveClickedOnCreateForm();
                             }
                         }],
                 close: function () {
                     var $addRecordForm = self._$addRecordDiv.find('form').first();
-                    var $saveButton = $('#AddRecordDialogSaveButton');
+                    var $saveButton = self._$addRecordDiv.parent().find('#AddRecordDialogSaveButton');
                     self._trigger("formClosed", null, { form: $addRecordForm, formType: 'create' });
                     self._setEnabledOfDialogButton($saveButton, true, self.options.messages.save);
                     $addRecordForm.remove();
@@ -112,6 +106,18 @@
             }
         },
 
+        _onSaveClickedOnCreateForm: function () {
+            var self = this;
+
+            var $saveButton = self._$addRecordDiv.parent().find('#AddRecordDialogSaveButton');
+            var $addRecordForm = self._$addRecordDiv.find('form');
+
+            if (self._trigger("formSubmitting", null, { form: $addRecordForm, formType: 'create' }) != false) {
+                self._setEnabledOfDialogButton($saveButton, false, self.options.messages.saving);
+                self._saveAddRecordForm($addRecordForm, $saveButton);
+            }
+        },
+
         /************************************************************************
         * PUBLIC METHODS                                                        *
         *************************************************************************/
@@ -129,7 +135,6 @@
             options = $.extend({
                 clientOnly: false,
                 animationsEnabled: self.options.animationsEnabled,
-                url: self.options.actions.createAction,
                 success: function () { },
                 error: function () { }
             }, options);
@@ -145,41 +150,68 @@
                         isNewRow: true,
                         animationsEnabled: options.animationsEnabled
                     });
-                
+
                 options.success();
                 return;
             }
 
-            self._submitFormUsingAjax(
-                options.url,
-                $.param(options.record),
-                function (data) {
-                    if (data.Result != 'OK') {
-                        self._showError(data.Message);
-                        options.error(data);
-                        return;
-                    }
-                    
-                    if(!data.Record) {
-                        self._logError('Server must return the created Record object.');
-                        options.error(data);
-                        return;
-                    }
+            var completeAddRecord = function (data) {
+                if (data.Result != 'OK') {
+                    self._showError(data.Message);
+                    options.error(data);
+                    return;
+                }
 
-                    self._onRecordAdded(data);
-                    
-                    self._addRow(
-                        self._createRowFromRecord(data.Record), {
-                            isNewRow: true,
-                            animationsEnabled: options.animationsEnabled
-                        });
+                if (!data.Record) {
+                    self._logError('Server must return the created Record object.');
+                    options.error(data);
+                    return;
+                }
 
-                    options.success(data);
-                },
-                function () {
-                    self._showError(self.options.messages.serverCommunicationError);
-                    options.error();
-                });
+                self._onRecordAdded(data);
+                self._addRow(
+                    self._createRowFromRecord(data.Record), {
+                        isNewRow: true,
+                        animationsEnabled: options.animationsEnabled
+                    });
+
+                options.success(data);
+            };
+
+            //createAction may be a function, check if it is
+            if (!options.url && $.isFunction(self.options.actions.createAction)) {
+
+                //Execute the function
+                var funcResult = self.options.actions.createAction($.param(options.record));
+
+                //Check if result is a jQuery Deferred object
+                if (self._isDeferredObject(funcResult)) {
+                    //Wait promise
+                    funcResult.done(function (data) {
+                        completeAddRecord(data);
+                    }).fail(function () {
+                        self._showError(self.options.messages.serverCommunicationError);
+                        options.error();
+                    });
+                } else { //assume it returned the creation result
+                    completeAddRecord(funcResult);
+                }
+
+            } else { //Assume it's a URL string
+
+                //Make an Ajax call to create record
+                self._submitFormUsingAjax(
+                    options.url || self.options.actions.createAction,
+                    $.param(options.record),
+                    function (data) {
+                        completeAddRecord(data);
+                    },
+                    function () {
+                        self._showError(self.options.messages.serverCommunicationError);
+                        options.error();
+                    });
+
+            }
         },
 
         /************************************************************************
@@ -192,7 +224,7 @@
             var self = this;
 
             //Create add new record form
-            var $addRecordForm = $('<form id="jtable-create-form" class="jtable-dialog-form jtable-create-form" action="' + self.options.actions.createAction + '" method="POST"></form>');
+            var $addRecordForm = $('<form id="jtable-create-form" class="jtable-dialog-form jtable-create-form"></form>');
 
             //Create input elements
             for (var i = 0; i < self._fieldList.length; i++) {
@@ -234,6 +266,11 @@
 
             self._makeCascadeDropDowns($addRecordForm, undefined, 'create');
 
+            $addRecordForm.submit(function () {
+                self._onSaveClickedOnCreateForm();
+                return false;
+            });
+
             //Open the form
             self._$addRecordDiv.append($addRecordForm).dialog('open');
             self._trigger("formCreated", null, { form: $addRecordForm, formType: 'create' });
@@ -244,37 +281,62 @@
         _saveAddRecordForm: function ($addRecordForm, $saveButton) {
             var self = this;
 
-            //Make an Ajax call to update record
-            $addRecordForm.data('submitting', true);
-
-            self._submitFormUsingAjax(
-                $addRecordForm.attr('action'),
-                $addRecordForm.serialize(),
-                function (data) {
-                    
-                    if (data.Result != 'OK') {
-                        self._showError(data.Message);
-                        self._setEnabledOfDialogButton($saveButton, true, self.options.messages.save);
-                        return;
-                    }
-                    
-                    if (!data.Record) {
-                        self._logError('Server must return the created Record object.');
-                        self._setEnabledOfDialogButton($saveButton, true, self.options.messages.save);
-                        return;
-                    }
-
-                    self._onRecordAdded(data);
-                    self._addRow(
-                        self._createRowFromRecord(data.Record), {
-                            isNewRow: true
-                        });
-                    self._$addRecordDiv.dialog("close");
-                },
-                function () {
-                    self._showError(self.options.messages.serverCommunicationError);
+            var completeAddRecord = function (data) {
+                if (data.Result != 'OK') {
+                    self._showError(data.Message);
                     self._setEnabledOfDialogButton($saveButton, true, self.options.messages.save);
-                });
+                    return;
+                }
+
+                if (!data.Record) {
+                    self._logError('Server must return the created Record object.');
+                    self._setEnabledOfDialogButton($saveButton, true, self.options.messages.save);
+                    return;
+                }
+
+                self._onRecordAdded(data);
+                self._addRow(
+                    self._createRowFromRecord(data.Record), {
+                        isNewRow: true
+                    });
+                self._$addRecordDiv.dialog("close");
+            };
+
+            $addRecordForm.data('submitting', true); //TODO: Why it's used, can remove? Check it.
+
+            //createAction may be a function, check if it is
+            if ($.isFunction(self.options.actions.createAction)) {
+
+                //Execute the function
+                var funcResult = self.options.actions.createAction($addRecordForm.serialize());
+
+                //Check if result is a jQuery Deferred object
+                if (self._isDeferredObject(funcResult)) {
+                    //Wait promise
+                    funcResult.done(function (data) {
+                        completeAddRecord(data);
+                    }).fail(function () {
+                        self._showError(self.options.messages.serverCommunicationError);
+                        self._setEnabledOfDialogButton($saveButton, true, self.options.messages.save);
+                    });
+                } else { //assume it returned the creation result
+                    completeAddRecord(funcResult);
+                }
+
+            } else { //Assume it's a URL string
+
+                //Make an Ajax call to create record
+                self._submitFormUsingAjax(
+                    self.options.actions.createAction,
+                    $addRecordForm.serialize(),
+                    function (data) {
+                        completeAddRecord(data);
+                    },
+                    function () {
+                        self._showError(self.options.messages.serverCommunicationError);
+                        self._setEnabledOfDialogButton($saveButton, true, self.options.messages.save);
+                    });
+            }
         },
 
         _onRecordAdded: function (data) {

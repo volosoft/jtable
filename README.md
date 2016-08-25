@@ -3,7 +3,9 @@ What is jTable
 
 http://www.jtable.org
 
-jTable is a jQuery plugin that is used to create AJAX based CRUD tables without coding HTML or Javascript. It has several features including:
+[![A screenshot of jTable](https://raw.githubusercontent.com/hikalkan/jtable/master/screenshot.png)](http://jtable.org/)
+
+jTable is a jQuery plugin used to create AJAX based CRUD tables without coding HTML or Javascript. It has several features including:
 
 * Automatically creates HTML table and loads records from server using AJAX.
 * Creates 'create new record' jQueryUI dialog form. When user creates a record, it sends data to server using AJAX and adds the same record to the table in the page.
@@ -26,8 +28,8 @@ jTable is a jQuery plugin that is used to create AJAX based CRUD tables without 
 Notes
 ======
 
-lib folder contains all necessary files to use jTable.
+lib folder contains files necessary to use jTable.
 
-dev folder contains parts of library that can be helpful for development of jTable.
+dev folder contains parts of library helpful for development of jTable.
 
-See http://www.jtable.org for documantation, demos, themes and more...
+See http://www.jtable.org for documentation, demos, themes and more...
