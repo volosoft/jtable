@@ -120,6 +120,10 @@ div.jtable-main-container table.jtable thead th.jtable-column-header div.jtable-
     right: auto;
     left: -8px !important;
 }
+div.jtable-main-container table.jtable thead th.jtable-column-header div.jtable-column-header-container div[dir="rtl"].jtable-column-resize-handler {
+    right: auto;
+    left: -8px !important;
+}
 div.jtable-main-container table.jtable thead th.jtable-command-column-header {
   text-align: center;
 }
