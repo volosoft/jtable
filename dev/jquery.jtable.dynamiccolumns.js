@@ -272,6 +272,8 @@
             
             if (self.options.rtl) {
                 //Create a handler to handle mouse click event
+                self._$mainContainer.parent().attr('dir', "rtl");
+
                 $('<div />')
                     .attr('dir', 'rtl')
                     .addClass('jtable-column-resize-handler')
