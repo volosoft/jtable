@@ -1,0 +1,25 @@
+{
+  "name": "jtable",
+  "version": "2.4.1",
+  "description": "A JQuery plugin to create AJAX based CRUD tables.",
+  "main": "lib/jquery.jtable.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hikalkan/jtable.git"
+  },
+  "keywords": [
+    "ajax",
+    "table",
+    "grid",
+    "crud"
+  ],
+  "author": "Halil ibrahim Kalkan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hikalkan/jtable/issues"
+  },
+  "homepage": "http://jtable.org/"
+}
