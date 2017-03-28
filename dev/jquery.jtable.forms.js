@@ -292,8 +292,8 @@ jQuery.fn.filterByText = function(textbox) {
             //Create select element
             var $filterpan=$('<center></center>').appendTo($containerDiv);
             var $select = $('<select class="' + field.inputClass + '" id="Edit-' + fieldName + '" name="' + fieldName + '"></select>')
-                .appendTo($containerDiv);
-            var $inp=$('<p><input class="' + field.inputClass + '" id="dit-' + fieldName + 'filter" name=' + fieldName + 'filter    onclick="$(\'#Edit-h_type\').filterByText($(\'#dit-h_typefilter\'));"></p>').appendTo($filterpan);
+                .appendTo($filterpan);
+            var $inp=$('<p><input class="' + field.inputClass + '" id="dit-' + fieldName + 'filter" name=' + fieldName + 'filter    onclick="$(\'#Edit-'+ fieldName +'\').filterByText($(\'#dit-'+fieldName+'filter\'));"></p>').appendTo($filterpan);
             //add options
             var options = this._getOptionsForField(fieldName, {
                 record: record,
