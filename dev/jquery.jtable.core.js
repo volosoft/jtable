@@ -715,7 +715,10 @@
                 return this._getDisplayTextForDateRecordField(field, fieldValue);
             } else if (field.type == 'checkbox') {
                 return this._getCheckBoxTextForFieldByValue(fieldName, fieldValue);
-            } else if (field.options) { //combobox or radio button list since there are options.
+            }else if (field.type == 'record-actions') {
+                return this._createRecordActionsDropdown(record, field);
+            }
+             else if (field.options) { //combobox or radio button list since there are options.
                 var options = this._getOptionsForField(fieldName, {
                     record: record,
                     value: fieldValue,

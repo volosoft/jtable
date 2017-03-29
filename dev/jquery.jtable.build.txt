@@ -11,3 +11,4 @@ add jquery.jtable.paging.js
 add jquery.jtable.sorting.js
 add jquery.jtable.dynamiccolumns.js
 add jquery.jtable.masterchild.js
+add jquery.jtable.record-actions.js
