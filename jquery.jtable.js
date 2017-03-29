@@ -4256,7 +4256,7 @@ THE SOFTWARE.
         _createHeaderCellForField: function (fieldName, field) {
             var $headerCell = base._createHeaderCellForField.apply(this, arguments);
             if (this.options.sorting && field.sorting) {
-                this._makeColumnSortable($headerCell, fieldName);
+                this._makeColumnSortable($headerCell, fieldName, field.initialSortingDirection);
             }
 
             return $headerCell;
@@ -4303,7 +4303,7 @@ THE SOFTWARE.
 
         /* Makes a column sortable.
         *************************************************************************/
-        _makeColumnSortable: function ($columnHeader, fieldName) {
+        _makeColumnSortable: function ($columnHeader, fieldName, initialSortingDirection) {
             var self = this;
             
             $columnHeader
@@ -4317,6 +4317,10 @@ THE SOFTWARE.
                     
                     self._sortTableByColumn($columnHeader);
                 });
+
+            if(initialSortingDirection){
+                $columnHeader.addClass('jtable-column-header-sorted-' + initialSortingDirection.toLowerCase());
+            }        
 
             //Set default sorting
             $.each(this._lastSorting, function (sortIndex, sortField) {
