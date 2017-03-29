@@ -714,6 +714,9 @@
                 return field.display({ record: record });
             }
 
+            var extraFieldType = this._findItemByProperty(this._extraFieldTypes, 'type', field.type);
+            if(extraFieldType && extraFieldType.creator){
+                return extraFieldType.creator(record, field);
             }
             else if (field.type == 'date') {
                 return this._getDisplayTextForDateRecordField(field, fieldValue);
