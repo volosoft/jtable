@@ -5,6 +5,7 @@
 
     //Reference to base object members
     var base = {
+        _initializeFields: $.hik.jtable.prototype._initializeFields,
         _onRecordsLoaded: $.hik.jtable.prototype._onRecordsLoaded
     };
 
@@ -14,6 +15,22 @@
         /************************************************************************
         * OVERRIDED METHODS                                                     *
         *************************************************************************/
+
+
+        /* Overrides base method to create sorting array.
+        *************************************************************************/
+        _initializeFields: function () {
+            base._initializeFields.apply(this, arguments);
+            
+            var self = this;
+
+            self._extraFieldTypes.push({
+                type:'record-actions',
+                creator: function(record, field){
+                    return self._createRecordActionsDropdown(record, field);
+                }
+            });
+        },
 
         /* Overrides base method to handle dropdown menu overflow.
         *************************************************************************/
@@ -62,7 +79,7 @@
         * PRIVATE METHODS                                                       *
         *************************************************************************/
 
-        /* Builds the sorting array according to defaultSorting string
+        /* Builds the dropdown actions button according to field definition
         *************************************************************************/
         _createRecordActionsDropdown: function(record, field){
             var self = this;
@@ -111,7 +128,7 @@
 
             if(item.action){
                 $a.click(function(){
-                    item.action(record);
+                    item.action(record, $li.closest('tr'));
                 });
             }
 

@@ -124,6 +124,8 @@ THE SOFTWARE.
 
         _cache: null, //General purpose cache dictionary (object)
 
+        _extraFieldTypes:[],
+
         /************************************************************************
         * CONSTRUCTOR AND INITIALIZATION METHODS                                *
         *************************************************************************/
@@ -189,6 +191,7 @@ THE SOFTWARE.
             this._columnList = [];
             this._fieldList = [];
             this._cache = [];
+            this._extraFieldTypes = [];
         },
 
         /* Fills _fieldList, _columnList arrays and sets _keyField variable.
@@ -740,14 +743,15 @@ THE SOFTWARE.
                 return field.display({ record: record });
             }
 
-            if (field.type == 'date') {
+            var extraFieldType = this._findItemByProperty(this._extraFieldTypes, 'type', field.type);
+            if(extraFieldType && extraFieldType.creator){
+                return extraFieldType.creator(record, field);
+            }
+            else if (field.type == 'date') {
                 return this._getDisplayTextForDateRecordField(field, fieldValue);
             } else if (field.type == 'checkbox') {
                 return this._getCheckBoxTextForFieldByValue(fieldName, fieldValue);
-            }else if (field.type == 'record-actions') {
-                return this._createRecordActionsDropdown(record, field);
-            }
-             else if (field.options) { //combobox or radio button list since there are options.
+            } else if (field.options) { //combobox or radio button list since there are options.
                 var options = this._getOptionsForField(fieldName, {
                     record: record,
                     value: fieldValue,
@@ -778,13 +782,19 @@ THE SOFTWARE.
         /* Finds an option object by given value.
         *************************************************************************/
         _findOptionByValue: function (options, value) {
-            for (var i = 0; i < options.length; i++) {
-                if (options[i].Value == value) {
-                    return options[i];
+            return this._findItemByProperty(options, 'Value', value);
+        },
+
+        /* Finds an option object by given value.
+        *************************************************************************/
+        _findItemByProperty: function (items, key, value) {
+            for (var i = 0; i < items.length; i++) {
+                if (items[i][key] == value) {
+                    return items[i];
                 }
             }
 
-            return {}; //no option found
+            return {}; //no item found
         },
 
         /* Gets text for a date field.
@@ -5032,6 +5042,7 @@ THE SOFTWARE.
 
     //Reference to base object members
     var base = {
+        _initializeFields: $.hik.jtable.prototype._initializeFields,
         _onRecordsLoaded: $.hik.jtable.prototype._onRecordsLoaded
     };
 
@@ -5041,12 +5052,29 @@ THE SOFTWARE.
         /************************************************************************
         * OVERRIDED METHODS                                                     *
         *************************************************************************/
+
+
         /* Overrides base method to create sorting array.
         *************************************************************************/
-        _onRecordsLoaded: function () {
+        _initializeFields: function () {
+            base._initializeFields.apply(this, arguments);
+            
             var self = this;
+
+            self._extraFieldTypes.push({
+                type:'record-actions',
+                creator: function(record, field){
+                    return self._createRecordActionsDropdown(record, field);
+                }
+            });
+        },
+
+        /* Overrides base method to handle dropdown menu overflow.
+        *************************************************************************/
+        _onRecordsLoaded: function () {
             base._onRecordsLoaded.apply(this, arguments);
 
+            var self = this;
             self._$tableBody.find('div.dropdown').on('show.bs.dropdown', function (e) {
                     var $this = $(this);
 
@@ -5054,7 +5082,6 @@ THE SOFTWARE.
                         var $dropdownButton = $this.find('.dropdown-toggle');
                         var $dropdownMenu = $this.find('.dropdown-menu');
 
-                        //we do this here on first attach, so that the element is showing before attaching, which will make the constraints work on load without having to reposition
                         $dropdownMenu.css({
                             'display': 'block'
                         });
@@ -5089,7 +5116,7 @@ THE SOFTWARE.
         * PRIVATE METHODS                                                       *
         *************************************************************************/
 
-        /* Builds the sorting array according to defaultSorting string
+        /* Builds the dropdown actions button according to field definition
         *************************************************************************/
         _createRecordActionsDropdown: function(record, field){
             var self = this;
@@ -5100,11 +5127,14 @@ THE SOFTWARE.
             var $dropdownButton = $('<button></button>')
                                         .html(field.text)
                                         .addClass('dropdown-toggle')
-                                        .addClass(field.cssClass)
                                         .attr('data-toggle','dropdown')
                                         .attr('aria-haspopup','true')
                                         .attr('aria-expanded','true');
                                         
+            if(field.cssClass){
+                $dropdownButton.addClass(field.cssClass);
+            }
+
             var $dropdownItemsContainer = $('<ul></ul>').addClass('dropdown-menu');
             for (var i = 0; i < field.items.length; i++) {
                 var fieldItem = field.items[i];
@@ -5135,7 +5165,7 @@ THE SOFTWARE.
 
             if(item.action){
                 $a.click(function(){
-                    item.action(record);
+                    item.action(record, $li.closest('tr'));
                 });
             }
 
