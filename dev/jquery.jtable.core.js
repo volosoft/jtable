@@ -95,6 +95,8 @@
 
         _cache: null, //General purpose cache dictionary (object)
 
+        _extraFieldTypes:[],
+
         /************************************************************************
         * CONSTRUCTOR AND INITIALIZATION METHODS                                *
         *************************************************************************/
@@ -160,6 +162,7 @@
             this._columnList = [];
             this._fieldList = [];
             this._cache = [];
+            this._extraFieldTypes = [];
         },
 
         /* Fills _fieldList, _columnList arrays and sets _keyField variable.
@@ -711,7 +714,11 @@
                 return field.display({ record: record });
             }
 
-            if (field.type == 'date') {
+            var extraFieldType = this._findItemByProperty(this._extraFieldTypes, 'type', field.type);
+            if(extraFieldType && extraFieldType.creator){
+                return extraFieldType.creator(record, field);
+            }
+            else if (field.type == 'date') {
                 return this._getDisplayTextForDateRecordField(field, fieldValue);
             } else if (field.type == 'checkbox') {
                 return this._getCheckBoxTextForFieldByValue(fieldName, fieldValue);
@@ -746,13 +753,19 @@
         /* Finds an option object by given value.
         *************************************************************************/
         _findOptionByValue: function (options, value) {
-            for (var i = 0; i < options.length; i++) {
-                if (options[i].Value == value) {
-                    return options[i];
+            return this._findItemByProperty(options, 'Value', value);
+        },
+
+        /* Finds an option object by given value.
+        *************************************************************************/
+        _findItemByProperty: function (items, key, value) {
+            for (var i = 0; i < items.length; i++) {
+                if (items[i][key] == value) {
+                    return items[i];
                 }
             }
 
-            return {}; //no option found
+            return {}; //no item found
         },
 
         /* Gets text for a date field.
