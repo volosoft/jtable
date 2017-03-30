@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
 * DYNAMIC COLUMNS extension for jTable                                  *
 * (Show/hide/resize columns)                                            *
 *************************************************************************/
@@ -22,7 +22,8 @@
         options: {
             tableId: undefined,
             columnResizable: true,
-            columnSelectable: true
+            columnSelectable: true,
+            rtl: false
         },
 
         /************************************************************************
@@ -268,9 +269,14 @@
         *************************************************************************/
         _makeColumnResizable: function ($columnHeader) {
             var self = this;
+            
+            if (self.options.rtl) {
+                self._$mainContainer.parent().attr('dir', "rtl");
+            }
 
             //Create a handler to handle mouse click event
             $('<div />')
+                .attr('dir', self.options.rtl ? "rtl": "")
                 .addClass('jtable-column-resize-handler')
                 .appendTo($columnHeader.find('.jtable-column-header-container')) //Append the handler to the column
                 .mousedown(function (downevent) { //handle mousedown event for the handler
@@ -319,7 +325,9 @@
 
                         //Calculate new widths in pixels
                         var mouseChangeX = upevent.pageX - self._currentResizeArgs.mouseStartX;
-                        var currentColumnFinalWidth = self._normalizeNumber(self._currentResizeArgs.currentColumnStartWidth + mouseChangeX, self._currentResizeArgs.minWidth, self._currentResizeArgs.maxWidth);
+                        var currentColumnNewWidth = (self.options.rtl ? self._currentResizeArgs.currentColumnStartWidth - mouseChangeX : self._currentResizeArgs.currentColumnStartWidth + mouseChangeX);
+                        var currentColumnFinalWidth = self._normalizeNumber(columnNewWidth, self._currentResizeArgs.minWidth, self._currentResizeArgs.maxWidth)
+                        //var currentColumnFinalWidth = self._normalizeNumber(self._currentResizeArgs.currentColumnStartWidth + mouseChangeX, self._currentResizeArgs.minWidth, self._currentResizeArgs.maxWidth);
                         var nextColumnFinalWidth = $nextColumnHeader.outerWidth() + (self._currentResizeArgs.currentColumnStartWidth - currentColumnFinalWidth);
 
                         //Calculate widths as percent
