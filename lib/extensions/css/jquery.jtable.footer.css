@@ -1,0 +1,18 @@
+/* FOOTER EXTENSION styles */
+/**************************************************************************/
+div.jtable-main-container table.jtable tfoot {
+    background: url('bg-tfoot.png') repeat-x scroll top left #dddddd;
+    border-top: 1px solid #C8C8C8;
+    border-bottom: 1px solid #C8C8C8;
+}
+div.jtable-main-container table.jtable tfoot th {
+    padding: 4px 3px 4px 6px;
+    border-left: 1px solid #fff;
+    border-right: 1px solid #C8C8C8;
+}
+div.jtable-main-container table.jtable tfoot th:first-child {
+    border-left: none;
+}
+div.jtable-main-container table.jtable tfoot thth:last-child {
+    border-right: none;
+}
