@@ -105,9 +105,20 @@
             if(value != undefined) {
                 $input.val(value);
             }
-            
+
             var displayFormat = field.displayFormat || this.options.defaultDateFormat;
-            $input.datepicker({ dateFormat: displayFormat });
+            var changeMonth = field.changeMonth || this.options.defaultChangeMonth;
+            var changeYear = field.changeYear || this.options.defaultChangeYear;
+            var yearRange = field.yearRange || this.options.defaultYearRange;
+            var maxDate = field.maxDate || this.options.defaultMaxDate;
+
+            $input.datepicker({
+              dateFormat: displayFormat,
+              changeMonth: changeMonth,
+              changeYear: changeYear,
+              yearRange: yearRange,
+              maxDate: maxDate
+            });
             return $('<div />')
                 .addClass('jtable-input jtable-date-input')
                 .append($input);
@@ -120,7 +131,7 @@
             if (value != undefined) {
                 $textArea.val(value);
             }
-            
+
             return $('<div />')
                 .addClass('jtable-input jtable-textarea-input')
                 .append($textArea);
@@ -133,7 +144,7 @@
             if (value != undefined) {
                 $input.val(value);
             }
-            
+
             return $('<div />')
                 .addClass('jtable-input jtable-text-input')
                 .append($input);
@@ -146,7 +157,7 @@
             if (value != undefined) {
                 $input.val(value);
             }
-            
+
             return $('<div />')
                 .addClass('jtable-input jtable-password-input')
                 .append($input);
@@ -236,7 +247,7 @@
 
             return $containerDiv;
         },
-        
+
         /* Fills a dropdown list with given options.
         *************************************************************************/
         _fillDropDownListWithOptions: function ($select, options, value) {
@@ -373,7 +384,7 @@
                     }
 
                     var field = self.options.fields[fieldName];
-                    
+
                     //check if this combobox depends on others
                     if (!field.dependsOn) {
                         return;

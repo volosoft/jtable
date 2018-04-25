@@ -4,7 +4,7 @@
 (function ($) {
 
     var unloadingPage;
-    
+
     $(window).on('beforeunload', function () {
         unloadingPage = true;
     });
@@ -24,6 +24,10 @@
             fields: {},
             animationsEnabled: true,
             defaultDateFormat: 'yy-mm-dd',
+            defaultChangeMonth: false,
+            defaultChangeYear: false,
+            defaultYearRange: 'c-10:c+10',
+            defaultMaxDate: null,
             dialogShowEffect: 'fade',
             dialogHideEffect: 'fade',
             showCloseButton: false,
@@ -119,7 +123,7 @@
             this._createErrorDialogDiv();
             this._addNoDataRow();
 
-            this._cookieKeyPrefix = this._generateCookieKeyPrefix();            
+            this._cookieKeyPrefix = this._generateCookieKeyPrefix();
         },
 
         /* Normalizes some options for all fields (sets default values).
@@ -1186,7 +1190,7 @@
                     jqXHR.abort();
                     return;
                 }
-                
+
                 if (options.error) {
                     options.error(arguments);
                 }
