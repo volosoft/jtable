@@ -1,6 +1,41 @@
-﻿/************************************************************************
+/************************************************************************
 * FORMS extension for jTable (base for edit/create forms)               *
 *************************************************************************/
+
+///////////////////////////////////////////////////////////////
+
+
+jQuery.fn.filterByText = function(textbox) {
+    return this.each(function() {
+        var select = this;
+        var options = [];
+        $(select).find('option').each(function() {
+            options.push({value: $(this).val(), text: $(this).text()});
+        });
+        $(select).data('options', options);
+
+        $(textbox).bind('change keyup', function() {
+            var options = $(select).empty().data('options');
+            var search = $.trim($(this).val());
+            var regex = new RegExp(search,"gi");
+
+            $.each(options, function(i) {
+                var option = options[i];
+                if(option.text.match(regex) !== null) {
+                    $(select).append(
+                        $('<option>').text(option.text).val(option.value)
+                    );
+                }
+            });
+        });
+    });
+};
+
+
+////////////////////////////////////////
+
+
+
 (function ($) {
 
     $.extend(true, $.hik.jtable.prototype, {
@@ -80,7 +115,11 @@
             } else if (field.options) {
                 if (field.type == 'radiobutton') {
                     return this._createRadioButtonListForField(field, fieldName, value, record, formType);
-                } else {
+                }
+                 if (field.type == 'filtered') {
+                    return this._createFilteredDropDownListForField(field, fieldName, value, record, formType);
+                } 
+                else {
                     return this._createDropDownListForField(field, fieldName, value, record, formType, form);
                 }
             } else {
@@ -212,6 +251,8 @@
             return $containerDiv;
         },
 
+        
+        
         /* Creates a drop down list (combobox) input element for a field.
         *************************************************************************/
         _createDropDownListForField: function (field, fieldName, value, record, source, form) {
@@ -224,6 +265,35 @@
             var $select = $('<select class="' + field.inputClass + '" id="Edit-' + fieldName + '" name="' + fieldName + '"></select>')
                 .appendTo($containerDiv);
 
+            //add options
+            var options = this._getOptionsForField(fieldName, {
+                record: record,
+                source: source,
+                form: form,
+                dependedValues: this._createDependedValuesUsingForm(form, field.dependsOn)
+            });
+
+            this._fillDropDownListWithOptions($select, options, value);
+
+            return $containerDiv;
+        },
+        
+        
+        
+        
+        /* Creates a drop down list (combobox) input with filtering option element for a field.
+        *************************************************************************/
+        _createFilteredDropDownListForField: function (field, fieldName, value, record, source, form) {
+
+            //Create a container div
+            var $containerDiv = $('<div />')
+                .addClass('jtable-input jtable-dropdown-input');
+
+            //Create select element
+            var $filterpan=$('<center></center>').appendTo($containerDiv);
+            var $select = $('<select class="' + field.inputClass + '" id="Edit-' + fieldName + '" name="' + fieldName + '"></select>')
+                .appendTo($filterpan);
+            var $inp=$('<p><input class="' + field.inputClass + '" id="dit-' + fieldName + 'filter" name=' + fieldName + 'filter    onclick="$(\'#Edit-'+ fieldName +'\').filterByText($(\'#dit-'+fieldName+'filter\'));"></p>').appendTo($filterpan);
             //add options
             var options = this._getOptionsForField(fieldName, {
                 record: record,
