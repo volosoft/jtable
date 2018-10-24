@@ -810,7 +810,7 @@ THE SOFTWARE.
             try {
                 return this._formatDate(displayFormat, date);
             } catch (e) {
-                return date;    //fieldValue;
+                return date;
             }
         },
 
