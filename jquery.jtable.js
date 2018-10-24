@@ -51,6 +51,7 @@ THE SOFTWARE.
             //Options
             actions: {},
             fields: {},
+            fieldOrder: [],
             animationsEnabled: true,
             defaultDateFormat: 'yy-mm-dd',
             dialogShowEffect: 'fade',
@@ -199,21 +200,31 @@ THE SOFTWARE.
         _createFieldAndColumnList: function () {
             var self = this;
 
-            $.each(self.options.fields, function (name, props) {
-
-                //Add field to the field list
-                self._fieldList.push(name);
-
-                //Check if this field is the key field
-                if (props.key == true) {
-                    self._keyField = name;
+            //fill columnList according to order
+            $.each(self.options.fieldOrder,
+                function (index, value) {
+                    if (value in self.options.fields) {
+                        self._columnList.push(value);
+                    }
                 }
+            );
+            
+            //fill rest of columns, if not part of fieldOrder already
+            $.each(self.options.fields,
+                function (name, props)
+                {
+                    self._fieldList.push(name);
+                    if (props.key == true) {
+                        self._keyField = name;
+                    }
 
-                //Add field to column list if it is shown in the table
-                if (props.list != false && props.type != 'hidden') {
-                    self._columnList.push(name);
+                    if (props.list != false && props.type != 'hidden') {
+                        if ($.inArray(name, self._columnList) == -1) {
+                            self._columnList.push(name);
+                        }
+                    }
                 }
-            });
+            );
         },
 
         /* Creates the main container div.
