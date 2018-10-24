@@ -33,7 +33,7 @@ THE SOFTWARE.
 (function ($) {
 
     var unloadingPage;
-    
+
     $(window).on('beforeunload', function () {
         unloadingPage = true;
     });
@@ -51,9 +51,12 @@ THE SOFTWARE.
             //Options
             actions: {},
             fields: {},
-            fieldOrder: [],
             animationsEnabled: true,
             defaultDateFormat: 'yy-mm-dd',
+            defaultChangeMonth: false,
+            defaultChangeYear: false,
+            defaultYearRange: 'c-10:c+10',
+            defaultMaxDate: null,
             dialogShowEffect: 'fade',
             dialogHideEffect: 'fade',
             showCloseButton: false,
@@ -149,7 +152,7 @@ THE SOFTWARE.
             this._createErrorDialogDiv();
             this._addNoDataRow();
 
-            this._cookieKeyPrefix = this._generateCookieKeyPrefix();            
+            this._cookieKeyPrefix = this._generateCookieKeyPrefix();
         },
 
         /* Normalizes some options for all fields (sets default values).
@@ -200,31 +203,21 @@ THE SOFTWARE.
         _createFieldAndColumnList: function () {
             var self = this;
 
-            //fill columnList according to order
-            $.each(self.options.fieldOrder,
-                function (index, value) {
-                    if (value in self.options.fields) {
-                        self._columnList.push(value);
-                    }
-                }
-            );
-            
-            //fill rest of columns, if not part of fieldOrder already
-            $.each(self.options.fields,
-                function (name, props)
-                {
-                    self._fieldList.push(name);
-                    if (props.key == true) {
-                        self._keyField = name;
-                    }
+            $.each(self.options.fields, function (name, props) {
 
-                    if (props.list != false && props.type != 'hidden') {
-                        if ($.inArray(name, self._columnList) == -1) {
-                            self._columnList.push(name);
-                        }
-                    }
+                //Add field to the field list
+                self._fieldList.push(name);
+
+                //Check if this field is the key field
+                if (props.key == true) {
+                    self._keyField = name;
                 }
-            );
+
+                //Add field to column list if it is shown in the table
+                if (props.list != false && props.type != 'hidden') {
+                    self._columnList.push(name);
+                }
+            });
         },
 
         /* Creates the main container div.
@@ -817,15 +810,14 @@ THE SOFTWARE.
 
             var displayFormat = field.displayFormat || this.options.defaultDateFormat;
             var date = this._parseDate(fieldValue);
-            // Gp - if an error occur, return a format error
             try {
                 return this._formatDate(displayFormat, date);
             } catch (e) {
                 return date;
             }
         },
-
-        /* Format the date/time field.
+        
+         /* Format the date/time field.
         *************************************************************************/
         _formatDate: function (format, date) {
 
@@ -1043,7 +1035,6 @@ THE SOFTWARE.
                         parseInt(dateString.substr(14, 2), 10),
                         parseInt(dateString.substr(17, 2), 10)
                     );
-                // added by Gp
                 } else if (dateString.indexOf('T') > 0) { //Format: ISO 8601 2009-10-15T14:42:51
                     var dtstr = dateString.replace(/\D/g, " ");
                     var dtcomps = dtstr.split(" ");
@@ -1282,7 +1273,7 @@ THE SOFTWARE.
                     jqXHR.abort();
                     return;
                 }
-                
+
                 if (options.error) {
                     options.error(arguments);
                 }
@@ -1667,9 +1658,20 @@ THE SOFTWARE.
             if(value != undefined) {
                 $input.val(value);
             }
-            
+
             var displayFormat = field.displayFormat || this.options.defaultDateFormat;
-            $input.datepicker({ dateFormat: displayFormat });
+            var changeMonth = field.changeMonth || this.options.defaultChangeMonth;
+            var changeYear = field.changeYear || this.options.defaultChangeYear;
+            var yearRange = field.yearRange || this.options.defaultYearRange;
+            var maxDate = field.maxDate || this.options.defaultMaxDate;
+
+            $input.datepicker({
+              dateFormat: displayFormat,
+              changeMonth: changeMonth,
+              changeYear: changeYear,
+              yearRange: yearRange,
+              maxDate: maxDate
+            });
             return $('<div />')
                 .addClass('jtable-input jtable-date-input')
                 .append($input);
@@ -1682,7 +1684,7 @@ THE SOFTWARE.
             if (value != undefined) {
                 $textArea.val(value);
             }
-            
+
             return $('<div />')
                 .addClass('jtable-input jtable-textarea-input')
                 .append($textArea);
@@ -1695,7 +1697,7 @@ THE SOFTWARE.
             if (value != undefined) {
                 $input.val(value);
             }
-            
+
             return $('<div />')
                 .addClass('jtable-input jtable-text-input')
                 .append($input);
@@ -1708,7 +1710,7 @@ THE SOFTWARE.
             if (value != undefined) {
                 $input.val(value);
             }
-            
+
             return $('<div />')
                 .addClass('jtable-input jtable-password-input')
                 .append($input);
@@ -1798,7 +1800,7 @@ THE SOFTWARE.
 
             return $containerDiv;
         },
-        
+
         /* Fills a dropdown list with given options.
         *************************************************************************/
         _fillDropDownListWithOptions: function ($select, options, value) {
@@ -1935,7 +1937,7 @@ THE SOFTWARE.
                     }
 
                     var field = self.options.fields[fieldName];
-                    
+
                     //check if this combobox depends on others
                     if (!field.dependsOn) {
                         return;
