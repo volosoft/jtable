@@ -1,6 +1,6 @@
 {
   "name": "jtable",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "description": "A JQuery plugin to create AJAX based CRUD tables.",
   "main": "lib/jquery.jtable.js",
   "scripts": {

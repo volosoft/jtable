@@ -11,7 +11,7 @@
 		"paging",
 		"sorting"
     ],
-    "version": "2.5.0",
+    "version": "2.6.0",
     "author": {
         "name": "Halil ibrahim Kalkan",
 		"email": "halil@jtable.org",
@@ -30,7 +30,7 @@
             "url": "http://en.wikipedia.org/wiki/MIT_License"
         }
     ],
-    "bugs": "https://github.com/hikalkan/jtable/issues",
+    "bugs": "https://github.com/volosoft/jtable/issues",
     "homepage": "http://www.jtable.org",
     "docs": "http://jtable.org/Home/Documents",
     "download": "http://jtable.org/Home/Downloads",

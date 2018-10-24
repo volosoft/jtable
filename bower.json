@@ -3,7 +3,7 @@
   "main": [
     "lib/jquery.jtable.min.js"
   ],
-  "version": "2.5.0",
+  "version": "2.6.0",
   "authors": [
     "Halil ibrahim Kalkan <hi_kalkan@yahoo.com>"
   ],
