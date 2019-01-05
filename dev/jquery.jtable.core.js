@@ -22,6 +22,7 @@
             //Options
             actions: {},
             fields: {},
+			security: { antiforgerytoken: null},
             animationsEnabled: true,
             defaultDateFormat: 'yy-mm-dd',
             dialogShowEffect: 'fade',
@@ -107,7 +108,8 @@
             this._normalizeFieldsOptions();
             this._initializeFields();
             this._createFieldAndColumnList();
-
+			this._addAntiforgeryToken();
+			
             //Creating DOM elements
             this._createMainContainer();
             this._createTableTitle();
@@ -117,9 +119,17 @@
             this._createErrorDialogDiv();
             this._addNoDataRow();
 
-            this._cookieKeyPrefix = this._generateCookieKeyPrefix();            
+            this._cookieKeyPrefix = this._generateCookieKeyPrefix(); 			
         },
-
+		/* Adds antiforgery token for MVC razor pages. to prevent cross-site request forgery by adding token to ajax call header
+        *************************************************************************/
+       _addAntiforgeryToken: function () {
+           var self = this;           
+           if (self.options.security.antiforgerytoken !== null ) {
+               var headerobj = JSON.parse('{ "RequestVerificationToken":"' + self.options.security.antiforgerytoken + '" }');
+               self.options.ajaxSettings.headers = headerobj;   
+           }                
+        },
         /* Normalizes some options for all fields (sets default values).
         *************************************************************************/
         _normalizeFieldsOptions: function () {
