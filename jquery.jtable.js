@@ -33,7 +33,7 @@ THE SOFTWARE.
 (function ($) {
 
     var unloadingPage;
-    
+
     $(window).on('beforeunload', function () {
         unloadingPage = true;
     });
@@ -53,6 +53,10 @@ THE SOFTWARE.
             fields: {},
             animationsEnabled: true,
             defaultDateFormat: 'yy-mm-dd',
+            defaultChangeMonth: false,
+            defaultChangeYear: false,
+            defaultYearRange: 'c-10:c+10',
+            defaultMaxDate: null,
             dialogShowEffect: 'fade',
             dialogHideEffect: 'fade',
             showCloseButton: false,
@@ -148,7 +152,7 @@ THE SOFTWARE.
             this._createErrorDialogDiv();
             this._addNoDataRow();
 
-            this._cookieKeyPrefix = this._generateCookieKeyPrefix();            
+            this._cookieKeyPrefix = this._generateCookieKeyPrefix();
         },
 
         /* Normalizes some options for all fields (sets default values).
@@ -806,7 +810,44 @@ THE SOFTWARE.
 
             var displayFormat = field.displayFormat || this.options.defaultDateFormat;
             var date = this._parseDate(fieldValue);
-            return $.datepicker.formatDate(displayFormat, date);
+            try {
+                return this._formatDate(displayFormat, date);
+            } catch (e) {
+                return date;
+            }
+        },
+        
+         /* Format the date/time field.
+        *************************************************************************/
+        _formatDate: function (format, date) {
+
+            var pad = function (n, width, z) {
+                z = z || '0';
+                n = n + '';
+                return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+            };
+
+            format = format.replace('ss', pad(date.getSeconds(), 2));
+            format = format.replace('s', date.getSeconds());
+            format = format.replace('dd', pad(date.getDate(), 2));
+            format = format.replace('d', date.getDate());
+            format = format.replace('mm', pad(date.getMinutes(), 2));
+            format = format.replace('m', date.getMinutes());
+            //format = format.replace('MMMM', monthNames[date.getMonth()]);
+            //format = format.replace('MMM', monthNames[date.getMonth()].substring(0, 3));
+            format = format.replace('MM', pad(date.getMonth() + 1, 2));
+            format = format.replace(/M(?![ao])/, date.getMonth() + 1);
+            //format = format.replace('DD', Days[date.getDay()]);
+            //format = format.replace(/D(?!e)/, Days[date.getDay()].substring(0, 3));
+            format = format.replace('yyyy', date.getFullYear());
+            format = format.replace('YYYY', date.getFullYear());
+            format = format.replace('yy', (date.getFullYear() + "").substring(2));
+            format = format.replace('YY', (date.getFullYear() + "").substring(2));
+            format = format.replace('HH', pad(date.getHours(), 2));
+            format = format.replace('H', date.getHours());
+            format = format.replace('hh', pad(date.getHours(), 2));
+            format = format.replace('h', date.getHours());
+            return format;
         },
 
         /* Gets options for a field according to user preferences.
@@ -971,29 +1012,46 @@ THE SOFTWARE.
         *  /Date(1320259705710)/
         *  2011-01-01 20:32:42 (YYYY-MM-DD HH:MM:SS)
         *  2011-01-01 (YYYY-MM-DD)
+        *  2011-10-15T14:42:51 (ISO 8601)
         *************************************************************************/
         _parseDate: function (dateString) {
-            if (dateString.indexOf('Date') >= 0) { //Format: /Date(1320259705710)/
-                return new Date(
-                    parseInt(dateString.substr(6), 10)
-                );
-            } else if (dateString.length == 10) { //Format: 2011-01-01
-                return new Date(
-                    parseInt(dateString.substr(0, 4), 10),
-                    parseInt(dateString.substr(5, 2), 10) - 1,
-                    parseInt(dateString.substr(8, 2), 10)
-                );
-            } else if (dateString.length == 19) { //Format: 2011-01-01 20:32:42
-                return new Date(
-                    parseInt(dateString.substr(0, 4), 10),
-                    parseInt(dateString.substr(5, 2), 10) - 1,
-                    parseInt(dateString.substr(8, 2), 10),
-                    parseInt(dateString.substr(11, 2), 10),
-                    parseInt(dateString.substr(14, 2), 10),
-                    parseInt(dateString.substr(17, 2), 10)
-                );
-            } else {
-                this._logWarn('Given date is not properly formatted: ' + dateString);
+            try {
+                if (dateString.indexOf('Date') >= 0) { //Format: /Date(1320259705710)/
+                    return new Date(
+                        parseInt(dateString.substr(6), 10)
+                    );
+                } else if (dateString.length == 10) { //Format: 2011-01-01
+                    return new Date(
+                        parseInt(dateString.substr(0, 4), 10),
+                        parseInt(dateString.substr(5, 2), 10) - 1,
+                        parseInt(dateString.substr(8, 2), 10)
+                    );
+                } else if (dateString.length == 19) { //Format: 2011-01-01 20:32:42
+                    return new Date(
+                        parseInt(dateString.substr(0, 4), 10),
+                        parseInt(dateString.substr(5, 2), 10) - 1,
+                        parseInt(dateString.substr(8, 2), 10),
+                        parseInt(dateString.substr(11, 2), 10),
+                        parseInt(dateString.substr(14, 2), 10),
+                        parseInt(dateString.substr(17, 2), 10)
+                    );
+                } else if (dateString.indexOf('T') > 0) { //Format: ISO 8601 2009-10-15T14:42:51
+                    var dtstr = dateString.replace(/\D/g, " ");
+                    var dtcomps = dtstr.split(" ");
+                    dtcomps[1]--;   // modify month between 1 based ISO 8601 and zero based Date
+                    return new Date(
+                        Date.UTC(
+                            dtcomps[0],
+                            dtcomps[1],
+                            dtcomps[2],
+                            dtcomps[3],
+                            dtcomps[4],
+                            dtcomps[5]));
+                } else {
+                    throw 'Given date is not properly formatted: ' + dateString;
+                }
+            } catch (e) {
+                this._logWarn(e);
                 return 'format error!';
             }
         },
@@ -1215,7 +1273,7 @@ THE SOFTWARE.
                     jqXHR.abort();
                     return;
                 }
-                
+
                 if (options.error) {
                     options.error(arguments);
                 }
@@ -1600,9 +1658,20 @@ THE SOFTWARE.
             if(value != undefined) {
                 $input.val(value);
             }
-            
+
             var displayFormat = field.displayFormat || this.options.defaultDateFormat;
-            $input.datepicker({ dateFormat: displayFormat });
+            var changeMonth = field.changeMonth || this.options.defaultChangeMonth;
+            var changeYear = field.changeYear || this.options.defaultChangeYear;
+            var yearRange = field.yearRange || this.options.defaultYearRange;
+            var maxDate = field.maxDate || this.options.defaultMaxDate;
+
+            $input.datepicker({
+              dateFormat: displayFormat,
+              changeMonth: changeMonth,
+              changeYear: changeYear,
+              yearRange: yearRange,
+              maxDate: maxDate
+            });
             return $('<div />')
                 .addClass('jtable-input jtable-date-input')
                 .append($input);
@@ -1615,7 +1684,7 @@ THE SOFTWARE.
             if (value != undefined) {
                 $textArea.val(value);
             }
-            
+
             return $('<div />')
                 .addClass('jtable-input jtable-textarea-input')
                 .append($textArea);
@@ -1628,7 +1697,7 @@ THE SOFTWARE.
             if (value != undefined) {
                 $input.val(value);
             }
-            
+
             return $('<div />')
                 .addClass('jtable-input jtable-text-input')
                 .append($input);
@@ -1641,7 +1710,7 @@ THE SOFTWARE.
             if (value != undefined) {
                 $input.val(value);
             }
-            
+
             return $('<div />')
                 .addClass('jtable-input jtable-password-input')
                 .append($input);
@@ -1731,7 +1800,7 @@ THE SOFTWARE.
 
             return $containerDiv;
         },
-        
+
         /* Fills a dropdown list with given options.
         *************************************************************************/
         _fillDropDownListWithOptions: function ($select, options, value) {
@@ -1868,7 +1937,7 @@ THE SOFTWARE.
                     }
 
                     var field = self.options.fields[fieldName];
-                    
+
                     //check if this combobox depends on others
                     if (!field.dependsOn) {
                         return;

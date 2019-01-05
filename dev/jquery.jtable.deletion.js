@@ -98,6 +98,7 @@
                                         self._$deleteRecordDiv.dialog('close');
                                     },
                                     function (message) { //error
+                                        self._$deleteRecordDiv.dialog('close');
                                         self._showError(message);
                                         self._setEnabledOfDialogButton($deleteButton, true, self.options.messages.deleteText);
                                     }
