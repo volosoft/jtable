@@ -29,6 +29,8 @@
             pageSizes: [10, 25, 50, 100, 250, 500],
             pageSizeChangeArea: true,
             gotoPageArea: 'combobox', //possible values: 'textbox', 'combobox', 'none'
+            pageSizeParam: 'jtPageSize',
+            startIndexParam: 'jtStartIndex',
 
             messages: {
                 pagingInfo: 'Showing {0}-{1} of {2}',
@@ -326,8 +328,8 @@
             var jtParams = base._createJtParamsForLoading.apply(this, arguments);
             
             if (this.options.paging) {
-                jtParams.jtStartIndex = (this._currentPageNo - 1) * this.options.pageSize;
-                jtParams.jtPageSize = this.options.pageSize;
+                jtParams[this.options.startIndexParam] = (this._currentPageNo - 1) * this.options.pageSize;
+                jtParams[this.options.pageSizeParam] = this.options.pageSize;
             }
 
             return jtParams;
@@ -388,7 +390,7 @@
         * PRIVATE METHODS                                                       *
         *************************************************************************/
 
-        /* Adds jtStartIndex and jtPageSize parameters to a URL as query string.
+        /* Adds startIndexParam and pageSizeParam parameters (old jtStartIndex and jtPageSize) to a URL as query string.
         *************************************************************************/
         _addPagingInfoToUrl: function (url, pageNumber) {
             if (!this.options.paging) {
@@ -398,7 +400,7 @@
             var jtStartIndex = (pageNumber - 1) * this.options.pageSize;
             var jtPageSize = this.options.pageSize;
 
-            return (url + (url.indexOf('?') < 0 ? '?' : '&') + 'jtStartIndex=' + jtStartIndex + '&jtPageSize=' + jtPageSize);
+            return (url + (url.indexOf('?') < 0 ? '?' : '&') + this.options.startIndexParam + '=' + jtStartIndex + '&' + this.options.pageSizeParam + '=' + jtPageSize);
         },
 
         /* Creates and shows the page list.
