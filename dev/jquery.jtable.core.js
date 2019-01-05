@@ -1086,6 +1086,12 @@
                     .html(item.text)
                     .addClass('jtable-toolbar-item-text').appendTo($toolBarItem);
             }
+            
+            //visible property
+            if (item.visible == false) {
+                $toolBarItem
+                    .css('display', 'none');
+            }
 
             //click event
             if (item.click) {
