@@ -106,7 +106,7 @@
         *************************************************************************/
         _makeColumnSortable: function ($columnHeader, fieldName, initialSortingDirection) {
             var self = this;
-            
+
             $columnHeader
                 .addClass('jtable-column-header-sortable')
                 .click(function (e) {
@@ -115,7 +115,7 @@
                     if (!self.options.multiSorting || !e.ctrlKey) {
                         self._lastSorting = []; //clear previous sorting
                     }
-                    
+
                     self._sortTableByColumn($columnHeader);
                 });
 
@@ -150,20 +150,15 @@
                 }
             }
 
-            //Sort ASC or DESC according to current sorting state
-            if ($columnHeader.hasClass('jtable-column-header-sorted-asc')) {
-                $columnHeader.removeClass('jtable-column-header-sorted-asc').addClass('jtable-column-header-sorted-desc');
-                this._lastSorting.push({
-                    'fieldName': $columnHeader.data('fieldName'),
-                    sortOrder: 'DESC'
-                });
-            } else {
-                $columnHeader.removeClass('jtable-column-header-sorted-desc').addClass('jtable-column-header-sorted-asc');
-                this._lastSorting.push({
-                    'fieldName': $columnHeader.data('fieldName'),
-                    sortOrder: 'ASC'
-                });
-            }
+            //Sort ASC or DESC according to current firstSort state on the field
+			var sortTo = 'ASC';
+			if ($columnHeader.data('firstSort') == 'ASC') {
+				// DEFAULT TO ASC unless already ASC
+				sortTo = ($columnHeader.hasClass('jtable-column-header-sorted-asc')) ? 'DESC' : 'ASC';
+			} else {
+				// DEFAULT TO DESC unless already DESC
+				sortTo = ($columnHeader.hasClass('jtable-column-header-sorted-desc')) ? 'ASC' : 'DESC';
+			}
 
             //Load current page again
             this._reloadTable();

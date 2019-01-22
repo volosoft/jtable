@@ -291,6 +291,7 @@
         *************************************************************************/
         _createHeaderCellForField: function (fieldName, field) {
             field.width = field.width || '10%'; //default column width: 10%.
+            field.firstSort = field.firstSort 	|| 'ASC'; //default to ASC sorting columns unless firstSort: DESC
 
             var $headerTextSpan = $('<span />')
                 .addClass('jtable-column-header-text')
@@ -305,6 +306,7 @@
                 .addClass(field.listClass)
                 .css('width', field.width)
                 .data('fieldName', fieldName)
+                .data('firstSort', field.firstSort)
                 .append($headerContainerDiv);
 
             this._jqueryuiThemeAddClass($th, 'ui-state-default');
