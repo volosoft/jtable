@@ -10,7 +10,7 @@
         *************************************************************************/
 
         /* Submits a form asynchronously using AJAX.
-        *  This method is needed, since form submitting logic can be overrided
+        *  This method is needed, since form submitting logic can be overridden
         *  by extensions.
         *************************************************************************/
         _submitFormUsingAjax: function (url, formData, success, error) {
@@ -137,7 +137,7 @@
                 .append($textArea);
         },
 
-        /* Creates a standart textbox for a field.
+        /* Creates a standard text input for a field.
         *************************************************************************/
         _createTextInputForField: function (field, fieldName, value) {
             var $input = $('<input class="' + field.inputClass + '" placeholder="' + field.placeholder + '" id="Edit-' + fieldName + '" type="text" name="' + fieldName + '"></input>');
@@ -163,7 +163,7 @@
                 .append($input);
         },
 
-        /* Creates a checkboxfor a field.
+        /* Creates a checkbox for a field.
         *************************************************************************/
         _createCheckboxForField: function (field, fieldName, value) {
             var self = this;
@@ -190,7 +190,7 @@
 
             //Check the checkbox if it's value is checked-value
             if (self._getIsCheckBoxSelectedForFieldByValue(fieldName, value)) {
-                $checkBox.attr('checked', 'checked');
+                $checkBox.prop('checked', true);
             }
 
             //This method sets checkbox's value and text according to state of the checkbox
@@ -211,9 +211,9 @@
                     .addClass('jtable-option-text-clickable')
                     .click(function () {
                         if ($checkBox.is(':checked')) {
-                            $checkBox.attr('checked', false);
+                            $checkBox.prop('checked', false);
                         } else {
-                            $checkBox.attr('checked', true);
+                            $checkBox.prop('checked', true);
                         }
 
                         refreshCheckBoxValueAndText();
