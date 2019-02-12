@@ -28,7 +28,11 @@
             selectOnRowClick: true,
 
             //Events
-            selectionChanged: function (event, data) { }
+            selectionChanged: function (event, data) { },
+            beforeRowSelected: function (event, $row) { },
+            rowSelected: function (event, $row) { },
+            beforeRowDeselected: function (event, $row) { },
+            rowDeselected: function (event, $row) { }
         },
 
         /************************************************************************
@@ -91,6 +95,13 @@
         *************************************************************************/
         selectRows: function ($rows) {
             this._selectRows($rows);
+            this._onSelectionChanged(); //TODO: trigger only if selected rows changes?
+        },
+
+        /* Deselect row/rows
+        *************************************************************************/
+        deselectRows: function ($rows) {
+            this._deselectRows($rows);
             this._onSelectionChanged(); //TODO: trigger only if selected rows changes?
         },
 
@@ -322,6 +333,22 @@
         /* Makes row/rows 'selected'.
         *************************************************************************/
         _selectRows: function ($rows) {
+            $allRows = $rows;
+            $rows = $rows.filter(function (key, row) {
+              var $row = $(row);
+              var isSelected = $row.hasClass('jtable-row-selected');
+              if (
+                   this._onBeforeRowSelected($row) === false
+                || isSelected
+              ) {
+                if (!isSelected) {
+                  $row.find('>td.jtable-selecting-column >input').prop('checked', false);
+                }
+                return false;
+              }
+              return true;
+            }.bind(this));
+
             if (!this.options.multiselect) {
                 this._deselectRows(this._getSelectedRows());
             }
@@ -334,17 +361,45 @@
             }
 
             this._refreshSelectAllCheckboxState();
+
+            $rows.each(function (key, row) {
+              this._onRowSelected($(row));
+            }.bind(this));
+
+            return $rows;
         },
 
         /* Makes row/rows 'non selected'.
         *************************************************************************/
         _deselectRows: function ($rows) {
+            $allRows = $rows;
+            $rows = $rows.filter(function (key, row) {
+              var $row = $(row);
+              var isSelected = $row.hasClass('jtable-row-selected');
+              if (
+                   this._onBeforeRowDeselected($(row)) === false
+                || !isSelected
+              ) {
+                if (isSelected) {
+                  $row.find('>td.jtable-selecting-column >input').prop('checked', true);
+                }
+                return false;
+              }
+              return true;
+            }.bind(this));
+
             $rows.removeClass('jtable-row-selected ui-state-highlight');
             if (this.options.selectingCheckboxes) {
                 $rows.find('>td.jtable-selecting-column >input').prop('checked', false);
             }
 
             this._refreshSelectAllCheckboxState();
+
+            $rows.each(function (key, row) {
+              this._onRowDeselected($(row));
+            }.bind(this));
+
+            return $rows;
         },
 
         /* Updates state of the 'select/deselect' all checkbox according to count of selected rows.
@@ -359,12 +414,12 @@
 
             if (selectedRowCount == 0) {
                 this._$selectAllCheckbox.prop('indeterminate', false);
-                this._$selectAllCheckbox.attr('checked', false);
+                this._$selectAllCheckbox.prop('checked', false);
             } else if (selectedRowCount == totalRowCount) {
-                this._$selectAllCheckbox.prop('indeterminate', false);
-                this._$selectAllCheckbox.attr('checked', true);
+              this._$selectAllCheckbox.prop('indeterminate', false);
+              this._$selectAllCheckbox.prop('checked', true);
             } else {
-                this._$selectAllCheckbox.attr('checked', false);
+                this._$selectAllCheckbox.prop('checked', false);
                 this._$selectAllCheckbox.prop('indeterminate', true);
             }
         },
@@ -375,6 +430,22 @@
 
         _onSelectionChanged: function () {
             this._trigger("selectionChanged", null, {});
+        },
+
+        _onBeforeRowSelected: function ($row) {
+          return this._trigger("beforeRowSelected", null, $row);
+        },
+
+        _onRowSelected: function ($row) {
+          return this._trigger("rowSelected", null, $row);
+        },
+
+        _onBeforeRowDeselected: function ($row) {
+          return this._trigger("beforeRowDeselected", null, $row);
+        },
+
+        _onRowDeselected: function ($row) {
+          return this._trigger("rowDeselected", null, $row);
         }
 
     });
