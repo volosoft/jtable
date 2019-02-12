@@ -62,6 +62,7 @@
 
             //Prepare dialog
             self._$editDiv.dialog({
+                appendTo: self._$mainContainer,
                 autoOpen: false,
                 show: self.options.dialogShowEffect,
                 hide: self.options.dialogHideEffect,

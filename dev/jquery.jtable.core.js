@@ -346,6 +346,7 @@
 
             self._$errorDialogDiv = $('<div></div>').appendTo(self._$mainContainer);
             self._$errorDialogDiv.dialog({
+                appendTo: self._$mainContainer,
                 autoOpen: false,
                 show: self.options.dialogShowEffect,
                 hide: self.options.dialogHideEffect,
