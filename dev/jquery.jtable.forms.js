@@ -127,7 +127,7 @@
         /* Creates a textarea element for a field.
         *************************************************************************/
         _createTextAreaForField: function (field, fieldName, value) {
-            var $textArea = $('<textarea class="' + field.inputClass + '" id="Edit-' + fieldName + '" name="' + fieldName + '"></textarea>');
+            var $textArea = $('<textarea class="' + field.inputClass + '" placeholder="' + field.placeholder + '" id="Edit-' + fieldName + '" name="' + fieldName + '"></textarea>');
             if (value != undefined) {
                 $textArea.val(value);
             }
