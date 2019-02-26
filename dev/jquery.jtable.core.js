@@ -411,6 +411,11 @@
         /* Performs an AJAX call to reload data of the table.
         *************************************************************************/
         _reloadTable: function (completeCallback) {
+            for(var key in data) {
+                data[key.charAt(0).toUpperCase() + key.slice(1).toLowerCase()] = data[key];
+                delete(data[key]);
+            }
+    
             var self = this;
 
             var completeReload = function(data) {
