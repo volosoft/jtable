@@ -181,7 +181,12 @@
                 sorting.push(value.fieldName + ' ' + value.sortOrder);
             });
 
+            if (this.options.ajaxSettings.type == 'POST') {
+				$.extend(this._lastPostData, {'jtSorting': sorting.join(',') });
+                return url;
+            }
             return (url + (url.indexOf('?') < 0 ? '?' : '&') + 'jtSorting=' + sorting.join(","));
+
         },
 
         /* Overrides _createJtParamsForLoading method to add sorging parameters to jtParams object.

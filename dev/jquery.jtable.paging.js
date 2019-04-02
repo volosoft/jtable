@@ -398,7 +398,12 @@
             var jtStartIndex = (pageNumber - 1) * this.options.pageSize;
             var jtPageSize = this.options.pageSize;
 
+            if (this.options.ajaxSettings.type == 'POST') {
+				$.extend(this._lastPostData, {'jtStartIndex': jtStartIndex, 'jtPageSize': jtPageSize });
+                return url;
+            }
             return (url + (url.indexOf('?') < 0 ? '?' : '&') + 'jtStartIndex=' + jtStartIndex + '&jtPageSize=' + jtPageSize);
+
         },
 
         /* Creates and shows the page list.
