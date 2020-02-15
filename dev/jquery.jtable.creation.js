@@ -225,7 +225,7 @@
 
             //Create add new record form
             var $addRecordForm = $('<form id="jtable-create-form" class="jtable-dialog-form jtable-create-form"></form>');
-			var ColumnCount=self.options.formDialogColumns ? self.options.formDialogColumns : 1;
+			var ColumnCount=self.options.createFormColumns ? self.options.createFormColumns : 1;
 			var CurrentColumnCount=0;
 			var $CreateFormTable = $('<table class="jtable-input-field-container-grid"/>').appendTo($addRecordForm);
 			var $RowContainer = $('<tr class="jtable-input-field-container-row" />').appendTo($CreateFormTable);
