@@ -364,8 +364,7 @@
             var postData = {};
             postData[self._keyField] = self._getKeyValueOfRecord($row.data('record'));
             
-            
-            //Add additonal field to delete request POST 
+            //Add additional field to delete request POST 
             for (var i = 0; i < this._fieldList.length; i++) {
                 var fieldName = this._fieldList[i];
                 var field = this.options.fields[fieldName];
@@ -383,11 +382,6 @@
                 //Add field to postData to be sent to server
                 postData[fieldName] = $row.data('record')[fieldName];
             }
-            
-            
-            
-            
-            
             
             //deleteAction may be a function, check if it is
             if (!url && $.isFunction(self.options.actions.deleteAction)) {
