@@ -371,7 +371,7 @@
                 var field = this.options.fields[fieldName];
 
                 //Do not send this field to server if field delete option is not true
-                if (!field.delete) {
+                if (field.delete == false) {
                     continue;
                 }
 
