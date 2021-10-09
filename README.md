@@ -1,11 +1,11 @@
-What is jTable
+What is msTable
 ======
 
-http://www.jtable.org
+
 
 [![A screenshot of jTable](https://raw.githubusercontent.com/hikalkan/jtable/master/screenshot.png)](http://jtable.org/)
 
-jTable is a jQuery plugin used to create AJAX based CRUD tables without coding HTML or Javascript. It has several features including:
+msTable is a jQuery plugin (forked from jTable with more features added) used to create AJAX based CRUD tables without coding HTML or Javascript. It has several features including:
 
 * Automatically creates HTML table and loads records from server using AJAX.
 * Creates 'create new record' jQueryUI dialog form. When user creates a record, it sends data to server using AJAX and adds the same record to the table in the page.
@@ -24,6 +24,11 @@ jTable is a jQuery plugin used to create AJAX based CRUD tables without coding H
 * It comes with pre-defined color themes.
 * It is not depended on any server side technology.
 * It is platform independed and works on all common browsers.
+
+#### What features msTable has that jTable doesn't ?
+
+* multi columns form for Create and Edit records
+* you can send any fields to row-delete-request POST data (jTable only sends single key field)
 
 Notes
 ======
