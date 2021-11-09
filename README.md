@@ -5,8 +5,7 @@ What is msjTable
 
 [![A screenshot of jTable](https://raw.githubusercontent.com/hikalkan/jtable/master/screenshot.png)](http://jtable.org/)
 
-msjTable is a jQuery plugin (forked from jTable with more features added) used to create AJAX based CRUD tables without coding HTML or Javascript. It has several features including:
-
+#### msjTable is a jQuery plugin forked from jTable, to create AJAX based CRUD tables without coding HTML or Javascript.
 
 #### What features msjTable has that jTable doesn't ?
 
