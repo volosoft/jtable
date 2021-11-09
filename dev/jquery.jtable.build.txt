@@ -5,6 +5,7 @@ add jquery.jtable.utils.js
 add jquery.jtable.forms.js
 add jquery.jtable.creation.js
 add jquery.jtable.editing.js
+add jquery.jtable.preview.js
 add jquery.jtable.deletion.js
 add jquery.jtable.selecting.js
 add jquery.jtable.paging.js
