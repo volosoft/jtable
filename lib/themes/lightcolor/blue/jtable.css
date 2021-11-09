@@ -554,7 +554,7 @@ form.jtable-dialog-form div.jtable-view  {
   max-width : 400px;
 }
 div.jtable-main-container > table.jtable > tbody > tr.jtable-data-row > td > .jtable-view-command-button {
-  background: url('../../metro/report.png') no-repeat;
+  background: url('../../report.png') no-repeat;
   width: 16px;
   height: 16px;
   opacity: 0.4;
