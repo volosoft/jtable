@@ -10,7 +10,7 @@ msjTable is a jQuery plugin (forked from jTable with more features added) used t
 
 #### What features msjTable has that jTable doesn't ?
 
-* Record Preview features
+* Record Preview feature
 * Multi columns form for Create, Edit and Preview dialogs.
 * You can send any required fields to row-delete-request POST data (jTable only sends single key field)
 
