@@ -7,7 +7,7 @@ What is msjTable
 
 #### msjTable is a jQuery plugin forked from jTable, to create AJAX based CRUD tables without coding HTML or Javascript.
 
-#### What features msjTable has that jTable doesn't ?
+#### Additional features of msjTable :
 
 * Record Preview feature
 * Multi columns form for Create, Edit and Preview dialogs.
