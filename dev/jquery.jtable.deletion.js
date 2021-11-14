@@ -369,8 +369,8 @@
                 var fieldName = this._fieldList[i];
                 var field = this.options.fields[fieldName];
 
-                //Do not send this field to server if field delete option is not true
-                if (field.delete == false) {
+                //Do not send this field to server if field delete option is not explicitly set to true
+                if (!field.delete) {
                     continue;
                 }
 
