@@ -9,10 +9,7 @@ What is msjTable
 
 #### Additional features of msjTable :
 
-* Record Preview feature
-* Multi columns form for Create, Edit and Preview dialogs.
-* You can send any required fields to row-delete-request POST data (jTable only sends single key field)
-
+* Record Preview feature :
 ```javascript
 $("#myjtable").jtable({
 ...,
@@ -31,6 +28,11 @@ fields : {
 });
 
 ```
+
+* Multi columns form for Create, Edit and Preview dialogs.
+* You can send any required fields to row-delete-request POST data (jTable only sends single key field)
+
+
 
 
 
