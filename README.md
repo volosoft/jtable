@@ -13,7 +13,7 @@ What is msjTable
 ```javascript
 $("#myjtable").jtable({
 ...,
-recordPreview : true,  // setting recordPreview to true, an view icon will appeare beside edit icon in each row
+recordPreview : true,  // setting recordPreview to true, a view icon will appeare beside edit icon in each row
 ...,
 fields : {
     ...,
