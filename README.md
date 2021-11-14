@@ -33,9 +33,9 @@ fields : {
 ```javascript
 $("#myjtable").jtable({
 ...,
-createFormColumns : 2,
-editFormColumns : 2,
-viewFormColumns : 2,
+createFormColumns : 2,  // set the number of columns in new record dialog
+editFormColumns : 2,  // set the number of columns in edit record dialog
+viewFormColumns : 2,  // set the number of columns in record preview dialog
 ...
 
 });
