@@ -13,7 +13,7 @@ What is msjTable
 ```javascript
 $("#myjtable").jtable({
 ...,
-recordPreview : true,
+recordPreview : true,  // setting recordPreview to true, an view icon will appeare beside edit icon in each row
 ...,
 fields : {
     ...,
@@ -21,7 +21,7 @@ fields : {
                title : 'First name',
                edit : true,
                create : true,
-               preview : true,
+               preview : true, // specify which field you want to be shown in preview dialog
                type : 'text'
                 },
         ...
