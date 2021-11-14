@@ -30,6 +30,17 @@ fields : {
 ```
 
 * Multi columns form for Create, Edit and Preview dialogs.
+```javascript
+$("#myjtable").jtable({
+...,
+createFormColumns : 2,
+editFormColumns : 2,
+viewFormColumns : 2,
+...
+
+});
+```
+
 * You can send any required fields to row-delete-request POST data (jTable only sends single key field)
 
 
