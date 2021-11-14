@@ -13,6 +13,30 @@ What is msjTable
 * Multi columns form for Create, Edit and Preview dialogs.
 * You can send any required fields to row-delete-request POST data (jTable only sends single key field)
 
+```javascript
+$("#myjtable").jtable({
+...,
+recordPreview : true,
+...,
+fields : {
+    ...,
+    first_name : {
+               title : 'First name',
+               edit : true,
+               create : true,
+               preview : true,
+               type : 'text'
+                },
+        ...
+});
+
+```
+
+
+
+
+
+
 Read More about additional features [here](https://m-shaeri.ir/blog/jquery-jtable-awesome-full-featured-plugin-for-crud-table/)
 
 Notes
