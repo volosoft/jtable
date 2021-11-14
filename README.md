@@ -24,7 +24,7 @@ fields : {
                preview : true, // specify which field you want to be shown in preview dialog
                type : 'text'
                 },
-        ...
+    ...
 });
 
 ```
