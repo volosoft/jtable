@@ -1,6 +1,6 @@
 {
-    "name": "jTable",
-    "title": "jTable",
+    "name": "msjTable",
+    "title": "msjTable",
     "description": "A JQuery plugin to create AJAX based CRUD tables (grids). It supports paging, sorting, selecting, master/child tables, show/hide/resize columns, localization, themes and more.",
     "keywords": [
         "ajax",
@@ -14,14 +14,14 @@
     "version": "2.6.0",
     "author": {
         "name": "Halil ibrahim Kalkan",
-		"email": "halil@jtable.org",
+	"email": "halil@jtable.org",
         "url": "http://www.halilibrahimkalkan.com"
     },
     "maintainers": [
         {
-            "name": "Halil ibrahim Kalkan",
-            "email": "hi_kalkan@yahoo.com",
-            "url": "http://www.halilibrahimkalkan.com"
+            "name": "Mostafa Shaeri",
+            
+            "url": "https://m-shaeri.ir"
         }
     ],
     "licenses": [
@@ -30,7 +30,7 @@
             "url": "http://en.wikipedia.org/wiki/MIT_License"
         }
     ],
-    "bugs": "https://github.com/volosoft/jtable/issues",
+    "bugs": "https://github.com/birddevelper/msjtable/issues",
     "homepage": "http://www.jtable.org",
     "docs": "http://jtable.org/Home/Documents",
     "download": "http://jtable.org/Home/Downloads",
