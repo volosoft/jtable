@@ -43,7 +43,19 @@ viewFormColumns : 2,  // set the number of columns in record preview dialog
 
 * You can send any required fields to row-delete-request POST data (jTable only sends single key field)
 
-
+$("#myjtable").jtable({
+...,
+fields : {
+    ...,
+    first_name : {
+               title : 'First name',
+               edit : true,
+               create : true,
+               delete : true, // setting delete option of field to true, sends this field beside key field to delete request.
+               type : 'text'
+                },
+    ...
+});
 
 
 
