@@ -51,7 +51,7 @@ fields : {
                title : 'First name',
                edit : true,
                create : true,
-               delete : true, // setting delete option of field to true, sends this field beside key field to delete request.
+               delete : true, // setting delete option of field to true, sends this field beside key field as parameters to delete request.
                type : 'text'
                 },
     ...
