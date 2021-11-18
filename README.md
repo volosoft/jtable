@@ -42,7 +42,7 @@ viewFormColumns : 2,  // set the number of columns in record preview dialog
 ```
 
 * You can send any required fields to row-delete-request POST data (jTable only sends single key field)
-
+```javascript
 $("#myjtable").jtable({
 ...,
 fields : {
@@ -57,7 +57,7 @@ fields : {
     ...
 });
 
-
+```
 
 
 
