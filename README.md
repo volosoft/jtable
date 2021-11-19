@@ -62,7 +62,7 @@ fields : {
 
 
 
-Read More about additional features [here](https://m-shaeri.ir/blog/jquery-jtable-awesome-full-featured-plugin-for-crud-table/)
+Read More about additional features and its usage [here](https://m-shaeri.ir/blog/jquery-jtable-awesome-full-featured-plugin-for-crud-table/)
 
 Notes
 ======
