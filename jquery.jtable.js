@@ -1,11 +1,11 @@
 ﻿/* 
 
-jTable 2.5.0
+msjTable 2.6.0
 http://www.jtable.org
 
 ---------------------------------------------------------------------------
 
-Copyright (C) 2011-2014 by Halil İbrahim Kalkan (http://www.halilibrahimkalkan.com)
+Copyright (C) 2020-2021 by Mostafa Shaeri (https://www.m-shaeri.ir)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -1551,8 +1551,9 @@ THE SOFTWARE.
 })(jQuery);
 
 
+
 /************************************************************************
-* FORMS extension for jTable (base for edit/create forms)               *
+* FORMS extension for jTable (base for edit/create/preview forms)               *
 *************************************************************************/
 (function ($) {
 
@@ -1583,6 +1584,14 @@ THE SOFTWARE.
                 .addClass('jtable-input-label')
                 .html(this.options.fields[fieldName].inputTitle || this.options.fields[fieldName].title);
         },
+        /* Creates label for an input element.
+        *************************************************************************/
+        _createViewLabelForRecordField: function (fieldName) {
+            //TODO: May create label tag instead of a div.
+            return $('<div />')
+                .addClass('jtable-view-label')
+                .html(this.options.fields[fieldName].title);
+        },
 
         /* Creates an input element according to field type.
         *************************************************************************/
@@ -1598,7 +1607,7 @@ THE SOFTWARE.
 
             //If value if not supplied, use defaultValue of the field
             if (value == undefined || value == null) {
-                value = field.defaultValue;
+            value = field.defaultValue;
             }
 
             //Use custom function if supplied
@@ -1621,6 +1630,7 @@ THE SOFTWARE.
                     .append($input);
             }
 
+
             //Create input according to field type
             if (field.type == 'date') {
                 return this._createDateInputForField(field, fieldName, value);
@@ -1629,7 +1639,7 @@ THE SOFTWARE.
             } else if (field.type == 'password') {
                 return this._createPasswordInputForField(field, fieldName, value);
             } else if (field.type == 'checkbox') {
-                return this._createCheckboxForField(field, fieldName, value);
+                return this._createCheckboxForField(field, fieldName, value, formType);
             } else if (field.options) {
                 if (field.type == 'radiobutton') {
                     return this._createRadioButtonListForField(field, fieldName, value, record, formType);
@@ -1640,6 +1650,64 @@ THE SOFTWARE.
                 return this._createTextInputForField(field, fieldName, value);
             }
         },
+
+        /* Creates an View element according to field type.
+        *************************************************************************/
+        _createViewForRecordField: function (funcParams) {
+        var fieldName = funcParams.fieldName,
+            value = funcParams.value,
+            record = funcParams.record,
+            formType = funcParams.formType,
+            form = funcParams.form;
+
+        //Get the field
+        var field = this.options.fields[fieldName];
+
+        //If value if not supplied, use defaultValue of the field
+        if (value == undefined || value == null) {
+            value = field.defaultViewValue;
+        }
+
+        //Use custom function if supplied
+        if (field.customView) {
+            var $view = $(field.customView({
+                value: value,
+                record: record,
+                formType: formType,
+                form: form
+            }));
+
+            //Add id attribute if does not exists
+            if (!$view.attr('id')) {
+                $view.attr('id', 'View-' + fieldName);
+            }
+
+            //Wrap input element with div
+            return $('<div />')
+                .addClass('jtable-view jtable-custom-view')
+                .append($view);
+        }
+
+
+        //Create input according to field type
+        if (field.type == 'date') {
+            return this._createTextViewForField(field, fieldName, value);
+        } else if (field.type == 'textarea') {
+            return this._createTextViewForField(field, fieldName, value);
+        } else if (field.type == 'password') {
+            return this._createTextViewForField(field, fieldName, value);
+        } else if (field.type == 'checkbox') {
+            return this._createTextViewForCheckboxField(field, fieldName, value,formType);
+        } else if (field.options) {
+            if (field.type == 'radiobutton') {
+                return this._createTextViewForOptions(field, fieldName, value, record, formType);
+            } else {
+                return this._createTextViewForOptions(field, fieldName, value, record, formType);
+            }
+        } else {
+            return this._createTextViewForField(field, fieldName, value);
+        }
+    },
 
         //Creates a hidden input element with given name and value.
         _createInputForHidden: function (fieldName, value) {
@@ -1658,20 +1726,9 @@ THE SOFTWARE.
             if(value != undefined) {
                 $input.val(value);
             }
-
+            
             var displayFormat = field.displayFormat || this.options.defaultDateFormat;
-            var changeMonth = field.changeMonth || this.options.defaultChangeMonth;
-            var changeYear = field.changeYear || this.options.defaultChangeYear;
-            var yearRange = field.yearRange || this.options.defaultYearRange;
-            var maxDate = field.maxDate || this.options.defaultMaxDate;
-
-            $input.datepicker({
-              dateFormat: displayFormat,
-              changeMonth: changeMonth,
-              changeYear: changeYear,
-              yearRange: yearRange,
-              maxDate: maxDate
-            });
+            $input.datepicker({ dateFormat: displayFormat });
             return $('<div />')
                 .addClass('jtable-input jtable-date-input')
                 .append($input);
@@ -1684,7 +1741,7 @@ THE SOFTWARE.
             if (value != undefined) {
                 $textArea.val(value);
             }
-
+            
             return $('<div />')
                 .addClass('jtable-input jtable-textarea-input')
                 .append($textArea);
@@ -1693,11 +1750,11 @@ THE SOFTWARE.
         /* Creates a standart textbox for a field.
         *************************************************************************/
         _createTextInputForField: function (field, fieldName, value) {
-            var $input = $('<input class="' + field.inputClass + '" placeholder="' + field.placeholder + '" id="Edit-' + fieldName + '" type="text" name="' + fieldName + '"></input>');
+            var $input = $('<input class="' + field.inputClass + '" id="Edit-' + fieldName + '" type="text" name="' + fieldName + '"></input>');
             if (value != undefined) {
                 $input.val(value);
             }
-
+            
             return $('<div />')
                 .addClass('jtable-input jtable-text-input')
                 .append($input);
@@ -1706,19 +1763,74 @@ THE SOFTWARE.
         /* Creates a password input for a field.
         *************************************************************************/
         _createPasswordInputForField: function (field, fieldName, value) {
-            var $input = $('<input class="' + field.inputClass + '" placeholder="' + field.placeholder + '" id="Edit-' + fieldName + '" type="password" name="' + fieldName + '"></input>');
+            var $input = $('<input class="' + field.inputClass + '" id="Edit-' + fieldName + '" type="password" name="' + fieldName + '"></input>');
             if (value != undefined) {
                 $input.val(value);
             }
-
+            
             return $('<div />')
                 .addClass('jtable-input jtable-password-input')
                 .append($input);
         },
 
+        /* Creates a standart view span for a field.
+        *************************************************************************/
+        _createTextViewForField: function (field, fieldName, value) {
+            var $view = $('<div class="' + field.viewClass + ' " id="View-' + fieldName + '"  ></div>');
+            if (value != undefined) {
+                $view.html(value);
+            }
+
+            return $('<div />')
+                .addClass('jtable-view jtable-view-text')
+                .append($view);
+        },
+
+        /* Creates a standart view for DropDownBoxs and Radio Options field.
+        *************************************************************************/
+        _createTextViewForOptions: function (field, fieldName, value, record, source ) {
+            var $view = $('<div class="' + field.viewClass + ' " id="View-' + fieldName + '"  ></div>');
+            var options = this._getOptionsForField(fieldName, {
+                record: record,
+                source: source
+            });
+
+            var DisplayValue = this._getOptionsSelectedItem(options,value)
+
+            if (DisplayValue != undefined && DisplayValue != null ) {
+                $view.html(DisplayValue);
+            }
+
+            return $('<div />')
+                .addClass('jtable-view jtable-view-text')
+                .append($view);
+        },
+        /* Creates a view for checkboxfor a field.
+        *************************************************************************/
+        _createTextViewForCheckboxField: function (field, fieldName, value, formType) {
+
+            var $view = $('<div class="' + field.viewClass + ' " id="View-' + fieldName + '"  ></div>');
+            var self = this;
+
+            //If value is undefined, get unchecked state's value
+            if (value == undefined) {
+                value = self._getCheckBoxPropertiesForFieldByState(fieldName, false).Value;
+            }
+            var DisplayValue = self._getCheckBoxTextForFieldByValue(fieldName, value)
+
+            if (DisplayValue != undefined && DisplayValue != null ) {
+                $view.html(DisplayValue);
+            }
+
+            return $('<div />')
+                .addClass('jtable-view jtable-view-text')
+                .append($view);
+
+        },
+
         /* Creates a checkboxfor a field.
         *************************************************************************/
-        _createCheckboxForField: function (field, fieldName, value) {
+        _createCheckboxForField: function (field, fieldName, value, formType) {
             var self = this;
 
             //If value is undefined, get unchecked state's value
@@ -1731,7 +1843,7 @@ THE SOFTWARE.
                 .addClass('jtable-input jtable-checkbox-input');
 
             //Create checkbox and check if needed
-            var $checkBox = $('<input class="' + field.inputClass + '" id="Edit-' + fieldName + '" type="checkbox" name="' + fieldName + '" />')
+            var $checkBox = $('<input class="' + field.inputClass + '" id="Edit-' + fieldName + '" type="checkbox" name="' + fieldName + '"   />')
                 .appendTo($containerDiv);
             if (value != undefined) {
                 $checkBox.val(value);
@@ -1745,6 +1857,8 @@ THE SOFTWARE.
             if (self._getIsCheckBoxSelectedForFieldByValue(fieldName, value)) {
                 $checkBox.attr('checked', 'checked');
             }
+
+
 
             //This method sets checkbox's value and text according to state of the checkbox
             var refreshCheckBoxValueAndText = function () {
@@ -1800,7 +1914,7 @@ THE SOFTWARE.
 
             return $containerDiv;
         },
-
+        
         /* Fills a dropdown list with given options.
         *************************************************************************/
         _fillDropDownListWithOptions: function ($select, options, value) {
@@ -1810,6 +1924,15 @@ THE SOFTWARE.
                     .val(options[i].Value)
                     .appendTo($select);
             }
+        },
+        /* get selected item from given options
+        *************************************************************************/
+        _getOptionsSelectedItem: function (options, value) {
+            for (var i = 0; i < options.length; i++) {
+                if (options[i].Value == value )
+                    return options[i].DisplayText ;
+            }
+            return null;
         },
 
         /* Creates depended values object from given form.
@@ -1859,6 +1982,10 @@ THE SOFTWARE.
                 var $textSpan = $('<span></span>')
                     .html(option.DisplayText)
                     .appendTo($radioButtonDiv);
+
+                if (source = 'view'){
+                    $radioButton.attr('disabled', 'disabled');
+                }
 
                 if (field.setOnTextClick != false) {
                     $textSpan
@@ -1937,7 +2064,7 @@ THE SOFTWARE.
                     }
 
                     var field = self.options.fields[fieldName];
-
+                    
                     //check if this combobox depends on others
                     if (!field.dependsOn) {
                         return;
@@ -2110,7 +2237,7 @@ THE SOFTWARE.
                 autoOpen: false,
                 show: self.options.dialogShowEffect,
                 hide: self.options.dialogHideEffect,
-                width: 'auto',
+                width: self.options.formDialogWidth ? self.options.formDialogWidth : 'auto',
                 minWidth: '300',
                 modal: true,
                 title: self.options.messages.addNewRecord,
@@ -2274,7 +2401,10 @@ THE SOFTWARE.
 
             //Create add new record form
             var $addRecordForm = $('<form id="jtable-create-form" class="jtable-dialog-form jtable-create-form"></form>');
-
+			var ColumnCount=self.options.createFormColumns ? self.options.createFormColumns : 1;
+			var CurrentColumnCount=0;
+			var $CreateFormTable = $('<table class="jtable-input-field-container-grid"/>').appendTo($addRecordForm);
+			var $RowContainer = $('<tr class="jtable-input-field-container-row" />').appendTo($CreateFormTable);
             //Create input elements
             for (var i = 0; i < self._fieldList.length; i++) {
 
@@ -2296,10 +2426,16 @@ THE SOFTWARE.
                     continue;
                 }
 
-                //Create a container div for this input field and add to form
-                var $fieldContainer = $('<div />')
+                //Create a container table cell for this input field and add to form
+                var $fieldContainer = $('<td />')
                     .addClass('jtable-input-field-container')
-                    .appendTo($addRecordForm);
+                    .appendTo($RowContainer);
+                
+                CurrentColumnCount++;
+				if(CurrentColumnCount==ColumnCount)	{
+						$RowContainer=$('<tr class="jtable-input-field-container-row" />').appendTo($CreateFormTable);
+						CurrentColumnCount=0;
+				}
 
                 //Create a label for input
                 $fieldContainer.append(self._createInputLabelForRecordField(fieldName));
@@ -2464,7 +2600,7 @@ THE SOFTWARE.
                 autoOpen: false,
                 show: self.options.dialogShowEffect,
                 hide: self.options.dialogHideEffect,
-                width: 'auto',
+                width: self.options.formDialogWidth ? self.options.formDialogWidth : 'auto',
                 minWidth: '300',
                 modal: true,
                 title: self.options.messages.editRecord,
@@ -2657,7 +2793,10 @@ THE SOFTWARE.
 
             //Create edit form
             var $editForm = $('<form id="jtable-edit-form" class="jtable-dialog-form jtable-edit-form"></form>');
-
+            var ColumnCount=self.options.editFormColumns ? self.options.editFormColumns : 1;
+            var CurrentColumnCount=0;
+            var $EditFormTable = $('<table class="jtable-input-field-container-grid"/>').appendTo($editForm);
+            var $RowContainer = $('<tr class="jtable-input-field-container-row" />').appendTo($EditFormTable);
             //Create input fields
             for (var i = 0; i < self._fieldList.length; i++) {
 
@@ -2688,7 +2827,15 @@ THE SOFTWARE.
                 }
 
                 //Create a container div for this input field and add to form
-                var $fieldContainer = $('<div class="jtable-input-field-container"></div>').appendTo($editForm);
+                var $fieldContainer = $('<td />')
+                    .addClass('jtable-input-field-container')
+                    .appendTo($RowContainer);
+                
+                CurrentColumnCount++;
+				if(CurrentColumnCount==ColumnCount)	{
+						$RowContainer=$('<tr class="jtable-input-field-container-row" />').appendTo($EditFormTable);
+						CurrentColumnCount=0;
+				}
 
                 //Create a label for input
                 $fieldContainer.append(self._createInputLabelForRecordField(fieldName));
@@ -2852,6 +2999,234 @@ THE SOFTWARE.
 
 
 /************************************************************************
+ * VIEW RECORD extension for jTable                                      *
+ *************************************************************************/
+(function ($) {
+
+    //Reference to base object members
+    var base = {
+        _create: $.hik.jtable.prototype._create,
+        _addColumnsToHeaderRow: $.hik.jtable.prototype._addColumnsToHeaderRow,
+        _addCellsToRowUsingRecord: $.hik.jtable.prototype._addCellsToRowUsingRecord
+    };
+
+    //extension members
+    $.extend(true, $.hik.jtable.prototype, {
+
+        /************************************************************************
+         * DEFAULT OPTIONS / EVENTS                                              *
+         *************************************************************************/
+        options: {
+
+            //Events
+            recordUpdated: function (event, data) { },
+            rowUpdated: function (event, data) { },
+
+            //Localization
+            messages: {
+                viewRecord: 'View'
+            }
+        },
+
+        /************************************************************************
+         * PRIVATE FIELDS                                                        *
+         *************************************************************************/
+
+        _$viewDiv: null, //Reference to the viewing dialog div (jQuery object)
+        _$viewingRow: null, //Reference to currently viewing row (jQuery object)
+
+        /************************************************************************
+         * CONSTRUCTOR AND INITIALIZATION METHODS                                *
+         *************************************************************************/
+
+        /* Overrides base method to do viewing-specific constructions.
+        *************************************************************************/
+        _create: function () {
+            base._create.apply(this, arguments);
+
+            if (!this.options.recordPreview) {
+                return;
+            }
+
+            this._createViewDialogDiv();
+        },
+
+        /* Creates and prepares preview dialog div
+        *************************************************************************/
+        _createViewDialogDiv: function () {
+            var self = this;
+
+            //Create a div for dialog and add to container element
+            self._$viewDiv = $('<div></div>')
+                .appendTo(self._$mainContainer);
+
+            //Prepare dialog
+            self._$viewDiv.dialog({
+                autoOpen: false,
+                show: self.options.dialogShowEffect,
+                hide: self.options.dialogHideEffect,
+                width: 'auto',
+                minWidth: '300',
+                modal: true,
+                title: self.options.messages.viewRecord,
+                buttons:
+                    [{  //close button
+                        text: self.options.messages.close,
+                        click: function () {
+                            self._$viewDiv.dialog('close');
+                        }
+                    }],
+                close: function () {
+                    var $viewForm = self._$viewDiv.find('form:first');
+                    self._trigger("formClosed", null, { form: $viewForm, formType: 'edit', row: self._$viewingRow });
+                    $viewForm.remove();
+                }
+            });
+        },
+
+
+
+        /************************************************************************
+         * PUBLIC METHODS                                                        *
+         *************************************************************************/
+
+
+        /************************************************************************
+         * OVERRIDED METHODS                                                     *
+         *************************************************************************/
+
+        /* Overrides base method to add a 'view coomand column cell' to header row.
+        *************************************************************************/
+        _addColumnsToHeaderRow: function ($tr) {
+            base._addColumnsToHeaderRow.apply(this, arguments);
+            if (self.options.recordPreview  == true) {
+                $tr.append(this._createEmptyCommandHeader());
+            }
+        },
+
+        /* Overrides base method to add a 'edit command cell' to a row.
+        *************************************************************************/
+        _addCellsToRowUsingRecord: function ($row) {
+            var self = this;
+            base._addCellsToRowUsingRecord.apply(this, arguments);
+
+
+            // Add View command cell if the viewable option is sef to true
+            if (self.options.recordPreview == true ) {
+                var $span = $('<span></span>').html(self.options.messages.viewRecord);
+                var $button = $('<button title="' + self.options.messages.viewRecord + '"></button>')
+                    .addClass('jtable-command-button jtable-view-command-button')
+                    .append($span)
+                    .click(function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        self._showViewForm($row);
+                    });
+                $('<td></td>')
+                    .addClass('jtable-command-column')
+                    .append($button)
+                    .appendTo($row);
+            }
+
+
+
+        },
+
+
+        /************************************************************************
+         * PRIVATE METHODS                                                       *
+         *************************************************************************/
+
+        /* Shows view form for a row.
+        *************************************************************************/
+        _showViewForm: function ($tableRow) {
+            var self = this;
+            var record = $tableRow.data('record');
+
+            //Create view form
+            var $ViewForm = $('<form id="jtable-view-form" class="jtable-dialog-form jtable-view-form"></form>');
+            var ColumnCount=self.options.viewFormColumns ? self.options.viewFormColumns : 1;
+            var CurrentColumnCount=0;
+            var $ViewFormTable = $('<table class="jtable-view-field-container-grid"/>').appendTo($ViewForm);
+            var $RowContainer = $('<tr class="jtable-view-field-container-row" />').appendTo($ViewFormTable);
+            //Create input fields
+            for (var i = 0; i < self._fieldList.length; i++) {
+
+                var fieldName = self._fieldList[i];
+                var field = self.options.fields[fieldName];
+                var fieldValue = record[fieldName];
+
+
+                //Do not create element for non-viewable fields
+                if (field.view == false) {
+                    continue;
+                }
+
+
+
+                //Create a container div for this input field and add to form
+                var $fieldContainer = $('<td />')
+                    .addClass('jtable-view-field-container')
+                    .appendTo($RowContainer);
+
+                CurrentColumnCount++;
+                if(CurrentColumnCount==ColumnCount)	{
+                    $RowContainer=$('<tr class="jtable-view-field-container-row" />').appendTo($ViewFormTable);
+                    CurrentColumnCount=0;
+                }
+
+                //Create a label for input
+                $fieldContainer.append(self._createViewLabelForRecordField(fieldName));
+
+                //Create input element with it's current value
+                var currentValue = self._getValueForRecordField(record, fieldName);
+                $fieldContainer.append(
+                    self._createViewForRecordField({
+                        fieldName: fieldName,
+                        value: currentValue,
+                        record: record,
+                        formType: 'view',
+                        form: $ViewForm
+                    }));
+            }
+
+            self._makeCascadeDropDowns($ViewForm, record, 'view');
+
+
+
+            //Open dialog
+            self._$viewingRow = $tableRow;
+            self._$viewDiv.clear();
+            self._$viewDiv.append($ViewForm).dialog('open');
+            self._trigger("formCreated", null, { form: $ViewForm, formType: 'view', record: record, row: $tableRow });
+        }
+        ,
+
+
+
+        /* Gets text for a field of a record according to it's type.
+        *************************************************************************/
+        _getValueForRecordField: function (record, fieldName) {
+            var field = this.options.fields[fieldName];
+            var fieldValue = record[fieldName];
+            if (field.type == 'date') {
+                return this._getDisplayTextForDateRecordField(field, fieldValue);
+            } else {
+                return fieldValue;
+            }
+        }
+
+
+        /************************************************************************
+         * EVENT RAISING METHODS                                                 *
+         *************************************************************************/
+
+
+    });
+
+})(jQuery);
+
+/************************************************************************
 * DELETION extension for jTable                                         *
 *************************************************************************/
 (function ($) {
@@ -2951,6 +3326,7 @@ THE SOFTWARE.
                                         self._$deleteRecordDiv.dialog('close');
                                     },
                                     function (message) { //error
+                                        self._$deleteRecordDiv.dialog('close');
                                         self._showError(message);
                                         self._setEnabledOfDialogButton($deleteButton, true, self.options.messages.deleteText);
                                     }
@@ -3215,6 +3591,25 @@ THE SOFTWARE.
 
             var postData = {};
             postData[self._keyField] = self._getKeyValueOfRecord($row.data('record'));
+            
+            //Add additional field to delete request POST 
+            for (var i = 0; i < this._fieldList.length; i++) {
+                var fieldName = this._fieldList[i];
+                var field = this.options.fields[fieldName];
+
+                //Do not send this field to server if field delete option is not explicitly set to true
+                if (!field.delete) {
+                    continue;
+                }
+
+                //Key field is already added to postData
+                if (self._keyField == fieldName) {
+                    continue;
+                } 
+
+                //Add field to postData to be sent to server
+                postData[fieldName] = $row.data('record')[fieldName];
+            }
             
             //deleteAction may be a function, check if it is
             if (!url && $.isFunction(self.options.actions.deleteAction)) {

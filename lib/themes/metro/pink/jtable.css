@@ -493,3 +493,36 @@ div.jtable-busy-message {
   background-color: #7d0085;
   background-position: 8px;
 }
+form.jtable-dialog-form table.jtable-view-field-container-grid {
+	border-spacing: 25px 15px;
+    border-collapse: separate;
+	
+}
+table.jtable-view-field-container-grid tr.jtable-view-field-container-row td.jtable-view-field-container {
+  padding: 2px 0px 3px 0px;
+  border-bottom: 1px solid #ddd;
+}
+
+form.jtable-dialog-form table.jtable-view-field-container-grid tr.jtable-view-field-container-row:last-child td.jtable-view-field-container {
+  border: none;
+}
+
+form.jtable-dialog-form table.jtable-view-field-container-grid div.jtable-view-label {
+  padding: 3px 3px;
+  font-size: 1.1em;
+  font-weight:bold;
+  color: #666;
+}
+form.jtable-dialog-form div.jtable-view  {
+  padding: 4px;
+  max-width : 400px;
+}
+div.jtable-main-container > table.jtable > tbody > tr.jtable-data-row > td > .jtable-view-command-button {
+  background: url('../../metro/report.png') no-repeat;
+  width: 16px;
+  height: 16px;
+  opacity: 0.4;
+}
+div.jtable-main-container > table.jtable > tbody > tr.jtable-data-row > td > .jtable-view-command-button:hover {
+  opacity: 0.8;
+}
